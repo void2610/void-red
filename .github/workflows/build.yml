@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 # Run名をコミットメッセージに設定
-run-name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.commit.message || github.event.head_commit.message || 'Manual run' }}
+run-name: ${{ github.event.head_commit.message || 'Manual run' }}
 
 permissions:
   contents: write    # リポジトリの内容をプッシュする権限
@@ -67,7 +67,6 @@ jobs:
           buildName:      build
           # ビルド時間短縮のための設定
           customParameters: |
-            -quit
             -batchmode
             -nographics
 
