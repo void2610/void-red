@@ -1,8 +1,8 @@
-<!-- I want to review in Japanese. -->
-<!-- 
+I want to review in Japanese.
+
 .csファイルのコードレビュー時は以下の命名規則をチェックしてください：
 
-**PascalCase（全ての英単語の1文字目を大文字）:**
+**クラス名, メソッド名, プライベートではないフィールド, Enum PascalCase（全ての英単語の1文字目を大文字）:**
 - public class TestClass{}
 - private void TestMethod(){}
 - protected int TestField = 0;
@@ -24,9 +24,5 @@
 
 **インターフェース: IPascalCase（大文字アイの後にPascalCase）:**
 - public interface ITestInterface(){}
--->
 
-## 実装内容
-- aの実装
-- bの実装
-<!-- I want to review in Japanese. -->
+I want to review in Japanese.
