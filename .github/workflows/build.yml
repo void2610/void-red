@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 # Run名をコミットメッセージに設定
-run-name: ${{ github.event.head_commit.message || 'Manual run' }}
+run-name: ${{ github.event_name == 'pull_request' && github.event.pull_request.title || github.event.head_commit.message || github.event.commits[0].message || format('Run #{0}', github.run_number) }}
 
 permissions:
   contents: write    # リポジトリの内容をプッシュする権限
