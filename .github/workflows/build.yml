@@ -130,7 +130,9 @@ jobs:
   discord:
     name: Notify Discord 🤖
     runs-on: ubuntu-latest
-    needs: [build, preview]
+    needs: build
+    # PRの場合は初回作成時のみ通知
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     steps:
       - name: Notify Discord 🚨
         env:
@@ -146,5 +148,5 @@ jobs:
             URL="https://void2610.github.io/bsgj2025-team5/$REF_DIR/merge/$REF_DIR/merge/"
           fi
           curl -X POST -H "Content-Type: application/json" -d "{
-            \"content\": \"🔥 ビルド完了: <${URL}>\n💬 タイトル: ${COMMIT_MESSAGE}\n👤 作成者: ${GITHUB_ACTOR}\n🌲ブランチ: ${BRANCH}\"
+            \"content\": \"💬 タイトル ${COMMIT_MESSAGE}: <${URL}>\n🔥 ビルド結果\n👤 作成者: ${GITHUB_ACTOR}\n🌲ブランチ: ${BRANCH}\"
           }" $DISCORD_WEBHOOK_URL
