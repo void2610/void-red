@@ -1,25 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Library List</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-<div style="padding: 20px; margi: 100px;">
+このUnityプロジェクトが利用しているライブラリ一覧(詳細)です。
 
 
-<h1>Library List</h1>
-Thanks for the useful library
-<hr>
+更新日時：2025/06/22_19:49:27
+
+
+-------
+## LicenseMaster
+### メモ１：
+
+```
+Unity Editor extension for managing library licenses
+```
 
 
 
-<hr>
-<h2>LicenseMaster</h2>
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/syskentokyo/unitylicensemaster
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2024 SyskenTokyo
@@ -27,15 +43,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>LitMotion</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## LitMotion
+### メモ１：
+
+```
+Lightning-fast and Zero Allocation Tween Library for Unity
+```
+
+
+
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/AnnulusGames/LitMotion
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2023 Yusuke Nakada
@@ -43,15 +89,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>NuGetForUnity</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## NuGetForUnity
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:13:18
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/GlitchEnzo/NuGetForUnity
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -75,15 +151,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>R3</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## R3
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:05:44
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/Cysharp/R3
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -107,15 +213,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>UI Effect</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## UI Effect
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_11:53:34
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/mob-sakai/UIEffect
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 Copyright 2017-2024 mob-sakai
 
@@ -125,15 +261,45 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>UniTask</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## UniTask
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2025/01/05_22:01:14
+* ライセンス：MIT
+* 料金タイプ：Unknown
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 The MIT License (MIT)
 
@@ -157,15 +323,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>unityroom-client-library</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## unityroom-client-library
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:05:44
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/naichilab/unityroom-client-library
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -189,15 +385,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>Unity Toolbar Extender</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## Unity Toolbar Extender
+### メモ１：
+
+```
+Extends the Unity Toolbar with your custom Editor GUI code
+```
+
+
+
+* 追加日：2025/06/17_12:00:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/marijnz/unity-toolbar-extender
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2018 Marijn Zwemmer
@@ -205,15 +431,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>Unmask For UGUI</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## Unmask For UGUI
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_11:53:34
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/mob-sakai/UnmaskForUGUI
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 Copyright 2018 mob-sakai
 
@@ -223,15 +479,45 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>VContainer</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## VContainer
+### メモ１：
+
+```
+A fast DI (Dependency Injection) library running on Unity Game Engine
+```
+
+
+
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：1.16.9
+
+
+* WebURL1：https://github.com/hadashiA/VContainer
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2020 hadashiA
@@ -239,15 +525,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>LicenseMaster</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## LicenseMaster
+### メモ１：
+
+```
+Unity Editor extension for managing library licenses
+```
+
+
+
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/syskentokyo/unitylicensemaster
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2024 SyskenTokyo
@@ -255,15 +571,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>LitMotion</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## LitMotion
+### メモ１：
+
+```
+Lightning-fast and Zero Allocation Tween Library for Unity
+```
+
+
+
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/AnnulusGames/LitMotion
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2023 Yusuke Nakada
@@ -271,15 +617,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>NuGetForUnity</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## NuGetForUnity
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:13:18
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/GlitchEnzo/NuGetForUnity
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -303,15 +679,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>R3</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## R3
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:05:44
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/Cysharp/R3
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -335,15 +741,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>UI Effect</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## UI Effect
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_11:53:34
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/mob-sakai/UIEffect
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 Copyright 2017-2024 mob-sakai
 
@@ -353,15 +789,45 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>UniTask</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## UniTask
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2025/01/05_22:01:14
+* ライセンス：MIT
+* 料金タイプ：Unknown
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 The MIT License (MIT)
 
@@ -385,15 +851,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>unityroom-client-library</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## unityroom-client-library
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_10:05:44
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/naichilab/unityroom-client-library
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -417,15 +913,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>Unity Toolbar Extender</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## Unity Toolbar Extender
+### メモ１：
+
+```
+Extends the Unity Toolbar with your custom Editor GUI code
+```
+
+
+
+* 追加日：2025/06/17_12:00:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/marijnz/unity-toolbar-extender
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2018 Marijn Zwemmer
@@ -433,15 +959,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>Unmask For UGUI</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## Unmask For UGUI
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2024/12/06_11:53:34
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：None
+
+
+* WebURL1：https://github.com/mob-sakai/UnmaskForUGUI
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 Copyright 2018 mob-sakai
 
@@ -451,15 +1007,45 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>VContainer</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## VContainer
+### メモ１：
+
+```
+A fast DI (Dependency Injection) library running on Unity Game Engine
+```
+
+
+
+* 追加日：2025/06/16_18:30:00
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：1.16.9
+
+
+* WebURL1：https://github.com/hadashiA/VContainer
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 Copyright (c) 2020 hadashiA
@@ -467,15 +1053,45 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-<h2>LicenseMaster</h2>
 
-<div style="padding: 20px; margin-bottom: 30px; border: 1px dotted #333333; border-radius: 5px;">
-<p style="white-space : pre-wrap;">
+-------
+## LicenseMaster
+### メモ１：
+
+```
+
+```
+
+
+
+* 追加日：2023/04/14_01:32:26
+* ライセンス：MIT
+* 料金タイプ：Free
+* ライセンス表記が必要？：True
+* チームメンバーごとにライセンス購入が必要か？：False
+* チームメンバー全員が把握する必要があるライブラリか？：False
+
+
+* バージョン：1.8.0
+
+
+* WebURL1：https://github.com/syskentokyo/unitylicensemaster
+* WebURL2：
+* 使用しているライブラリ
+
+
+* カスタム１：
+* カスタム2：
+
+### ライセンス表記内容：
+
+```
 
 MIT License
 
@@ -500,11 +1116,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-</p>
+```
 
-</div>
+---------------------------------------
+---------------------------------------
+---------------------------------------
 
-<hr>
-</div>
-</body>
-</html>
+
+-------

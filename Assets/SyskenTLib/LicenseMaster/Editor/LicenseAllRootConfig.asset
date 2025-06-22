@@ -13,11 +13,27 @@ MonoBehaviour:
   m_Name: LicenseAllRootConfig
   m_EditorClassIdentifier: 
   _licenseAllConfigList:
-  - {fileID: 11400000, guid: 8ac4e3dc9578e470db3ec4cf07435606, type: 2}
-  - {fileID: 11400000, guid: 1879b0ced03764f2f8e9ed77290ca1bd, type: 2}
-  - {fileID: 11400000, guid: 7bfe2ce4a53c1436094fd46c905cf508, type: 2}
+  - {fileID: 11400000, guid: 2743522e044b14249bb45bf75e1573b0, type: 2}
+  - {fileID: 11400000, guid: 508982d65e389416a93810942ee8e544, type: 2}
+  - {fileID: 11400000, guid: e6d8bbf3bd561449cb9f71f056cebf30, type: 2}
+  - {fileID: 11400000, guid: 83dbb2da363674b66a4e4ea352a7e700, type: 2}
+  - {fileID: 11400000, guid: 7e0bc815f7c054537b0c6fdeb6a93e33, type: 2}
+  - {fileID: 11400000, guid: f09225f2a75c44a57a803a31f554ed26, type: 2}
+  - {fileID: 11400000, guid: 5f40a3c93aff24561a1a3f9bc546f484, type: 2}
+  - {fileID: 11400000, guid: fc74658f373e54a16bb49fe36d5bfba7, type: 2}
+  - {fileID: 11400000, guid: 2f08aef559bdb44d19a7a9b274cdcdac, type: 2}
+  - {fileID: 11400000, guid: 3b631b7ece0da448cb29605dd03c81c2, type: 2}
+  - {fileID: 11400000, guid: af07958166eb4c5d974332b60fd408e0, type: 2}
+  - {fileID: 11400000, guid: ea0eabaf0cd54169bb46fd39f953e1cc, type: 2}
+  - {fileID: 11400000, guid: 4a831785c417c4f73b6ad05c9f94cee4, type: 2}
+  - {fileID: 11400000, guid: 89078cdaf5ecc49888e895a42b35984d, type: 2}
+  - {fileID: 11400000, guid: 34653998762f14eb683569764cb63804, type: 2}
+  - {fileID: 11400000, guid: f336f34f0c36a467cb57bae41ded11a4, type: 2}
+  - {fileID: 11400000, guid: f8cec9598125241aaa98881858af79ab, type: 2}
+  - {fileID: 11400000, guid: 7d3e4f8a9b2c4e5498f7a8b9c0d1e2f3, type: 2}
+  - {fileID: 11400000, guid: 86375f5d4ab234c4dbc49fbcd697f8b6, type: 2}
+  - {fileID: 11400000, guid: 8b3d95c124f448fe9b26ed5003b8fcad, type: 2}
   - {fileID: 11400000, guid: 61c848b1adb1d4b8ea34c966ce58d2ec, type: 2}
-  - {fileID: 11400000, guid: bf6b3081cec264af4a322d41bca4130f, type: 2}
   _licenseHtml: {fileID: 4900000, guid: 3cde6c1e6e07494f99302e5987578f90, type: 3}
   _licenseMarkdown: {fileID: 4900000, guid: d26c5da25f6547edb2caa1afd56ac64d, type: 3}
   _licenseRawTxt: {fileID: 4900000, guid: ba4625cd84c94b4e9a266501c28b95bf, type: 3}
