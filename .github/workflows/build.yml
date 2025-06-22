@@ -65,10 +65,6 @@ jobs:
           allowDirtyBuild: true
           buildsPath:     CIBuilds
           buildName:      build
-          # ビルド時間短縮のための設定
-          customParameters: |
-            -batchmode
-            -nographics
 
       - name: Prepare artifact for deployment 🎯
         run: |
