@@ -13,7 +13,6 @@ namespace void2610.UnityTemplate.Tutorials
         // 外部に公開する場合は、ReadOnlyReactiveProperty<T>にキャストすると、外部から値を変更できないが、Subscribeと値の取得はできる
         public ReadOnlyReactiveProperty<int> PlayerHp =>_playerHp;  
 
-        
         private void OnValueChanged(int newValue)
         {
             Debug.Log($"player hp changed A: {newValue}");
@@ -27,7 +26,6 @@ namespace void2610.UnityTemplate.Tutorials
             // こんな感じで、アロー演算子を使った匿名関数も使える
             _playerHp.Subscribe(newValue => Debug.Log($"player hp changed B: {newValue}"));
             
-            
             // ForceNotifyを使うと、値の変更がなくても、強制的に通知を行える
             _playerHp.ForceNotify();
         }
@@ -36,7 +34,7 @@ namespace void2610.UnityTemplate.Tutorials
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                // Valueプロパティを使って値を取得・設定する
+                // Valueプロパティを使って値を取得したり設定したりする
                 _playerHp.Value++;
             }
         }

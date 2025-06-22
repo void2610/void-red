@@ -47,7 +47,8 @@ namespace void2610.UnityTemplate.Tutorials
             WaitAndPrint("Goodbye, UniTask!").Forget();
             
             // 非同期関数から帰ってきた値を使うこともできる
-            Debug.Log(await WaitAndReturn(100));
+            var result = await WaitAndReturn(42);
+            Debug.Log($"Returned value: {result}");
 
             // これはawaitできないのでエラーになる
             // await WaitAndPrintVoid("Hello, UniTask!");

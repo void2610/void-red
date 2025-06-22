@@ -53,9 +53,5 @@ namespace void2610.UnityTemplate.Tutorials
                 .BindToLocalScale(object4) // object3の大きさに紐づけ
                 .AddTo(this.gameObject);
         }
-
-        private void Update()
-        {
-        }
     }
 }

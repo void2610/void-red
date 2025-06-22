@@ -27,6 +27,7 @@ namespace void2610.UnityTemplate.Tutorials
                     .WithEase(Ease.OutQuad)
                     .BindToTMPCharColor(text, i)
                     .AddTo(this.gameObject);
+                //   ↑ このAddTo(this.gameObject)は、MonoBehaviourのライフサイクルに合わせて自動でTweenを停止する
         
                 // スケールのアニメーション（0から1へ）
                 LMotion.Create(Vector3.zero, Vector3.one, 1f)

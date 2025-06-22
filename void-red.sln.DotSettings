@@ -25,8 +25,14 @@
 	<s:Boolean x:Key="/Default/CodeInspection/NamespaceProvider/NamespaceFoldersToSkip/=Assets_005CSamples_005CVContainer/@EntryIndexedValue">True</s:Boolean>
 	
 	<!-- 名前空間インスペクションの設定 -->
-	<!-- 空の名前空間を許可する -->
-	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CheckNamespace/@EntryIndexedValue">False</s:Boolean>
-	<!-- または重要度を下げる場合は以下を使用 -->
-	<!-- <s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CheckNamespace/@EntryIndexedValue">DO_NOT_SHOW</s:String> -->
+
+	<!-- CheckNamespace インスペクションを完全に無効化 -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CheckNamespace/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	
+	<!-- ルート名前空間を空に設定 -->
+	<s:String x:Key="/Default/CodeEditing/CSharp/FileLayoutPatterns/Pattern/@EntryValue"></s:String>
+	<s:Boolean x:Key="/Default/CodeEditing/CSharp/NAMESPACE_BODY/@EntryValue">False</s:Boolean>
+	
+	<!-- 名前空間の自動生成を無効化 -->
+	<s:Boolean x:Key="/Default/CodeEditing/CSharp/GENERATE_NAMESPACE_USING_FOLDER_NAME/@EntryValue">False</s:Boolean>
 </wpf:ResourceDictionary>
