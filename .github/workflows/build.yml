@@ -6,9 +6,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Run名をコミットメッセージに設定
-run-name: "${{ github.event.head_commit.message || 'Build Run' }}"
-
 permissions:
   contents: write    # リポジトリの内容をプッシュする権限
   pages: write       # GitHub Pages ブランチへの書き込み権限
