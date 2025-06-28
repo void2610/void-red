@@ -21,7 +21,11 @@ public abstract class BasePlayer : MonoBehaviour
     // 選択中のカード
     protected readonly ReactiveProperty<Card> selectedCard = new (null);
     
+    // 精神力（MP）
+    protected readonly ReactiveProperty<int> mentalPower = new (20);
+    
     public ReadOnlyReactiveProperty<Card> SelectedCard => selectedCard;
+    public ReadOnlyReactiveProperty<int> MentalPower => mentalPower;
     
     protected virtual void Awake()
     {
@@ -102,6 +106,38 @@ public abstract class BasePlayer : MonoBehaviour
     protected virtual void OnCardSelected(Card card)
     {
         selectedCard.Value = card;
+    }
+    
+    /// <summary>
+    /// 精神力を消費する
+    /// </summary>
+    /// <param name="amount">消費する精神力</param>
+    /// <returns>消費に成功したかどうか</returns>
+    public virtual bool ConsumeMentalPower(int amount)
+    {
+        if (mentalPower.Value < amount) return false;
+        
+        mentalPower.Value -= amount;
+        return true;
+    }
+    
+    /// <summary>
+    /// 精神力を回復する
+    /// </summary>
+    /// <param name="amount">回復する精神力</param>
+    public virtual void RestoreMentalPower(int amount)
+    {
+        mentalPower.Value = Mathf.Min(mentalPower.Value + amount, 20); // 最大20まで
+    }
+    
+    /// <summary>
+    /// 指定した精神ベットが可能かチェック
+    /// </summary>
+    /// <param name="betAmount">精神ベット値</param>
+    /// <returns>ベット可能かどうか</returns>
+    public virtual bool CanMentalBet(int betAmount)
+    {
+        return mentalPower.Value >= betAmount;
     }
     
     /// <summary>

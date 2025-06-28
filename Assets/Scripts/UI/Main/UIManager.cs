@@ -27,6 +27,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     [SerializeField] private Button mentalBetPlusButton;
     [SerializeField] private Button mentalBetMinusButton;
     [SerializeField] private TextMeshProUGUI mentalBetValueText;
+    
+    [Header("精神力表示")]
+    [SerializeField] private TextMeshProUGUI mentalPowerText;
 
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_OUT_DURATION = 0.3f;
@@ -225,8 +228,16 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     {
         mentalBetValueText.text = _mentalBetValue.ToString();
         
-        // ボタンの有効/無効を切り替え
-        mentalBetPlusButton.interactable = (_mentalBetValue < MAX_MENTAL_BET);
+        // プレイヤーの現在の精神力を取得
+        var player = FindFirstObjectByType<Player>();
+        var currentMentalPower = player ? player.MentalPower.CurrentValue : MAX_MENTAL_BET;
+        
+        // 精神力表示を更新
+        if (mentalPowerText)
+            mentalPowerText.text = $"精神力: {currentMentalPower}";
+        
+        // ボタンの有効/無効を切り替え（精神力制限も考慮）
+        mentalBetPlusButton.interactable = (_mentalBetValue < MAX_MENTAL_BET && _mentalBetValue < currentMentalPower);
         mentalBetMinusButton.interactable = (_mentalBetValue > MIN_MENTAL_BET);
     }
     
@@ -260,6 +271,16 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public int GetMentalBetValue()
     {
         return _mentalBetValue;
+    }
+    
+    private void Start()
+    {
+        // プレイヤーの精神力変化を監視
+        var player = FindFirstObjectByType<Player>();
+        if (player)
+        {
+            player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(this);
+        }
     }
     
     protected override void Awake()

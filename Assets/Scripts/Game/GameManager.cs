@@ -130,6 +130,16 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // プレイヤーの手を作成
         var playStyle = UIManager.Instance.GetSelectedPlayStyle();
         var mentalBet = UIManager.Instance.GetMentalBetValue();
+        
+        // 精神力チェックと消費
+        if (!player.CanMentalBet(mentalBet))
+        {
+            await UIManager.Instance.ShowAnnouncement("精神力が不足しています！", 2.0f);
+            return; // プレイボタンの処理を中断
+        }
+        
+        // 精神力を消費
+        player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(selectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
@@ -167,7 +177,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         {
             // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
             var npcPlayStyle = (PlayStyle)Random.Range(0, 3);
-            var npcMentalBet = Random.Range(1, 6);
+            var npcMentalBet = Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
+            
+            // NPCの精神力を消費
+            enemy.ConsumeMentalPower(npcMentalBet);
             _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
             
             // NPCの選択を表示
