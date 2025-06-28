@@ -154,5 +154,5 @@ jobs:
             URL="https://void2610.github.io/void-red/$REF_DIR/merge/$REF_DIR/merge/"
           fi
           curl -X POST -H "Content-Type: application/json" -d "{
-            \"content\": \"💬 タイトル ${COMMIT_MESSAGE}: <${URL}>\n🔥 ビルド結果\n👤 作成者: ${GITHUB_ACTOR}\n🌲ブランチ: ${BRANCH}\"
+            \"content\": \"💬 タイトル: ${COMMIT_MESSAGE} \n🔥 ビルド結果: <${URL}> \n👤 作成者: ${GITHUB_ACTOR} \n🌲ブランチ: ${BRANCH}\"
           }" $DISCORD_WEBHOOK_URL

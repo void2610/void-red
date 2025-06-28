@@ -22,6 +22,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
     
+    // 実行中フラグ（重複実行防止）
+    private bool _isProcessing = false;
+    
     // プロパティ
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
@@ -62,12 +65,15 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         switch (newState)
         {
             case GameState.ThemeAnnouncement:
+                _isProcessing = false; // フラグリセット
                 HandleThemeAnnouncement();
                 break;
             case GameState.PlayerCardSelection:
+                _isProcessing = false; // フラグリセット
                 HandlePlayerCardSelection();
                 break;
             case GameState.EnemyCardSelection:
+                _isProcessing = false; // フラグリセット
                 HandleEnemyCardSelection();
                 break;
             case GameState.Evaluation:
@@ -160,22 +166,18 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         
         // AIでカードを選択
         var npcCard = enemy.SelectCardByAI();
+        // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
+        var npcPlayStyle = (PlayStyle)Random.Range(0, 3);
+        var npcMentalBet = Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
-        if (npcCard)
-        {
-            // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
-            var npcPlayStyle = (PlayStyle)Random.Range(0, 3);
-            var npcMentalBet = Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
-            
-            // NPCの精神力を消費
-            enemy.ConsumeMentalPower(npcMentalBet);
-            _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
-            
-            // NPCの選択を表示
-            await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
-            // 少し間を置いてから評価フェーズに移行
-            await UniTask.Delay(500);
-        }
+        // NPCの精神力を消費
+        enemy.ConsumeMentalPower(npcMentalBet);
+        _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+        
+        // NPCの選択を表示
+        await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
+        // 少し間を置いてから評価フェーズに移行
+        await UniTask.Delay(500);
         
         // 評価フェーズへ
         ChangeState(GameState.Evaluation);
@@ -186,6 +188,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleEvaluation()
     {
+        if (_isProcessing) return; // 既に処理中の場合はスキップ
         EvaluationAsync(_playerMove, _npcMove).Forget();
     }
     
@@ -194,6 +197,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private async UniTask EvaluationAsync(PlayerMove playerMove, PlayerMove npcMove)
     {
+        _isProcessing = true; // 処理開始フラグ
+        
         // 評価中のアナウンス
         await UIManager.Instance.ShowAnnouncement("カードを評価中...", 0.5f);
         
@@ -208,6 +213,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
+        _isProcessing = false; // フラグリセット
         ChangeState(GameState.ResultDisplay);
     }
     
@@ -216,6 +222,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleResultDisplay()
     {
+        if (_isProcessing) return; // 既に処理中の場合はスキップ
         ResultDisplayAsync().Forget();
     }
     
@@ -224,6 +231,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private async UniTask ResultDisplayAsync()
     {
+        _isProcessing = true; // 処理開始フラグ
+        
         // スコアで勝敗判定（スコアが高い方が勝利）
         var playerScore = _playerMove.GetScore(_currentTheme.CurrentValue);
         var npcScore = _npcMove.GetScore(_currentTheme.CurrentValue);
@@ -245,6 +254,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(2000);
+        _isProcessing = false; // フラグリセット
         ChangeState(GameState.ThemeAnnouncement);
     }
     
