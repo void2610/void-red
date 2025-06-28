@@ -142,4 +142,12 @@ public abstract class BasePlayer : MonoBehaviour
         // 手札からカードを削除
         hand.RemoveCard(selectedCard);
     }
+    
+    /// <summary>
+    /// 手札のインタラクト可能状態を設定
+    /// </summary>
+    public virtual void SetHandInteractable(bool interactable)
+    {
+        hand.SetInteractable(interactable);
+    }
 }

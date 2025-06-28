@@ -52,6 +52,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         await UniTask.Delay(200);
         enemy.DrawCard(5);
         
+        // エネミーのカードを非インタラクティブに設定
+        enemy.SetHandInteractable(false);
+        
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement);
     }

@@ -23,6 +23,7 @@ public class Hand : MonoBehaviour
     [Header("配置設定")]
     [SerializeField] private float cardSpacing = 150f; // カード間の間隔
     [SerializeField] private float cardAngle = 5f; // カードの角度
+    [SerializeField] private bool isInteractable = true; // カードが選択可能かどうか
     
     // 手札のカードリスト
     private readonly ReactiveProperty<List<Card>> _cards = new(new List<Card>());
@@ -38,6 +39,23 @@ public class Hand : MonoBehaviour
     public ReadOnlyReactiveProperty<List<Card>> Cards => _cards;
     public ReadOnlyReactiveProperty<Card> SelectedCard => _selectedCard;
     public int Count => _cards.Value.Count;
+    
+    /// <summary>
+    /// カードのインタラクト可能状態を設定
+    /// </summary>
+    public void SetInteractable(bool interactable)
+    {
+        isInteractable = interactable;
+        
+        // 既存のカードにも適用
+        foreach (var card in _cards.Value)
+        {
+            if (card && card.TryGetComponent<Button>(out var button))
+            {
+                button.interactable = interactable;
+            }
+        }
+    }
     
     /// <summary>
     /// カードを手札に追加（アニメーション付き）
@@ -162,9 +180,15 @@ public class Hand : MonoBehaviour
         var cardObject = Instantiate(cardPrefab, handContainer);
         cardObject.Init(cardData);
         
-        // カードクリックイベントを登録
+        // カードクリックイベントを登録（インタラクト可能な場合のみ）
         if (cardObject.TryGetComponent<Button>(out var button))
-            button.onClick.AddListener(() => SelectCard(cardObject));
+        {
+            button.interactable = isInteractable;
+            if (isInteractable)
+            {
+                button.onClick.AddListener(() => SelectCard(cardObject));
+            }
+        }
         
         return cardObject;
     }
@@ -294,14 +318,6 @@ public class Hand : MonoBehaviour
     }
     
     /// <summary>
-    /// 手札を扇状に配置（同期版）
-    /// </summary>
-    private void ArrangeCards()
-    {
-        ArrangeCardsAsync().Forget();
-    }
-    
-    /// <summary>
     /// カードのハイライト表示
     /// </summary>
     public void HighlightCard(Card card, bool highlight)
@@ -309,14 +325,8 @@ public class Hand : MonoBehaviour
         if (!card) return;
         
         var rectTransform = card.GetComponent<RectTransform>();
-        if (rectTransform)
-        {
             // 元のY位置を取得（記憶されていない場合は0）
-            float originalY = _originalYPositions.ContainsKey(card) ? _originalYPositions[card] : 0f;
-            
-            // デバッグログ
-            Debug.Log($"HighlightCard: {card.name}, highlight: {highlight}, originalY: {originalY}, currentY: {rectTransform.anchoredPosition.y}");
-            
+            var originalY = _originalYPositions.TryGetValue(card, out var position) ? position : 0f;
             // 選択時は少し上に移動、非選択時は元の位置に戻る
             var currentPos = rectTransform.anchoredPosition;
             var targetPos = new Vector2(currentPos.x, highlight ? originalY + 30f : originalY);
@@ -326,6 +336,6 @@ public class Hand : MonoBehaviour
                 .WithEase(Ease.OutCubic)
                 .BindToAnchoredPosition(rectTransform)
                 .AddTo(card.gameObject);
-        }
+            SeManager.Instance.PlaySe("Card");
     }
 }

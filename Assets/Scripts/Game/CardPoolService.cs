@@ -18,6 +18,7 @@ public class CardPoolService
     public CardPoolService(AllCardDataList allCardDataList)
     {
         _allCardDataList = allCardDataList;
+        _allCardDataList.RegisterAllCards(); // 全カードを登録
         _availableCards = new List<CardData>(_allCardDataList.CardList);
     }
     
