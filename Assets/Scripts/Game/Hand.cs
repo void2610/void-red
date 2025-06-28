@@ -102,13 +102,21 @@ public class Hand : MonoBehaviour
     /// </summary>
     public void RemoveCard(Card card)
     {
-        RemoveCardAsync(card).Forget();
+        RemoveCardAsync(card, false).Forget();
+    }
+    
+    /// <summary>
+    /// カードを手札から削除（崩壊演出）
+    /// </summary>
+    public void CollapseCard(Card card)
+    {
+        RemoveCardAsync(card, true).Forget();
     }
     
     /// <summary>
     /// カードを手札から削除（アニメーション付き）
     /// </summary>
-    private async UniTask RemoveCardAsync(Card card)
+    private async UniTask RemoveCardAsync(Card card, bool isCollapse)
     {
         if (!_cards.Value.Contains(card)) return;
         
@@ -120,27 +128,62 @@ public class Hand : MonoBehaviour
         // 元の位置情報も削除
         _originalYPositions.Remove(card);
         
-        // カードの削除アニメーション
+        // カードのアニメーション
         var rectTransform = card.GetComponent<RectTransform>();
         if (rectTransform)
         {
-            // 上に移動しながらスケール縮小
-            var currentPos = rectTransform.anchoredPosition;
-            var targetPos = new Vector2(currentPos.x, currentPos.y + 100f);
-            
-            var moveTask = LMotion.Create(currentPos, targetPos, 0.3f)
-                .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(rectTransform)
-                .AddTo(card.gameObject)
-                .ToUniTask();
+            if (isCollapse)
+            {
+                // 崩壊アニメーション：ランダムな方向に飛び散りながら回転
+                var randomDirection = new Vector2(
+                    UnityEngine.Random.Range(-200f, 200f),
+                    UnityEngine.Random.Range(100f, 300f)
+                );
+                var currentPos = rectTransform.anchoredPosition;
+                var targetPos = currentPos + randomDirection;
                 
-            var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.5f, 0.3f)
-                .WithEase(Ease.InCubic)
-                .BindToLocalScale(rectTransform)
-                .AddTo(card.gameObject)
-                .ToUniTask();
+                var moveTask = LMotion.Create(currentPos, targetPos, 0.5f)
+                    .WithEase(Ease.OutCubic)
+                    .BindToAnchoredPosition(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                    
+                var startRotation = rectTransform.rotation;
+                var targetRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-360f, 360f));
+                var rotateTask = LMotion.Create(startRotation, targetRotation, 0.5f)
+                    .WithEase(Ease.OutCubic)
+                    .BindToRotation(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                    
+                var scaleTask = LMotion.Create(Vector3.one, Vector3.zero, 0.5f)
+                    .WithEase(Ease.InCubic)
+                    .BindToLocalScale(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                    
+                await UniTask.WhenAll(moveTask, rotateTask, scaleTask);
+            }
+            else
+            {
+                // 通常の削除アニメーション：上に移動しながらスケール縮小
+                var currentPos = rectTransform.anchoredPosition;
+                var targetPos = new Vector2(currentPos.x, currentPos.y + 100f);
                 
-            await UniTask.WhenAll(moveTask, scaleTask);
+                var moveTask = LMotion.Create(currentPos, targetPos, 0.3f)
+                    .WithEase(Ease.InCubic)
+                    .BindToAnchoredPosition(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                    
+                var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.5f, 0.3f)
+                    .WithEase(Ease.InCubic)
+                    .BindToLocalScale(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                    
+                await UniTask.WhenAll(moveTask, scaleTask);
+            }
         }
         
         // カードオブジェクトを破棄
@@ -325,8 +368,11 @@ public class Hand : MonoBehaviour
         if (!card) return;
         
         var rectTransform = card.GetComponent<RectTransform>();
+        if (rectTransform)
+        {
             // 元のY位置を取得（記憶されていない場合は0）
             var originalY = _originalYPositions.TryGetValue(card, out var position) ? position : 0f;
+            
             // 選択時は少し上に移動、非選択時は元の位置に戻る
             var currentPos = rectTransform.anchoredPosition;
             var targetPos = new Vector2(currentPos.x, highlight ? originalY + 30f : originalY);
@@ -336,6 +382,6 @@ public class Hand : MonoBehaviour
                 .WithEase(Ease.OutCubic)
                 .BindToAnchoredPosition(rectTransform)
                 .AddTo(card.gameObject);
-            SeManager.Instance.PlaySe("Card");
+        }
     }
 }

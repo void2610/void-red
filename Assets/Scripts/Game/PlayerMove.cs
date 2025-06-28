@@ -53,12 +53,35 @@ public class PlayerMove
     }
     
     /// <summary>
+    /// カードの崩壊確率を計算
+    /// </summary>
+    /// <returns>崩壊確率（0.0～1.0）</returns>
+    public float GetCollapseChance()
+    {
+        // 精神ベット値に基づいて崩壊確率を計算
+        // ベット0: 0%, ベット1: 5%, ベット2: 10%, ..., ベット7: 35%
+        return MentalBet * 0.05f;
+    }
+    
+    /// <summary>
+    /// カードが崩壊するかどうかを判定
+    /// </summary>
+    /// <returns>崩壊するかどうか</returns>
+    public bool ShouldCollapse()
+    {
+        var chance = GetCollapseChance();
+        var randomValue = UnityEngine.Random.Range(0f, 1f);
+        return randomValue < chance;
+    }
+    
+    /// <summary>
     /// デバッグ用の文字列表現
     /// </summary>
     public override string ToString()
     {
         var cardName = SelectedCard.CardData.CardName;
         var playStyleText = PlayStyle.ToJapaneseString();
-        return $"カード: {cardName}, スタイル: {playStyleText}, 精神ベット: {MentalBet}";
+        var collapseChance = GetCollapseChance() * 100f;
+        return $"カード: {cardName}, スタイル: {playStyleText}, 精神ベット: {MentalBet}, 崩壊率: {collapseChance:F1}%";
     }
 }

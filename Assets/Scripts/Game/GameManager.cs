@@ -251,9 +251,36 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // 結果を表示
         await UIManager.Instance.ShowAnnouncement(result, 2f);
         
-        // 使用したカードをプレイ
-        player.PlaySelectedCard();
-        enemy.PlaySelectedCard();
+        // カード崩壊判定
+        var playerCollapse = _playerMove.ShouldCollapse();
+        var npcCollapse = _npcMove.ShouldCollapse();
+        
+        Debug.Log($"崩壊判定 - Player: {playerCollapse} ({_playerMove.GetCollapseChance()*100:F1}%), NPC: {npcCollapse} ({_npcMove.GetCollapseChance()*100:F1}%)");
+        
+        // 崩壊結果を表示
+        if (playerCollapse || npcCollapse)
+        {
+            var collapseMessage = "";
+            if (playerCollapse && npcCollapse)
+                collapseMessage = "プレイヤーとNPCのカードが崩壊した！";
+            else if (playerCollapse)
+                collapseMessage = "プレイヤーのカードが崩壊した！";
+            else
+                collapseMessage = "NPCのカードが崩壊した！";
+                
+            await UIManager.Instance.ShowAnnouncement(collapseMessage, 1.5f);
+        }
+        
+        // 使用したカードをプレイ（崩壊判定を含む）
+        if (playerCollapse)
+            player.CollapseSelectedCard();
+        else
+            player.PlaySelectedCard(false);
+            
+        if (npcCollapse)
+            enemy.CollapseSelectedCard();
+        else
+            enemy.PlaySelectedCard(false);
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(2000);

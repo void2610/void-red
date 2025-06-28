@@ -136,11 +136,48 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public virtual void PlaySelectedCard()
     {
+        PlaySelectedCard(false);
+    }
+    
+    /// <summary>
+    /// 選択したカードをプレイ
+    /// </summary>
+    /// <param name="shouldCollapse">カードが崩壊するかどうか</param>
+    public virtual void PlaySelectedCard(bool shouldCollapse)
+    {
         var selectedCard = hand.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
         // 手札からカードを削除
         hand.RemoveCard(selectedCard);
+        
+        // 崩壊しない場合はデッキに戻す
+        if (!shouldCollapse)
+        {
+            ReturnCardToDeck(selectedCard.CardData);
+        }
+    }
+    
+    /// <summary>
+    /// カードをデッキに戻す
+    /// </summary>
+    /// <param name="cardData">戻すカードデータ</param>
+    protected virtual void ReturnCardToDeck(CardData cardData)
+    {
+        _deck.Add(cardData);
+        ShuffleDeck();
+    }
+    
+    /// <summary>
+    /// 選択したカードを崩壊させる
+    /// </summary>
+    public virtual void CollapseSelectedCard()
+    {
+        var selectedCard = hand.SelectedCard.CurrentValue;
+        if (!selectedCard) return;
+        
+        // 崩壊演出で手札からカードを削除
+        hand.CollapseCard(selectedCard);
     }
     
     /// <summary>
