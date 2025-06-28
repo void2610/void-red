@@ -209,14 +209,14 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // 評価中のアナウンス
         await UIManager.Instance.ShowAnnouncement("カードを評価中...", 0.5f);
         
-        // テーマとの距離を計算（プレイスタイルと精神ベットの補正を含む）
-        var playerDistance = playerMove.GetDistanceTo(_currentTheme.CurrentValue);
-        var npcDistance = npcMove.GetDistanceTo(_currentTheme.CurrentValue);
+        // スコアを計算（テーマとの一致度 × 精神ベット）
+        var playerScore = playerMove.GetScore(_currentTheme.CurrentValue);
+        var npcScore = npcMove.GetScore(_currentTheme.CurrentValue);
         
         // 評価結果を順次表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーカードのテーマとの距離: {playerDistance:F2}", 1f);
+        await UIManager.Instance.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
         await UniTask.Delay(300);
-        await UIManager.Instance.ShowAnnouncement($"NPCカードのテーマとの距離: {npcDistance:F2}", 1f);
+        await UIManager.Instance.ShowAnnouncement($"NPCのスコア: {npcScore:F2}", 1f);
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
@@ -236,14 +236,14 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private async UniTask ResultDisplayAsync()
     {
-        // テーマとの距離で勝敗判定（距離が近い方が勝利）
-        var playerDistance = _playerMove.GetDistanceTo(_currentTheme.CurrentValue);
-        var npcDistance = _npcMove.GetDistanceTo(_currentTheme.CurrentValue);
+        // スコアで勝敗判定（スコアが高い方が勝利）
+        var playerScore = _playerMove.GetScore(_currentTheme.CurrentValue);
+        var npcScore = _npcMove.GetScore(_currentTheme.CurrentValue);
         
         string result;
-        if (playerDistance < npcDistance)
+        if (playerScore > npcScore)
             result = "プレイヤーの勝利!";
-        else if (npcDistance < playerDistance)
+        else if (npcScore > playerScore)
             result = "NPCの勝利!";
         else
             result = "引き分け!";

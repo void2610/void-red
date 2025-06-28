@@ -35,39 +35,21 @@ public class PlayerMove
     }
     
     /// <summary>
-    /// テーマとの距離を計算（プレイスタイルと精神ベットによる補正を含む）
+    /// スコアを計算（テーマとの一致度 × 精神ベット）
     /// </summary>
     /// <param name="theme">テーマのカードステータス</param>
-    /// <returns>補正後の距離</returns>
-    public float GetDistanceTo(CardStatus theme)
+    /// <returns>計算されたスコア</returns>
+    public float GetScore(CardStatus theme)
     {
-        // 基本距離を計算
-        float baseDistance = SelectedCard.CardData.Effect.GetDistanceTo(theme);
+        // テーマとの距離を計算
+        var distance = SelectedCard.CardData.Effect.GetDistanceTo(theme);
         
-        // プレイスタイルによる補正（将来的な拡張用）
-        float playStyleModifier = 1.0f;
-        switch (PlayStyle)
-        {
-            case PlayStyle.Hesitation:
-                // 迷いは距離をわずかに増やす（不利になる）
-                playStyleModifier = 1.1f;
-                break;
-            case PlayStyle.Impulse:
-                // 衝動は変化なし
-                playStyleModifier = 1.0f;
-                break;
-            case PlayStyle.Conviction:
-                // 確信は距離をわずかに減らす（有利になる）
-                playStyleModifier = 0.9f;
-                break;
-        }
+        // 距離を一致度に変換（距離が小さいほど一致度が高い）
+        // 距離の範囲を0～√3（最大距離）として、一致度を1.0～1.5に正規化
+        var matchRate = 1.0f + (1.0f - (distance / Mathf.Sqrt(3f))) * 0.5f;
         
-        // 精神ベットによる補正（将来的な拡張用）
-        // 高い精神ベットほどリスクとリターンが大きくなる
-        float mentalBetModifier = 1.0f + (MentalBet - 3) * 0.02f; // ベット3を基準に、±2%ずつ変化
-        
-        // 最終的な距離を計算
-        return baseDistance * playStyleModifier * mentalBetModifier;
+        // スコア = 一致度 × 精神ベット
+        return matchRate * MentalBet;
     }
     
     /// <summary>
