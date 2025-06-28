@@ -112,7 +112,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             
             // 背景のフェードアウト
             var bgColorOut = announcementBackground.color;
-            fadeOutTasks[0] = LMotion.Create(new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 1f), new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 0f), FADE_OUT_DURATION)
+            fadeOutTasks[0] = LMotion.Create(new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 0.95f), new Color(bgColorOut.r, bgColorOut.g, bgColorOut.b, 0f), FADE_OUT_DURATION)
                 .WithEase(Ease.InQuart)
                 .BindToColor(announcementBackground)
                 .AddTo(gameObject)

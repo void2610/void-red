@@ -97,7 +97,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         );
         UIManager.Instance.SetTheme(_currentTheme.Value);
         
-        DelayedStateChangeAsync(GameState.PlayerCardSelection, 2f, this.GetCancellationTokenOnDestroy()).Forget();
+        DelayedStateChangeAsync(GameState.PlayerCardSelection, 0.3f).Forget();
     }
     
     /// <summary>
@@ -105,7 +105,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandlePlayerCardSelection()
     {
-        UIManager.Instance.ShowAnnouncement("プレイヤーのカード選択を待機中...", 1f).Forget();
+        UIManager.Instance.ShowAnnouncement("プレイヤーのカード選択を待機中...", 0.5f).Forget();
         
         // プレイヤーの選択を監視
         player.SelectedCard.Subscribe(card =>
@@ -133,7 +133,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         _playerMove = new PlayerMove(selectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を{_playerMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_playerMove.MentalBet}）", 2.5f);
+        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を{_playerMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         
         // デバッグログで詳細を表示
         Debug.Log($"プレイヤーの選択 - {_playerMove}");
@@ -148,7 +148,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleEnemyCardSelection()
     {
-        UIManager.Instance.ShowAnnouncement("NPCがカードを選択中...", 1f).Forget();
+        UIManager.Instance.ShowAnnouncement("NPCがカードを選択中...", 0.5f).Forget();
         NpcThinkAndSelectAsync().Forget();
     }
     
@@ -171,7 +171,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
             
             // NPCの選択を表示
-            await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 2.5f);
+            await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
             // 少し間を置いてから評価フェーズに移行
             await UniTask.Delay(500);
         }
@@ -194,16 +194,16 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private async UniTask EvaluationAsync(PlayerMove playerMove, PlayerMove npcMove)
     {
         // 評価中のアナウンス
-        await UIManager.Instance.ShowAnnouncement("カードを評価中...", 1.5f);
+        await UIManager.Instance.ShowAnnouncement("カードを評価中...", 0.5f);
         
         // テーマとの距離を計算（プレイスタイルと精神ベットの補正を含む）
         var playerDistance = playerMove.GetDistanceTo(_currentTheme.CurrentValue);
         var npcDistance = npcMove.GetDistanceTo(_currentTheme.CurrentValue);
         
         // 評価結果を順次表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーカードのテーマとの距離: {playerDistance:F2}", 2f);
+        await UIManager.Instance.ShowAnnouncement($"プレイヤーカードのテーマとの距離: {playerDistance:F2}", 1f);
         await UniTask.Delay(300);
-        await UIManager.Instance.ShowAnnouncement($"NPCカードのテーマとの距離: {npcDistance:F2}", 2f);
+        await UIManager.Instance.ShowAnnouncement($"NPCカードのテーマとの距離: {npcDistance:F2}", 1f);
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
@@ -236,7 +236,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             result = "引き分け!";
         
         // 結果を表示
-        await UIManager.Instance.ShowAnnouncement(result, 3f);
+        await UIManager.Instance.ShowAnnouncement(result, 2f);
         
         // 使用したカードをプレイ
         player.PlaySelectedCard();
@@ -250,17 +250,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// <summary>
     /// 遅延してステート変更
     /// </summary>
-    private async UniTask DelayedStateChangeAsync(GameState newState, float delay, CancellationToken cancellationToken)
+    private async UniTask DelayedStateChangeAsync(GameState newState, float delay)
     {
-        try
-        {
-            await UniTask.Delay((int)(delay * 1000), cancellationToken: cancellationToken);
-            ChangeState(newState);
-        }
-        catch (System.OperationCanceledException)
-        {
-            // キャンセルされた場合の処理
-            UIManager.Instance.ShowAnnouncement($"ステート変更({newState})がキャンセルされました", 1.5f).Forget();
-        }
+        await UniTask.Delay((int)(delay * 1000));
+        ChangeState(newState);
     }
 }
