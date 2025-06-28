@@ -10,7 +10,7 @@ using Cysharp.Threading.Tasks;
 public abstract class BasePlayer : MonoBehaviour
 {
     [SerializeField] protected int maxMentalPower = 20;
-    [SerializeField] protected int maxHandSize = 5;
+    [SerializeField] protected int maxHandSize = 3;
     [SerializeField] protected Hand hand; // 手札管理クラス
     
     // デッキと精神力
@@ -178,6 +178,36 @@ public abstract class BasePlayer : MonoBehaviour
         
         // 崩壊演出で手札からカードを削除
         hand.CollapseCard(selectedCard);
+    }
+    
+    /// <summary>
+    /// 手札をデッキに戻す
+    /// </summary>
+    public virtual async UniTask ReturnHandToDeck()
+    {
+        // 現在の手札のカードデータを取得
+        var handCards = hand.Cards.CurrentValue;
+        var cardDataList = new List<CardData>();
+        
+        foreach (var card in handCards)
+        {
+            if (card && card.CardData)
+            {
+                cardDataList.Add(card.CardData);
+            }
+        }
+        
+        // 手札をデッキに戻すアニメーション
+        await hand.ReturnCardsToDeck();
+        
+        // カードデータをデッキに追加
+        foreach (var cardData in cardDataList)
+        {
+            _deck.Add(cardData);
+        }
+        
+        // デッキをシャッフル
+        ShuffleDeck();
     }
     
     /// <summary>

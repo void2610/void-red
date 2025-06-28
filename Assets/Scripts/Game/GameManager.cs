@@ -48,9 +48,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         enemy.InitializeDeck(npcDeck);
         
         // 手札を配る
-        player.DrawCard(5);
+        player.DrawCard(3);
         await UniTask.Delay(200);
-        enemy.DrawCard(5);
+        enemy.DrawCard(3);
         
         // エネミーのカードを非インタラクティブに設定
         enemy.SetHandInteractable(false);
@@ -155,7 +155,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleEnemyCardSelection()
     {
-        UIManager.Instance.ShowAnnouncement("NPCがカードを選択中...", 0.5f).Forget();
         NpcThinkAndSelectAsync().Forget();
     }
     
@@ -165,7 +164,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private async UniTask NpcThinkAndSelectAsync()
     {
         // 思考時間を待つ（NPCが考えているように見せる）
-        await UniTask.Delay(2000);
+        await UniTask.Delay(1000);
         
         // AIでカードを選択
         var npcCard = enemy.SelectCardByAI();
@@ -201,9 +200,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private async UniTask EvaluationAsync(PlayerMove playerMove, PlayerMove npcMove)
     {
         _isProcessing = true; // 処理開始フラグ
-        
-        // 評価中のアナウンス
-        await UIManager.Instance.ShowAnnouncement("カードを評価中...", 0.5f);
         
         // スコアを計算（テーマとの一致度 × 精神ベット）
         var playerScore = playerMove.GetScore(_currentTheme.CurrentValue);
@@ -255,8 +251,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         var playerCollapse = _playerMove.ShouldCollapse();
         var npcCollapse = _npcMove.ShouldCollapse();
         
-        Debug.Log($"崩壊判定 - Player: {playerCollapse} ({_playerMove.GetCollapseChance()*100:F1}%), NPC: {npcCollapse} ({_npcMove.GetCollapseChance()*100:F1}%)");
-        
         // 崩壊結果を表示
         if (playerCollapse || npcCollapse)
         {
@@ -268,7 +262,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             else
                 collapseMessage = "NPCのカードが崩壊した！";
                 
-            await UIManager.Instance.ShowAnnouncement(collapseMessage, 1.5f);
+            await UIManager.Instance.ShowAnnouncement(collapseMessage, 1.0f);
         }
         
         // 使用したカードをプレイ（崩壊判定を含む）
@@ -282,8 +276,23 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         else
             enemy.PlaySelectedCard(false);
         
+        // カード使用後の処理完了を待つ
+        await UniTask.Delay(1000);
+        
+        // 両プレイヤーの手札をデッキに戻す
+        var returnTasks = new UniTask[2];
+        returnTasks[0] = player.ReturnHandToDeck();
+        returnTasks[1] = enemy.ReturnHandToDeck();
+        
+        await UniTask.WhenAll(returnTasks);
+        
+        // 手札を3枚ずつ配る
+        player.DrawCard(3);
+        await UniTask.Delay(500);
+        enemy.DrawCard(3);
+        
         // 新しいラウンドの準備時間
-        await UniTask.Delay(2000);
+        await UniTask.Delay(1000);
         _isProcessing = false; // フラグリセット
         ChangeState(GameState.ThemeAnnouncement);
     }

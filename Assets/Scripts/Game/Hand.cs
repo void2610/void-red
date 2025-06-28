@@ -18,7 +18,7 @@ public class Hand : MonoBehaviour
     [SerializeField] private Transform handContainer; // 手札を配置するコンテナ
     [SerializeField] private Card cardPrefab; // カードのプレハブ
     [SerializeField] private Transform deckPosition; // デッキの位置（アニメーション開始位置）
-    [SerializeField] private int maxHandSize = 5;
+    [SerializeField] private int maxHandSize = 3;
     
     [Header("配置設定")]
     [SerializeField] private float cardSpacing = 150f; // カード間の間隔
@@ -212,7 +212,93 @@ public class Hand : MonoBehaviour
         }
         _cards.Value.Clear();
         _selectedCard.Value = null;
+        _originalYPositions.Clear();
         _cards.ForceNotify();
+    }
+    
+    /// <summary>
+    /// 手札をデッキに戻す（アニメーション付き）
+    /// </summary>
+    public async UniTask ReturnCardsToDeck()
+    {
+        var cards = new List<Card>(_cards.Value);
+        if (cards.Count == 0) return;
+        
+        // 選択状態をクリア
+        _selectedCard.Value = null;
+        
+        // 各カードをデッキ位置にアニメーション
+        var animationTasks = new List<UniTask>();
+        
+        for (int i = 0; i < cards.Count; i++)
+        {
+            var card = cards[i];
+            if (!card) continue;
+            
+            var rectTransform = card.GetComponent<RectTransform>();
+            if (rectTransform && deckPosition)
+            {
+                // デッキ位置を計算
+                var deckPos = handContainer.InverseTransformPoint(deckPosition.position);
+                var targetPosition = new Vector2(deckPos.x, deckPos.y);
+                
+                // 少しずつ時間差をつけてアニメーション
+                var delay = i * 0.1f;
+                animationTasks.Add(ReturnCardToDeckAsync(card, targetPosition, delay));
+            }
+        }
+        
+        // 全てのアニメーション完了まで待機
+        await UniTask.WhenAll(animationTasks);
+        
+        // カードオブジェクトを削除
+        foreach (var card in cards)
+        {
+            if (card) Destroy(card.gameObject);
+        }
+        
+        // 手札データをクリア
+        _cards.Value.Clear();
+        _originalYPositions.Clear();
+        _cards.ForceNotify();
+    }
+    
+    /// <summary>
+    /// 単一カードをデッキに戻すアニメーション
+    /// </summary>
+    private async UniTask ReturnCardToDeckAsync(Card card, Vector2 targetPosition, float delay)
+    {
+        // 遅延
+        if (delay > 0)
+            await UniTask.Delay((int)(delay * 1000));
+        
+        var rectTransform = card.GetComponent<RectTransform>();
+        if (!rectTransform) return;
+        
+        var currentPos = rectTransform.anchoredPosition;
+        var currentScale = rectTransform.localScale;
+        var currentRotation = rectTransform.rotation;
+        
+        // 移動、スケール、回転のアニメーション
+        var moveTask = LMotion.Create(currentPos, targetPosition, 0.4f)
+            .WithEase(Ease.InCubic)
+            .BindToAnchoredPosition(rectTransform)
+            .AddTo(card.gameObject)
+            .ToUniTask();
+            
+        var scaleTask = LMotion.Create(currentScale, Vector3.one * 0.1f, 0.4f)
+            .WithEase(Ease.InCubic)
+            .BindToLocalScale(rectTransform)
+            .AddTo(card.gameObject)
+            .ToUniTask();
+            
+        var rotateTask = LMotion.Create(currentRotation, Quaternion.identity, 0.4f)
+            .WithEase(Ease.InCubic)
+            .BindToRotation(rectTransform)
+            .AddTo(card.gameObject)
+            .ToUniTask();
+        
+        await UniTask.WhenAll(moveTask, scaleTask, rotateTask);
     }
     
     /// <summary>
