@@ -51,8 +51,8 @@ public class Hand : MonoBehaviour
         _cards.Value.Add(cardObject);
         
         // アニメーション実行
-        await AnimateCardFromDeck(cardObject);
         SeManager.Instance.PlaySe("Card");
+        await AnimateCardFromDeck(cardObject);
         
         // 手札を再配置
         await ArrangeCardsAsync();

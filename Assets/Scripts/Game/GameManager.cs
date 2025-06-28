@@ -25,35 +25,29 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     // プロパティ
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
-    }
-    
-    private async UniTaskVoid Start()
-    {
-        await UniTask.Delay(1000);
-        InitializeGame();
+        InitializeGame().Forget();
     }
     
     /// <summary>
     /// ゲームを初期化
     /// </summary>
-    private void InitializeGame()
+    private async UniTaskVoid InitializeGame()
     {
+        await UniTask.Delay(500);
+        
         // カードデッキを初期化
-        if (_cardPoolService.AvailableCardCount > 0)
-        {
-            var playerDeck = _cardPoolService.GetRandomCards(10);
-            var npcDeck = _cardPoolService.GetRandomCards(10);
-            
-            player.InitializeDeck(playerDeck);
-            enemy.InitializeDeck(npcDeck);
-            
-            // 手札を配る
-            player.DrawCard(5);
-            enemy.DrawCard(5);
-        }
+        var playerDeck = _cardPoolService.GetRandomCards(10);
+        var npcDeck = _cardPoolService.GetRandomCards(10);
+        
+        player.InitializeDeck(playerDeck);
+        enemy.InitializeDeck(npcDeck);
+        
+        // 手札を配る
+        player.DrawCard(5);
+        await UniTask.Delay(200);
+        enemy.DrawCard(5);
         
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement);
@@ -131,13 +125,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // プレイヤーの手を作成
         var playStyle = UIManager.Instance.GetSelectedPlayStyle();
         var mentalBet = UIManager.Instance.GetMentalBetValue();
-        
-        // 精神力チェックと消費
-        if (!player.CanMentalBet(mentalBet))
-        {
-            await UIManager.Instance.ShowAnnouncement("精神力が不足しています！", 2.0f);
-            return; // プレイボタンの処理を中断
-        }
         
         // 精神力を消費
         player.ConsumeMentalPower(mentalBet);
