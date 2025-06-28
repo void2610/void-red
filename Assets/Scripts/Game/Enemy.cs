@@ -10,13 +10,13 @@ public class Enemy : BasePlayer
     /// <summary>
     /// AIによるカード選択
     /// </summary>
-    public Card SelectCardByAI()
+    public CardView SelectCardByAI()
     {
-        if (hand.Count == 0) return null;
+        if (!handView || handView.Count == 0) return null;
         
-        var cards = hand.Cards.CurrentValue;
+        var cards = handView.Cards.CurrentValue;
         var selectedCard = cards[Random.Range(0, cards.Count)];
-        hand.SetSelectedCard(selectedCard);
+        handView.SetSelectedCard(selectedCard);
         return selectedCard;
     }
 }

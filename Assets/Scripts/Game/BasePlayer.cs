@@ -6,18 +6,19 @@ using Cysharp.Threading.Tasks;
 /// <summary>
 /// プレイヤーとNPCの基底クラス
 /// カードデッキを持ち、カード選択の基本機能を提供
+/// 簡略化されたMVPパターンでHandViewを直接使用
 /// </summary>
 public abstract class BasePlayer : MonoBehaviour
 {
     [SerializeField] protected int maxMentalPower = 20;
     [SerializeField] protected int maxHandSize = 3;
-    [SerializeField] protected Hand hand; // 手札管理クラス
+    [SerializeField] protected HandView handView;
     
     // デッキと精神力
     private readonly List<CardData> _deck = new ();
     private readonly ReactiveProperty<int> _mentalPower = new ();
     
-    public ReadOnlyReactiveProperty<Card> SelectedCard => hand.SelectedCard;
+    public ReadOnlyReactiveProperty<CardView> SelectedCard => handView?.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public int MaxMentalPower => maxMentalPower;
     
@@ -25,15 +26,12 @@ public abstract class BasePlayer : MonoBehaviour
     {
         // 精神力を最大値で初期化
         _mentalPower.Value = maxMentalPower;
-        
-        // 手札のカード選択イベントを購読
-        hand.OnCardSelected += OnCardSelected;
     }
     
     /// <summary>
     /// デッキを初期化
     /// </summary>
-    public virtual void InitializeDeck(List<CardData> cardDataList)
+    public void InitializeDeck(List<CardData> cardDataList)
     {
         _deck.Clear();
         _deck.AddRange(cardDataList);
@@ -43,7 +41,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// <summary>
     /// デッキをシャッフル
     /// </summary>
-    protected virtual void ShuffleDeck()
+    protected void ShuffleDeck()
     {
         for (var i = 0; i < _deck.Count; i++)
         {
@@ -54,49 +52,25 @@ public abstract class BasePlayer : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// カードを引く
-    /// </summary>
-    public virtual void DrawCard(int count = 1)
-    {
-        DrawCardAsync(count).Forget();
-    }
+    public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
     
     /// <summary>
     /// カードを引く（アニメーション付き）
     /// </summary>
-    protected virtual async UniTask DrawCardAsync(int count = 1)
+    private async UniTask DrawCardAsync(int count = 1)
     {
         var cardDataList = new List<CardData>();
         
         for (var i = 0; i < count; i++)
         {
-            if (_deck.Count == 0 || hand.Count >= maxHandSize) break;
+            if (_deck.Count == 0 || handView.Count >= maxHandSize) break;
             
             var cardData = _deck[0];
             _deck.RemoveAt(0);
             cardDataList.Add(cardData);
         }
         
-        // 手札クラスにカードを追加（アニメーション付き）
-        await hand.AddCardsAsync(cardDataList);
-    }
-    
-    /// <summary>
-    /// 手札を整列（Handクラスに委譲）
-    /// </summary>
-    protected virtual void ArrangeHand()
-    {
-        // Handクラスで自動的に処理される
-    }
-    
-    /// <summary>
-    /// カードが選択された時の処理
-    /// </summary>
-    protected virtual void OnCardSelected(Card card)
-    {
-        // Handクラスで既に選択状態は管理されているため、
-        // 子クラスで必要な追加処理があれば実装
+        await handView.AddCardsAsync(cardDataList);
     }
     
     /// <summary>
@@ -104,7 +78,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     /// <param name="amount">消費する精神力</param>
     /// <returns>消費に成功したかどうか</returns>
-    public virtual bool ConsumeMentalPower(int amount)
+    public bool ConsumeMentalPower(int amount)
     {
         if (_mentalPower.Value < amount) return false;
         
@@ -116,44 +90,29 @@ public abstract class BasePlayer : MonoBehaviour
     /// 精神力を回復する
     /// </summary>
     /// <param name="amount">回復する精神力</param>
-    public virtual void RestoreMentalPower(int amount)
+    public void RestoreMentalPower(int amount)
     {
         _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, maxMentalPower);
-    }
-    
-    /// <summary>
-    /// 指定した精神ベットが可能かチェック
-    /// </summary>
-    /// <param name="betAmount">精神ベット値</param>
-    /// <returns>ベット可能かどうか</returns>
-    public virtual bool CanMentalBet(int betAmount)
-    {
-        return _mentalPower.Value >= betAmount;
-    }
-    
-    /// <summary>
-    /// 選択したカードをプレイ
-    /// </summary>
-    public virtual void PlaySelectedCard()
-    {
-        PlaySelectedCard(false);
     }
     
     /// <summary>
     /// 選択したカードをプレイ
     /// </summary>
     /// <param name="shouldCollapse">カードが崩壊するかどうか</param>
-    public virtual void PlaySelectedCard(bool shouldCollapse)
+    public void PlaySelectedCard(bool shouldCollapse)
     {
-        var selectedCard = hand.SelectedCard.CurrentValue;
+        var selectedCard = handView.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
         // 手札からカードを削除
-        hand.RemoveCard(selectedCard);
-        
-        // 崩壊しない場合はデッキに戻す
-        if (!shouldCollapse)
+        if (shouldCollapse)
         {
+            handView.CollapseCard(selectedCard);
+        }
+        else
+        {
+            handView.RemoveCard(selectedCard);
+            // 崩壊しない場合はデッキに戻す
             ReturnCardToDeck(selectedCard.CardData);
         }
     }
@@ -162,7 +121,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// カードをデッキに戻す
     /// </summary>
     /// <param name="cardData">戻すカードデータ</param>
-    protected virtual void ReturnCardToDeck(CardData cardData)
+    protected void ReturnCardToDeck(CardData cardData)
     {
         _deck.Add(cardData);
         ShuffleDeck();
@@ -171,34 +130,33 @@ public abstract class BasePlayer : MonoBehaviour
     /// <summary>
     /// 選択したカードを崩壊させる
     /// </summary>
-    public virtual void CollapseSelectedCard()
+    public void CollapseSelectedCard()
     {
-        var selectedCard = hand.SelectedCard.CurrentValue;
+        var selectedCard = handView.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
         // 崩壊演出で手札からカードを削除
-        hand.CollapseCard(selectedCard);
+        handView.CollapseCard(selectedCard);
     }
     
     /// <summary>
     /// 手札をデッキに戻す
     /// </summary>
-    public virtual async UniTask ReturnHandToDeck()
+    public async UniTask ReturnHandToDeck()
     {
         // 現在の手札のカードデータを取得
-        var handCards = hand.Cards.CurrentValue;
         var cardDataList = new List<CardData>();
         
-        foreach (var card in handCards)
+        foreach (var cardView in handView.Cards.CurrentValue)
         {
-            if (card && card.CardData)
+            if (cardView?.CardData)
             {
-                cardDataList.Add(card.CardData);
+                cardDataList.Add(cardView.CardData);
             }
         }
         
         // 手札をデッキに戻すアニメーション
-        await hand.ReturnCardsToDeck();
+        await handView.ReturnCardsToDeck();
         
         // カードデータをデッキに追加
         foreach (var cardData in cardDataList)
@@ -213,8 +171,8 @@ public abstract class BasePlayer : MonoBehaviour
     /// <summary>
     /// 手札のインタラクト可能状態を設定
     /// </summary>
-    public virtual void SetHandInteractable(bool interactable)
+    public void SetHandInteractable(bool interactable)
     {
-        hand.SetInteractable(interactable);
+        handView.SetInteractable(interactable);
     }
 }

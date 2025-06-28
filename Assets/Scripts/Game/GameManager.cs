@@ -143,7 +143,7 @@ public class GameManager: IStartable
                 return;
             
             var selectedCard = _player.SelectedCard.CurrentValue;
-            if (selectedCard)
+            if (selectedCard != null)
             {
                 // カードが選択されたらプレイボタンを表示
                 _uiPresenter.ShowPlayButton();
@@ -157,7 +157,7 @@ public class GameManager: IStartable
         _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
-        if (!finalSelectedCard)
+        if (finalSelectedCard == null)
             return;
         
         // プレイヤーの手を作成
@@ -166,10 +166,10 @@ public class GameManager: IStartable
         
         // 精神力を消費
         _player.ConsumeMentalPower(mentalBet);
-        _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
+        _playerMove = new PlayerMove(finalSelectedCard.CardData, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
-        await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
+        await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         
         // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
@@ -200,10 +200,10 @@ public class GameManager: IStartable
         
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
-        _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+        _npcMove = new PlayerMove(npcCard.CardData, npcPlayStyle, npcMentalBet);
         
         // NPCの選択を表示
-        await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
+        await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         
