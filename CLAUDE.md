@@ -27,6 +27,14 @@
 - CardData: ScriptableObjectでカード情報を定義
 - Card: MonoBehaviourでUIと効果を統合
 - CardEffect: 許し、拒絶、空白の3つのfloatパラメータ
+- PlayerMove: プレイヤーの手（カード、プレイスタイル、精神ベット）をまとめたクラス
+
+### nullチェックのガイドライン
+- SerializeFieldやInspectorで事前に設定すべき要素（GameManager、Player、Enemy、UIManager等）に対するnullチェックは避ける
+- これらの要素がnullの場合は設定ミスであり、NullReferenceExceptionが発生して然るべき
+- nullチェックを行うのは、ランタイム中に動的に設定される要素のみ
+  - 例：動的に生成/破棄されるオブジェクト、ネットワークから取得するデータ、ユーザー入力によって変化する値など
+- `?.` や `??` 演算子の過剰な使用は避け、コードの可読性を重視する
 
 ## Unity開発ツール
 

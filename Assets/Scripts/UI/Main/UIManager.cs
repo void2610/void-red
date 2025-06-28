@@ -163,19 +163,13 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         announcementText.gameObject.SetActive(false);
         
         // プレイボタンの初期化
-        if (playButton)
-        {
-            playButton.onClick.AddListener(OnPlayButtonClicked);
-            playButton.gameObject.SetActive(false);
-        }
+        playButton.onClick.AddListener(OnPlayButtonClicked);
+        playButton.gameObject.SetActive(false);
         
         // プレイスタイルボタンの初期化
         InitializePlayStyleButtons();
-        
         // 精神ベットボタンの初期化
         InitializeMentalBetButtons();
-        
-        HidePlayStyleSelection();
     }
     
     /// <summary>
@@ -316,21 +310,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     /// </summary>
     private void UpdateMentalBetDisplay()
     {
-        if (mentalBetValueText)
-        {
-            mentalBetValueText.text = _mentalBetValue.ToString();
-        }
+        mentalBetValueText.text = _mentalBetValue.ToString();
         
         // ボタンの有効/無効を切り替え
-        if (mentalBetPlusButton)
-        {
-            mentalBetPlusButton.interactable = (_mentalBetValue < MAX_MENTAL_BET);
-        }
-        
-        if (mentalBetMinusButton)
-        {
-            mentalBetMinusButton.interactable = (_mentalBetValue > MIN_MENTAL_BET);
-        }
+        mentalBetPlusButton.interactable = (_mentalBetValue < MAX_MENTAL_BET);
+        mentalBetMinusButton.interactable = (_mentalBetValue > MIN_MENTAL_BET);
     }
     
     /// <summary>
@@ -339,65 +323,18 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     private void OnPlayButtonClicked()
     {
         _playButtonClicked.OnNext(Unit.Default);
-        HidePlayStyleSelection();
     }
     
     /// <summary>
     /// プレイボタンとプレイスタイル選択を表示
     /// </summary>
-    public void ShowPlayButton(string cardName)
+    public void ShowPlayButton()
     {
-        ShowPlayStyleSelection();
-        
-        if (playButton)
-        {
-            playButton.gameObject.SetActive(true);
-        }
-    }
-    
-    /// <summary>
-    /// プレイスタイル選択を表示
-    /// </summary>
-    private void ShowPlayStyleSelection()
-    {
-        // プレイスタイルボタンを表示
-        if (hesitationButton) hesitationButton.gameObject.SetActive(true);
-        if (impulseButton) impulseButton.gameObject.SetActive(true);
-        if (convictionButton) convictionButton.gameObject.SetActive(true);
-        if (playStyleSelectedText) playStyleSelectedText.gameObject.SetActive(true);
-        
-        // 精神ベットUIを表示
-        if (mentalBetPlusButton) mentalBetPlusButton.gameObject.SetActive(true);
-        if (mentalBetMinusButton) mentalBetMinusButton.gameObject.SetActive(true);
-        if (mentalBetValueText) mentalBetValueText.gameObject.SetActive(true);
-        
-        // デフォルトで「迷い」を選択
-        _selectedPlayStyle = PlayStyle.Hesitation;
         UpdatePlayStyleButtonColors();
         UpdatePlayStyleSelectedText();
-        
-        // 精神ベットをリセット
-        _mentalBetValue = 0;
         UpdateMentalBetDisplay();
-    }
-    
-    /// <summary>
-    /// プレイスタイル選択を非表示
-    /// </summary>
-    private void HidePlayStyleSelection()
-    {
-        // プレイスタイルボタンを非表示
-        if (hesitationButton) hesitationButton.gameObject.SetActive(false);
-        if (impulseButton) impulseButton.gameObject.SetActive(false);
-        if (convictionButton) convictionButton.gameObject.SetActive(false);
-        if (playStyleSelectedText) playStyleSelectedText.gameObject.SetActive(false);
         
-        // 精神ベットUIを非表示
-        if (mentalBetPlusButton) mentalBetPlusButton.gameObject.SetActive(false);
-        if (mentalBetMinusButton) mentalBetMinusButton.gameObject.SetActive(false);
-        if (mentalBetValueText) mentalBetValueText.gameObject.SetActive(false);
-        
-        if (playButton) playButton.gameObject.SetActive(false);
+        playButton.gameObject.SetActive(true);
     }
     
     /// <summary>
@@ -420,33 +357,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     {
         _playButtonClicked?.Dispose();
         
-        if (playButton)
-        {
-            playButton.onClick.RemoveListener(OnPlayButtonClicked);
-        }
+        playButton.onClick.RemoveListener(OnPlayButtonClicked);
         
         // ボタンのイベントをクリーンアップ
-        if (hesitationButton)
-        {
-            hesitationButton.onClick.RemoveAllListeners();
-        }
-        if (impulseButton)
-        {
-            impulseButton.onClick.RemoveAllListeners();
-        }
-        if (convictionButton)
-        {
-            convictionButton.onClick.RemoveAllListeners();
-        }
+        hesitationButton.onClick.RemoveAllListeners();
+        impulseButton.onClick.RemoveAllListeners();
+        convictionButton.onClick.RemoveAllListeners();
         
         // 精神ベットボタンのイベントをクリーンアップ
-        if (mentalBetPlusButton)
-        {
-            mentalBetPlusButton.onClick.RemoveAllListeners();
-        }
-        if (mentalBetMinusButton)
-        {
-            mentalBetMinusButton.onClick.RemoveAllListeners();
-        }
+        mentalBetPlusButton.onClick.RemoveAllListeners();
+        mentalBetMinusButton.onClick.RemoveAllListeners();
     }
 }

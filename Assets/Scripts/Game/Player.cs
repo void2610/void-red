@@ -20,7 +20,6 @@ public class Player : BasePlayer
     /// </summary>
     protected override void ArrangeHand()
     {
-        if (!handContainer) return;
         
         var cardCount = Hand.Value.Count;
         if (cardCount == 0) return;

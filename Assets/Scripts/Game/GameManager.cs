@@ -16,11 +16,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<CardStatus> _currentTheme = new (null);
     
-    // 選択されたカード、プレイスタイル、精神ベット
-    private Card _playerSelectedCard;
-    private Card _npcSelectedCard;
-    private PlayStyle _playerPlayStyle;
-    private int _playerMentalBet;
+    // プレイヤーとNPCの手
+    private PlayerMove _playerMove;
+    private PlayerMove _npcMove;
     
     // プロパティ
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
@@ -47,12 +45,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             var playerDeck = allCardDataList.GetRandomCards(10);
             var npcDeck = allCardDataList.GetRandomCards(10);
             
-            player?.InitializeDeck(playerDeck);
-            enemy?.InitializeDeck(npcDeck);
+            player.InitializeDeck(playerDeck);
+            enemy.InitializeDeck(npcDeck);
             
             // 手札を配る
-            player?.DrawCard(5);
-            enemy?.DrawCard(5);
+            player.DrawCard(5);
+            enemy.DrawCard(5);
         }
         
         // ゲーム開始
@@ -109,39 +107,35 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         UIManager.Instance.ShowAnnouncement("プレイヤーのカード選択を待機中...", 1f).Forget();
         
         // プレイヤーの選択を監視
-        if (player)
+        player.SelectedCard.Subscribe(card =>
         {
-            player.SelectedCard.Subscribe(card =>
+            if (card && _currentState.Value == GameState.PlayerCardSelection)
             {
-                if (card && _currentState.Value == GameState.PlayerCardSelection)
-                {
-                    _playerSelectedCard = card;
-                    // プレイボタンを表示してプレイヤーの確定を待つ
-                    UIManager.Instance.ShowPlayButton(card.CardData.CardName);
-                    WaitForPlayButtonAsync().Forget();
-                }
-            }).AddTo(this);
-        }
+                // プレイボタンを表示してプレイヤーの確定を待つ
+                UIManager.Instance.ShowPlayButton();
+                WaitForPlayButtonAsync(card).Forget();
+            }
+        }).AddTo(this);
     }
     
     /// <summary>
     /// プレイボタンが押されるのを待つ
     /// </summary>
-    private async UniTask WaitForPlayButtonAsync()
+    private async UniTask WaitForPlayButtonAsync(Card selectedCard)
     {
         // プレイボタンが押されるのを待つ
         await UIManager.Instance.PlayButtonClicked.FirstAsync();
         
-        // 選択されたプレイスタイルと精神ベットを取得
-        _playerPlayStyle = UIManager.Instance.GetSelectedPlayStyle();
-        _playerMentalBet = UIManager.Instance.GetMentalBetValue();
+        // プレイヤーの手を作成
+        var playStyle = UIManager.Instance.GetSelectedPlayStyle();
+        var mentalBet = UIManager.Instance.GetMentalBetValue();
+        _playerMove = new PlayerMove(selectedCard, playStyle, mentalBet);
         
-        // プレイヤーの選択を表示（プレイスタイルと精神ベットを含めて）
-        var playStyleText = _playerPlayStyle.ToJapaneseString();
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerSelectedCard.CardData.CardName} を{playStyleText}で選択（精神ベット: {_playerMentalBet}）", 2.5f);
+        // プレイヤーの選択を表示
+        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を{_playerMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_playerMove.MentalBet}）", 2.5f);
         
         // デバッグログで詳細を表示
-        Debug.Log($"プレイヤーの選択 - カード: {_playerSelectedCard.CardData.CardName}, スタイル: {playStyleText} ({_playerPlayStyle.GetDescription()}), 精神ベット: {_playerMentalBet}");
+        Debug.Log($"プレイヤーの選択 - {_playerMove}");
         
         // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
@@ -166,12 +160,17 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         await UniTask.Delay(2000);
         
         // AIでカードを選択
-        _npcSelectedCard = enemy.SelectCardByAI();
+        var npcCard = enemy.SelectCardByAI();
         
-        if (_npcSelectedCard)
+        if (npcCard)
         {
+            // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
+            var npcPlayStyle = (PlayStyle)Random.Range(0, 3);
+            var npcMentalBet = Random.Range(1, 6);
+            _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
+            
             // NPCの選択を表示
-            await UIManager.Instance.ShowAnnouncement($"NPCが {_npcSelectedCard.CardData.CardName} を選択", 2f);
+            await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 2.5f);
             // 少し間を置いてから評価フェーズに移行
             await UniTask.Delay(500);
         }
@@ -185,20 +184,20 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleEvaluation()
     {
-        EvaluationAsync().Forget();
+        EvaluationAsync(_playerMove, _npcMove).Forget();
     }
     
     /// <summary>
     /// 評価処理
     /// </summary>
-    private async UniTask EvaluationAsync()
+    private async UniTask EvaluationAsync(PlayerMove playerMove, PlayerMove npcMove)
     {
         // 評価中のアナウンス
         await UIManager.Instance.ShowAnnouncement("カードを評価中...", 1.5f);
         
-        // テーマとの距離を計算
-        var playerDistance = _playerSelectedCard?.CardData.Effect?.GetDistanceTo(_currentTheme.CurrentValue) ?? float.MaxValue;
-        var npcDistance = _npcSelectedCard?.CardData.Effect?.GetDistanceTo(_currentTheme.CurrentValue) ?? float.MaxValue;
+        // テーマとの距離を計算（プレイスタイルと精神ベットの補正を含む）
+        var playerDistance = playerMove.GetDistanceTo(_currentTheme.CurrentValue);
+        var npcDistance = npcMove.GetDistanceTo(_currentTheme.CurrentValue);
         
         // 評価結果を順次表示
         await UIManager.Instance.ShowAnnouncement($"プレイヤーカードのテーマとの距離: {playerDistance:F2}", 2f);
@@ -224,29 +223,23 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private async UniTask ResultDisplayAsync()
     {
         // テーマとの距離で勝敗判定（距離が近い方が勝利）
-        var playerDistance = _playerSelectedCard?.CardData.Effect?.GetDistanceTo(_currentTheme.CurrentValue) ?? float.MaxValue;
-        var npcDistance = _npcSelectedCard?.CardData.Effect?.GetDistanceTo(_currentTheme.CurrentValue) ?? float.MaxValue;
+        var playerDistance = _playerMove.GetDistanceTo(_currentTheme.CurrentValue);
+        var npcDistance = _npcMove.GetDistanceTo(_currentTheme.CurrentValue);
         
         string result;
         if (playerDistance < npcDistance)
-        {
             result = "プレイヤーの勝利!";
-        }
         else if (npcDistance < playerDistance)
-        {
             result = "NPCの勝利!";
-        }
         else
-        {
             result = "引き分け!";
-        }
         
         // 結果を表示
         await UIManager.Instance.ShowAnnouncement(result, 3f);
         
         // 使用したカードをプレイ
-        player?.PlaySelectedCard();
-        enemy?.PlaySelectedCard();
+        player.PlaySelectedCard();
+        enemy.PlaySelectedCard();
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(2000);

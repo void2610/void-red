@@ -36,29 +36,18 @@ public class Card : MonoBehaviour
         if (!CardData) return;
         
         // カード名を設定
-        if (cardNameText)
-        {
-            cardNameText.text = CardData.CardName;
-        }
+        cardNameText.text = CardData.CardName;
         
         // カード画像を設定
-        if (cardImage && CardData.CardImage)
+        if (CardData.CardImage)
         {
             cardImage.sprite = CardData.CardImage;
         }
         
         // 効果パラメータを設定
         var effect = CardData.Effect;
-        if (effect != null)
-        {
-            if (forgivenessText)
-                forgivenessText.text = $"許し: {effect.Forgiveness:F1}";
-            
-            if (rejectionText)
-                rejectionText.text = $"拒絶: {effect.Rejection:F1}";
-            
-            if (blankText)
-                blankText.text = $"空白: {effect.Blank:F1}";
-        }
+        forgivenessText.text = $"許し: {effect.Forgiveness:F1}";
+        rejectionText.text = $"拒絶: {effect.Rejection:F1}";
+        blankText.text = $"空白: {effect.Blank:F1}";
     }
 }
