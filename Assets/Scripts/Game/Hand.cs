@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
 using System;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 手札を管理するクラス
@@ -48,6 +49,7 @@ public class Hand : MonoBehaviour
         
         // アニメーション実行
         await AnimateCardFromDeck(cardObject);
+        SeManager.Instance.PlaySe("Card");
         
         // 手札を再配置
         ArrangeCards();
@@ -64,7 +66,7 @@ public class Hand : MonoBehaviour
         foreach (var cardData in cardDataList)
         {
             await AddCardAsync(cardData);
-            await UniTask.Delay(100); // 少し間を置く
+            await UniTask.Delay(50); // 少し間を置く
         }
     }
     
