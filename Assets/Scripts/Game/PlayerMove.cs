@@ -35,7 +35,7 @@ public class PlayerMove
     }
     
     /// <summary>
-    /// スコアを計算（テーマとの一致度 × 精神ベット）
+    /// スコアを計算（テーマとの一致度 × 精神ベット × カード倍率）
     /// </summary>
     /// <param name="theme">テーマのカードステータス</param>
     /// <returns>計算されたスコア</returns>
@@ -48,8 +48,8 @@ public class PlayerMove
         // 距離の範囲を0～√3（最大距離）として、一致度を1.0～1.5に正規化
         var matchRate = 1.0f + (1.0f - (distance / Mathf.Sqrt(3f))) * 0.5f;
         
-        // スコア = 一致度 × 精神ベット
-        return matchRate * MentalBet;
+        // スコア = 一致度 × 精神ベット × カード固有の倍率
+        return matchRate * MentalBet * SelectedCard.CardData.ScoreMultiplier;
     }
     
     /// <summary>

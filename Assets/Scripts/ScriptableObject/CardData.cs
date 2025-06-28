@@ -9,9 +9,11 @@ public class CardData : ScriptableObject
     [SerializeField] private string cardName;
     [SerializeField] private CardStatus status;
     [SerializeField] private Sprite image;
+    [SerializeField] private float scoreMultiplier = 1.0f; // カード固有の倍率
     
     // プロパティ
     public string CardName => cardName;
     public CardStatus Effect => status;
     public Sprite CardImage => image;
+    public float ScoreMultiplier => scoreMultiplier;
 }
