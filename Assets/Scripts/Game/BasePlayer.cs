@@ -10,25 +10,25 @@ using UnityEngine.UI;
 /// </summary>
 public abstract class BasePlayer : MonoBehaviour
 {
+    [SerializeField] protected int maxMentalPower = 20;
     [SerializeField] protected int maxHandSize = 5;
     [SerializeField] protected Transform handContainer; // 手札を配置するコンテナ
     [SerializeField] protected Card cardPrefab; // カードのプレハブ
     
     // デッキと手札
-    protected readonly List<CardData> Deck = new ();
+    private readonly List<CardData> _deck = new ();
     protected readonly ReactiveProperty<List<Card>> Hand = new (new List<Card>());
-    
-    // 選択中のカード
     protected readonly ReactiveProperty<Card> selectedCard = new (null);
-    
-    // 精神力（MP）
-    protected readonly ReactiveProperty<int> mentalPower = new (20);
+    private readonly ReactiveProperty<int> _mentalPower = new ();
     
     public ReadOnlyReactiveProperty<Card> SelectedCard => selectedCard;
-    public ReadOnlyReactiveProperty<int> MentalPower => mentalPower;
+    public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
+    public int MaxMentalPower => maxMentalPower;
     
     protected virtual void Awake()
     {
+        // 精神力を最大値で初期化
+        _mentalPower.Value = maxMentalPower;
     }
     
     /// <summary>
@@ -36,8 +36,8 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public virtual void InitializeDeck(List<CardData> cardDataList)
     {
-        Deck.Clear();
-        Deck.AddRange(cardDataList);
+        _deck.Clear();
+        _deck.AddRange(cardDataList);
         ShuffleDeck();
     }
     
@@ -46,12 +46,12 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     protected virtual void ShuffleDeck()
     {
-        for (var i = 0; i < Deck.Count; i++)
+        for (var i = 0; i < _deck.Count; i++)
         {
-            var temp = Deck[i];
-            var randomIndex = Random.Range(i, Deck.Count);
-            Deck[i] = Deck[randomIndex];
-            Deck[randomIndex] = temp;
+            var temp = _deck[i];
+            var randomIndex = Random.Range(i, _deck.Count);
+            _deck[i] = _deck[randomIndex];
+            _deck[randomIndex] = temp;
         }
     }
     
@@ -62,10 +62,10 @@ public abstract class BasePlayer : MonoBehaviour
     {
         for (var i = 0; i < count; i++)
         {
-            if (Deck.Count == 0 || Hand.Value.Count >= maxHandSize) break;
+            if (_deck.Count == 0 || Hand.Value.Count >= maxHandSize) break;
             
-            var cardData = Deck[0];
-            Deck.RemoveAt(0);
+            var cardData = _deck[0];
+            _deck.RemoveAt(0);
             
             // カードオブジェクトを生成
             var cardObject = CreateCardObject(cardData);
@@ -115,9 +115,9 @@ public abstract class BasePlayer : MonoBehaviour
     /// <returns>消費に成功したかどうか</returns>
     public virtual bool ConsumeMentalPower(int amount)
     {
-        if (mentalPower.Value < amount) return false;
+        if (_mentalPower.Value < amount) return false;
         
-        mentalPower.Value -= amount;
+        _mentalPower.Value -= amount;
         return true;
     }
     
@@ -127,7 +127,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// <param name="amount">回復する精神力</param>
     public virtual void RestoreMentalPower(int amount)
     {
-        mentalPower.Value = Mathf.Min(mentalPower.Value + amount, 20); // 最大20まで
+        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, maxMentalPower);
     }
     
     /// <summary>
@@ -137,7 +137,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// <returns>ベット可能かどうか</returns>
     public virtual bool CanMentalBet(int betAmount)
     {
-        return mentalPower.Value >= betAmount;
+        return _mentalPower.Value >= betAmount;
     }
     
     /// <summary>

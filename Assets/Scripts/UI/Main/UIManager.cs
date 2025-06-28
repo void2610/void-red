@@ -39,6 +39,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     private readonly Subject<Unit> _playButtonClicked = new();
     public Observable<Unit> PlayButtonClicked => _playButtonClicked;
     
+    // 現在実行中のアナウンスメントのキャンセレーショントークン
+    private CancellationTokenSource _currentAnnouncementCts;
+    
     // 選択されたプレイスタイルと精神ベット
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue;
@@ -57,14 +60,27 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     
     public async UniTask ShowAnnouncement(string message, float duration = 2f)
     {
+        // 現在実行中のアナウンスメントをキャンセル
+        _currentAnnouncementCts?.Cancel();
+        _currentAnnouncementCts?.Dispose();
+        
+        // 新しいキャンセレーショントークンを作成
+        _currentAnnouncementCts = new CancellationTokenSource();
+        
         // アプリケーション終了時にもキャンセルされるようにする  
         var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
+            _currentAnnouncementCts.Token,
             this.GetCancellationTokenOnDestroy(), 
             Application.exitCancellationToken
         ).Token;
         
         try
         {
+            // テキストの位置をリセット（前回のアニメーションの影響を除去）
+            var textRect = announcementText.rectTransform;
+            var originalPosition = Vector2.zero; // 元の位置を0,0に固定
+            textRect.anchoredPosition = originalPosition;
+            
             // メッセージを設定
             announcementText.text = message;
             
@@ -75,8 +91,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             announcementText.color = new Color(announcementText.color.r, announcementText.color.g, announcementText.color.b, 0f);
             
             // テキストを左側に配置
-            var textRect = announcementText.rectTransform;
-            var originalPosition = textRect.anchoredPosition;
             textRect.anchoredPosition = new Vector2(originalPosition.x - SLIDE_DISTANCE, originalPosition.y);
             
             // フェードインアニメーション
@@ -143,7 +157,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             {
                 announcementBackground.gameObject.SetActive(false);
                 announcementText.gameObject.SetActive(false);
-                textRect.anchoredPosition = originalPosition;
+                textRect.anchoredPosition = Vector2.zero; // 位置を確実にリセット
             }
         }
         catch (System.OperationCanceledException)
@@ -230,11 +244,17 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         
         // プレイヤーの現在の精神力を取得
         var player = FindFirstObjectByType<Player>();
-        var currentMentalPower = player ? player.MentalPower.CurrentValue : MAX_MENTAL_BET;
+        var currentMentalPower = player.MentalPower.CurrentValue;
         
         // 精神力表示を更新
-        if (mentalPowerText)
-            mentalPowerText.text = $"精神力: {currentMentalPower}";
+        mentalPowerText.text = $"{currentMentalPower} / {player.MaxMentalPower}";
+        
+        // 現在のベット値が精神力を超えている場合は調整
+        if (_mentalBetValue > currentMentalPower)
+        {
+            _mentalBetValue = currentMentalPower;
+            mentalBetValueText.text = _mentalBetValue.ToString();
+        }
         
         // ボタンの有効/無効を切り替え（精神力制限も考慮）
         mentalBetPlusButton.interactable = (_mentalBetValue < MAX_MENTAL_BET && _mentalBetValue < currentMentalPower);
@@ -277,10 +297,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     {
         // プレイヤーの精神力変化を監視
         var player = FindFirstObjectByType<Player>();
-        if (player)
-        {
-            player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(this);
-        }
+        player.MentalPower.Subscribe(_ => UpdateMentalBetDisplay()).AddTo(this);
     }
     
     protected override void Awake()
@@ -299,12 +316,17 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         hesitationButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Hesitation));
         impulseButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Impulse));
         convictionButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Conviction));
+        UpdatePlayStyleButtonColors(_selectedPlayStyle);
         
         UpdateMentalBetDisplay();
     }
     
     private new void OnDestroy()
     {
+        // アナウンスメントのキャンセレーショントークンをクリーンアップ
+        _currentAnnouncementCts?.Cancel();
+        _currentAnnouncementCts?.Dispose();
+        
         _playButtonClicked?.Dispose();
         
         playButton.onClick.RemoveListener(OnPlayButtonClicked);
