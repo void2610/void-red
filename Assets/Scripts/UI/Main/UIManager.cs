@@ -6,6 +6,7 @@ using Void2610.UnityTemplate;
 using LitMotion;
 using LitMotion.Extensions;
 using R3;
+using System.Threading;
 
 public class UIManager : SingletonMonoBehaviour<UIManager>
 {
@@ -53,7 +54,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     
     public async UniTask ShowAnnouncement(string message, float duration = 2f)
     {
-        var cancellationToken = this.GetCancellationTokenOnDestroy();
+        // アプリケーション終了時にもキャンセルされるようにする  
+        var cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(
+            this.GetCancellationTokenOnDestroy(), 
+            Application.exitCancellationToken
+        ).Token;
         
         try
         {

@@ -1837,7 +1837,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8D66\u3057: 0.0\n\u62D2\u7D76: 0.0\n\u7A7A\u767D: 0.0"
+  m_text: "\u8D66\u3057: 0.15\n\u62D2\u7D76: 0.51\n\u7A7A\u767D: 0.78\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b8e6fe21ffb644619c549832b0ae123, type: 2}
   m_sharedMaterial: {fileID: 8805525192272063845, guid: 3b8e6fe21ffb644619c549832b0ae123, type: 2}
@@ -2337,7 +2337,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1406153002
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2371,7 +2371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.9490196}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3367,7 +3367,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2064822056
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3407,7 +3407,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30B9\u30C6\u30FC\u30C8\u5909\u66F4(PlayerCardSelection)\u304C\u30AD\u30E3\u30F3\u30BB\u30EB\u3055\u308C\u307E\u3057\u305F"
+  m_text: AnnouncementText
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b8e6fe21ffb644619c549832b0ae123, type: 2}
   m_sharedMaterial: {fileID: 8805525192272063845, guid: 3b8e6fe21ffb644619c549832b0ae123, type: 2}
@@ -3416,8 +3416,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 201326591
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3434,7 +3434,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 29.6
+  m_fontSize: 57.3
   m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 1
