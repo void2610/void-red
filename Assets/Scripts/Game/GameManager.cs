@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using VContainer;
+using System;
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
@@ -94,6 +95,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandleThemeAnnouncement()
     {
+        
         // ランダムなお題を選択
         _currentTheme.Value = _themeService.GetRandomTheme();
         UIManager.Instance.SetTheme(_currentTheme.Value);
@@ -108,25 +110,41 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         UIManager.Instance.ShowAnnouncement("プレイヤーのカード選択を待機中...", 0.5f).Forget();
         
-        // プレイヤーの選択を監視
-        player.SelectedCard.Subscribe(card =>
-        {
-            if (card && _currentState.Value == GameState.PlayerCardSelection)
-            {
-                // プレイボタンを表示してプレイヤーの確定を待つ
-                UIManager.Instance.ShowPlayButton();
-                WaitForPlayButtonAsync(card).Forget();
-            }
-        }).AddTo(this);
+        // プレイヤーの操作を待つ（カード選択とプレイボタン）
+        WaitForPlayerActionAsync().Forget();
     }
     
     /// <summary>
-    /// プレイボタンが押されるのを待つ
+    /// プレイヤーのアクションを待つ
     /// </summary>
-    private async UniTask WaitForPlayButtonAsync(Card selectedCard)
+    private async UniTask WaitForPlayerActionAsync()
     {
+        // カード選択を待つ
+        while (true)
+        {
+            await UniTask.Yield();
+            
+            // ゲーム状態が変わったら終了
+            if (_currentState.Value != GameState.PlayerCardSelection)
+                return;
+            
+            var selectedCard = player.SelectedCard.CurrentValue;
+            if (selectedCard)
+            {
+                // カードが選択されたらプレイボタンを表示
+                UIManager.Instance.ShowPlayButton();
+                break;
+            }
+        }
+        
         // プレイボタンが押されるのを待つ
         await UIManager.Instance.PlayButtonClicked.FirstAsync();
+        
+        UIManager.Instance.HidePlayButton();
+        // 選択されたカードを再取得
+        var finalSelectedCard = player.SelectedCard.CurrentValue;
+        if (!finalSelectedCard)
+            return;
         
         // プレイヤーの手を作成
         var playStyle = UIManager.Instance.GetSelectedPlayStyle();
@@ -134,7 +152,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         
         // 精神力を消費
         player.ConsumeMentalPower(mentalBet);
-        _playerMove = new PlayerMove(selectedCard, playStyle, mentalBet);
+        _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
         await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
@@ -163,8 +181,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // AIでカードを選択
         var npcCard = enemy.SelectCardByAI();
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
-        var npcPlayStyle = (PlayStyle)Random.Range(0, 3);
-        var npcMentalBet = Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
+        var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
+        var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
         // NPCの精神力を消費
         enemy.ConsumeMentalPower(npcMentalBet);

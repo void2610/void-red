@@ -280,6 +280,14 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     }
     
     /// <summary>
+    /// プレイボタンを非表示
+    /// </summary>
+    public void HidePlayButton()
+    {
+        playButton.gameObject.SetActive(false);
+    }
+    
+    /// <summary>
     /// 選択されたプレイスタイルを取得
     /// </summary>
     public PlayStyle GetSelectedPlayStyle()
