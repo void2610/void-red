@@ -14,9 +14,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     
     // DIされるサービス
     [Inject] private readonly CardPoolService _cardPoolService;
+    [Inject] private readonly ThemeService _themeService;
     
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
-    private readonly ReactiveProperty<CardStatus> _currentTheme = new (null);
+    private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     
     // プレイヤーとNPCの手
     private PlayerMove _playerMove;
@@ -94,11 +95,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private void HandleThemeAnnouncement()
     {
         // ランダムなお題を選択
-        _currentTheme.Value = new CardStatus(
-            forgiveness: Random.Range(0f, 1f),
-            rejection: Random.Range(0f, 1f),
-            blank: Random.Range(0f, 1f)
-        );
+        _currentTheme.Value = _themeService.GetRandomTheme();
         UIManager.Instance.SetTheme(_currentTheme.Value);
         
         DelayedStateChangeAsync(GameState.PlayerCardSelection, 0.3f).Forget();
@@ -140,7 +137,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         _playerMove = new PlayerMove(selectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を{_playerMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
+        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         
         // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
@@ -174,7 +171,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
         
         // NPCの選択を表示
-        await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を{_npcMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
+        await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         
@@ -199,8 +196,11 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         _isProcessing = true; // 処理開始フラグ
         
         // スコアを計算（テーマとの一致度 × 精神ベット）
-        var playerScore = playerMove.GetScore(_currentTheme.CurrentValue);
-        var npcScore = npcMove.GetScore(_currentTheme.CurrentValue);
+        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
+        if (currentThemeStatus == null) return;
+        
+        var playerScore = playerMove.GetScore(currentThemeStatus);
+        var npcScore = npcMove.GetScore(currentThemeStatus);
         
         // 評価結果を順次表示
         await UIManager.Instance.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
@@ -230,8 +230,11 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         _isProcessing = true; // 処理開始フラグ
         
         // スコアで勝敗判定（スコアが高い方が勝利）
-        var playerScore = _playerMove.GetScore(_currentTheme.CurrentValue);
-        var npcScore = _npcMove.GetScore(_currentTheme.CurrentValue);
+        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
+        if (currentThemeStatus == null) return;
+        
+        var playerScore = _playerMove.GetScore(currentThemeStatus);
+        var npcScore = _npcMove.GetScore(currentThemeStatus);
         
         string result;
         if (playerScore > npcScore)

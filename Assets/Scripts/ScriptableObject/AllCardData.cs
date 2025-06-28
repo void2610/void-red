@@ -45,8 +45,6 @@ public class AllCardData : ScriptableObject
         
         // ScriptableObjectを更新
         EditorUtility.SetDirty(this);
-        
-        Debug.Log($"カードを{cardList.Count}枚登録しました");
 #endif
     }
     

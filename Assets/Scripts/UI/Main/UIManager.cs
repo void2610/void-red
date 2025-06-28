@@ -49,13 +49,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     private const int MIN_MENTAL_BET = 0;
     private const int MAX_MENTAL_BET = 7;
 
-    public void SetTheme(CardStatus theme)
+    public void SetTheme(ThemeData theme)
     {
-        var text = "";
-        text += $"赦し: {theme.Forgiveness:F2}\n";
-        text += $"拒絶: {theme.Rejection:F2}\n";
-        text += $"空白: {theme.Blank:F2}\n";
-        themeText.text = text;
+        var fullText = $"『{theme.Title}』";
+        
+        LMotion.String.Create128Bytes("", fullText, 1f)
+            .WithEase(Ease.OutQuad)
+            .WithScrambleChars(ScrambleMode.None)
+            .BindToText(themeText)
+            .AddTo(gameObject);
     }
     
     public async UniTask ShowAnnouncement(string message, float duration = 2f)

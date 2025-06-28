@@ -45,8 +45,6 @@ public class AllThemeData : ScriptableObject
         
         // ScriptableObjectを更新
         EditorUtility.SetDirty(this);
-        
-        Debug.Log($"テーマを{themeList.Count}個登録しました");
 #endif
     }
     
