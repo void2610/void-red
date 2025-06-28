@@ -1,21 +1,18 @@
-using UnityEngine;
-using Void2610.UnityTemplate;
 using R3;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using System.Threading;
 using VContainer;
-using System;
+using VContainer.Unity;
+using UnityEngine;
 
-public class GameManager : SingletonMonoBehaviour<GameManager>
+public class GameManager: IStartable
 {
-    [Header("ゲーム設定")]
-    [SerializeField] private Player player;
-    [SerializeField] private Enemy enemy;
-    
-    // DIされるサービス
-    [Inject] private readonly CardPoolService _cardPoolService;
-    [Inject] private readonly ThemeService _themeService;
+    // DIされるサービスとコンポーネント
+    private readonly CardPoolService _cardPoolService;
+    private readonly ThemeService _themeService;
+    private readonly UIPresenter _uiPresenter;
+    private readonly Player _player;
+    private readonly Enemy _enemy;
     
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
@@ -30,7 +27,24 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     // プロパティ
     public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
-    private void Start()
+    /// <summary>
+    /// コンストラクタ（依存性注入）
+    /// </summary>
+    public GameManager(
+        CardPoolService cardPoolService,
+        ThemeService themeService,
+        UIPresenter uiPresenter,
+        Player player,
+        Enemy enemy)
+    {
+        _cardPoolService = cardPoolService;
+        _themeService = themeService;
+        _uiPresenter = uiPresenter;
+        _player = player;
+        _enemy = enemy;
+    }
+    
+    public void Start()
     {
         InitializeGame().Forget();
     }
@@ -46,16 +60,16 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         var playerDeck = _cardPoolService.GetRandomCards(10);
         var npcDeck = _cardPoolService.GetRandomCards(10);
         
-        player.InitializeDeck(playerDeck);
-        enemy.InitializeDeck(npcDeck);
+        _player.InitializeDeck(playerDeck);
+        _enemy.InitializeDeck(npcDeck);
         
         // 手札を配る
-        player.DrawCard(3);
+        _player.DrawCard(3);
         await UniTask.Delay(200);
-        enemy.DrawCard(3);
+        _enemy.DrawCard(3);
         
         // エネミーのカードを非インタラクティブに設定
-        enemy.SetHandInteractable(false);
+        _enemy.SetHandInteractable(false);
         
         // ゲーム開始
         ChangeState(GameState.ThemeAnnouncement);
@@ -98,7 +112,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         
         // ランダムなお題を選択
         _currentTheme.Value = _themeService.GetRandomTheme();
-        UIManager.Instance.SetTheme(_currentTheme.Value);
+        _uiPresenter.SetTheme(_currentTheme.Value);
         
         DelayedStateChangeAsync(GameState.PlayerCardSelection, 0.3f).Forget();
     }
@@ -108,7 +122,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     /// </summary>
     private void HandlePlayerCardSelection()
     {
-        UIManager.Instance.ShowAnnouncement("プレイヤーのカード選択を待機中...", 0.5f).Forget();
+        _uiPresenter.ShowAnnouncement("プレイヤーのカード選択を待機中...", 0.5f).Forget();
         
         // プレイヤーの操作を待つ（カード選択とプレイボタン）
         WaitForPlayerActionAsync().Forget();
@@ -128,34 +142,34 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             if (_currentState.Value != GameState.PlayerCardSelection)
                 return;
             
-            var selectedCard = player.SelectedCard.CurrentValue;
+            var selectedCard = _player.SelectedCard.CurrentValue;
             if (selectedCard)
             {
                 // カードが選択されたらプレイボタンを表示
-                UIManager.Instance.ShowPlayButton();
+                _uiPresenter.ShowPlayButton();
                 break;
             }
         }
         
         // プレイボタンが押されるのを待つ
-        await UIManager.Instance.PlayButtonClicked.FirstAsync();
+        await _uiPresenter.PlayButtonClicked.FirstAsync();
         
-        UIManager.Instance.HidePlayButton();
+        _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
-        var finalSelectedCard = player.SelectedCard.CurrentValue;
+        var finalSelectedCard = _player.SelectedCard.CurrentValue;
         if (!finalSelectedCard)
             return;
         
         // プレイヤーの手を作成
-        var playStyle = UIManager.Instance.GetSelectedPlayStyle();
-        var mentalBet = UIManager.Instance.GetMentalBetValue();
+        var playStyle = _uiPresenter.GetSelectedPlayStyle();
+        var mentalBet = _uiPresenter.GetMentalBetValue();
         
         // 精神力を消費
-        player.ConsumeMentalPower(mentalBet);
+        _player.ConsumeMentalPower(mentalBet);
         _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
+        await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         
         // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
@@ -179,17 +193,17 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         await UniTask.Delay(1000);
         
         // AIでカードを選択
-        var npcCard = enemy.SelectCardByAI();
+        var npcCard = _enemy.SelectCardByAI();
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
         var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
-        var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
+        var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
         // NPCの精神力を消費
-        enemy.ConsumeMentalPower(npcMentalBet);
+        _enemy.ConsumeMentalPower(npcMentalBet);
         _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
         
         // NPCの選択を表示
-        await UIManager.Instance.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
+        await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardData.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);
         // 少し間を置いてから評価フェーズに移行
         await UniTask.Delay(500);
         
@@ -221,9 +235,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         var npcScore = npcMove.GetScore(currentThemeStatus);
         
         // 評価結果を順次表示
-        await UIManager.Instance.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
+        await _uiPresenter.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
         await UniTask.Delay(300);
-        await UIManager.Instance.ShowAnnouncement($"NPCのスコア: {npcScore:F2}", 1f);
+        await _uiPresenter.ShowAnnouncement($"NPCのスコア: {npcScore:F2}", 1f);
         
         // 結果表示フェーズに移行
         await UniTask.Delay(500);
@@ -263,7 +277,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             result = "引き分け!";
         
         // 結果を表示
-        await UIManager.Instance.ShowAnnouncement(result, 2f);
+        await _uiPresenter.ShowAnnouncement(result, 2f);
         
         // カード崩壊判定
         var playerCollapse = _playerMove.ShouldCollapse();
@@ -280,34 +294,34 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             else
                 collapseMessage = "NPCのカードが崩壊した！";
                 
-            await UIManager.Instance.ShowAnnouncement(collapseMessage, 1.0f);
+            await _uiPresenter.ShowAnnouncement(collapseMessage, 1.0f);
         }
         
         // 使用したカードをプレイ（崩壊判定を含む）
         if (playerCollapse)
-            player.CollapseSelectedCard();
+            _player.CollapseSelectedCard();
         else
-            player.PlaySelectedCard(false);
+            _player.PlaySelectedCard(false);
             
         if (npcCollapse)
-            enemy.CollapseSelectedCard();
+            _enemy.CollapseSelectedCard();
         else
-            enemy.PlaySelectedCard(false);
+            _enemy.PlaySelectedCard(false);
         
         // カード使用後の処理完了を待つ
         await UniTask.Delay(1000);
         
         // 両プレイヤーの手札をデッキに戻す
         var returnTasks = new UniTask[2];
-        returnTasks[0] = player.ReturnHandToDeck();
-        returnTasks[1] = enemy.ReturnHandToDeck();
+        returnTasks[0] = _player.ReturnHandToDeck();
+        returnTasks[1] = _enemy.ReturnHandToDeck();
         
         await UniTask.WhenAll(returnTasks);
         
         // 手札を3枚ずつ配る
-        player.DrawCard(3);
+        _player.DrawCard(3);
         await UniTask.Delay(500);
-        enemy.DrawCard(3);
+        _enemy.DrawCard(3);
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);

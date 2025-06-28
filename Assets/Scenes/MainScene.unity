@@ -304,6 +304,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &138013219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 138013220}
+  - component: {fileID: 138013221}
+  m_Layer: 0
+  m_Name: Presenters
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &138013220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138013219}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &138013221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138013219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecd0700f79534a42a4bb8da8b3dc978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &159546606
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,52 +557,6 @@ MonoBehaviour:
   cardSpacing: 85
   cardAngle: 5
   isInteractable: 1
---- !u!1 &266725919
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 266725920}
-  - component: {fileID: 266725921}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &266725920
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 266725919}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &266725921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 266725919}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb5a9b4180dbc41398fc9bb794e03da4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 242816800}
-  enemy: {fileID: 889872061}
 --- !u!1 &293733584
 GameObject:
   m_ObjectHideFlags: 0
@@ -925,7 +923,7 @@ GameObject:
   - component: {fileID: 420335753}
   - component: {fileID: 420335752}
   m_Layer: 5
-  m_Name: Now
+  m_Name: MentalBetValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6934,6 +6932,8 @@ MonoBehaviour:
   autoInjectGameObjects: []
   allCardData: {fileID: 11400000, guid: 075876f7cb3fc4a0ba6a5498533fcd46, type: 2}
   allThemeData: {fileID: 11400000, guid: 5679fc83a0723432a91d3c598ccbc458, type: 2}
+  player: {fileID: 242816800}
+  enemy: {fileID: 889872061}
 --- !u!1 &889872060
 GameObject:
   m_ObjectHideFlags: 0
@@ -7137,75 +7137,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 890866790}
   m_CullTransparentMesh: 1
---- !u!1 &924331526
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 924331527}
-  - component: {fileID: 924331528}
-  - component: {fileID: 924331529}
-  m_Layer: 0
-  m_Name: UIManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &924331527
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924331526}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &924331528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924331526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f82b92360c6e94bc79f26f65447ae312, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  themeText: {fileID: 890866792}
-  announcementBackground: {fileID: 1406153003}
-  announcementText: {fileID: 2064822057}
-  playButton: {fileID: 1749416360}
-  hesitationButton: {fileID: 525348656}
-  impulseButton: {fileID: 159546608}
-  convictionButton: {fileID: 387609709}
-  playStyleSelectedText: {fileID: 512527748}
-  mentalBetPlusButton: {fileID: 1126778713}
-  mentalBetMinusButton: {fileID: 524478633}
-  mentalBetValueText: {fileID: 420335752}
-  mentalPowerText: {fileID: 17744037}
---- !u!114 &924331529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 924331526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1015278466
 GameObject:
   m_ObjectHideFlags: 0
@@ -7281,6 +7212,114 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1015278466}
   m_CullTransparentMesh: 1
+--- !u!1 &1048262595
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1048262596}
+  - component: {fileID: 1048262598}
+  - component: {fileID: 1048262597}
+  - component: {fileID: 1048262600}
+  - component: {fileID: 1048262599}
+  - component: {fileID: 1048262601}
+  m_Layer: 0
+  m_Name: Views
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1048262596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1048262597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1b46a2446844847a9387c4b0f858a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  themeText: {fileID: 890866792}
+--- !u!114 &1048262598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969686229e745437ea66ef1591a6db31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playButton: {fileID: 1749416360}
+--- !u!114 &1048262599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f807e2d93ad34bb0b87bee38d77ab26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mentalBetPlusButton: {fileID: 1126778713}
+  mentalBetMinusButton: {fileID: 524478633}
+  mentalBetValueText: {fileID: 420335752}
+  mentalPowerText: {fileID: 17744037}
+--- !u!114 &1048262600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0331857e7f64ad29d80ab88b54f2a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  announcementBackground: {fileID: 1406153003}
+  announcementText: {fileID: 2064822057}
+--- !u!114 &1048262601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048262595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1bd52e6d02ef49249b30ba60b31c1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hesitationButton: {fileID: 525348656}
+  impulseButton: {fileID: 159546608}
+  convictionButton: {fileID: 387609709}
+  playStyleSelectedText: {fileID: 512527748}
 --- !u!1 &1051276007
 GameObject:
   m_ObjectHideFlags: 0
@@ -8921,12 +8960,12 @@ SceneRoots:
   - {fileID: 1535600228}
   - {fileID: 619394802}
   - {fileID: 595253103}
-  - {fileID: 266725920}
+  - {fileID: 537741478}
   - {fileID: 242816801}
   - {fileID: 889872062}
-  - {fileID: 924331527}
   - {fileID: 1258626842}
   - {fileID: 62886071}
   - {fileID: 782623187}
-  - {fileID: 537741478}
   - {fileID: 484343041}
+  - {fileID: 1048262596}
+  - {fileID: 138013220}

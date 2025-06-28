@@ -6,6 +6,8 @@ public class MainLifetimeScope : LifetimeScope
 {
     [SerializeField] private AllCardData allCardData;
     [SerializeField] private AllThemeData allThemeData;
+    [SerializeField] private Player player;
+    [SerializeField] private Enemy enemy;
     
     private void RegisterAllData()
     {
@@ -17,6 +19,8 @@ public class MainLifetimeScope : LifetimeScope
     
     protected override void Configure(IContainerBuilder builder)
     {
+        builder.RegisterInstance(player);
+        builder.RegisterInstance(enemy);
         builder.RegisterInstance(allCardData);
         builder.RegisterInstance(allThemeData);
         RegisterAllData();
@@ -24,6 +28,7 @@ public class MainLifetimeScope : LifetimeScope
         builder.Register<CardPoolService>(Lifetime.Singleton);
         builder.Register<ThemeService>(Lifetime.Singleton);
         
-        builder.RegisterComponentInHierarchy<GameManager>();
+        builder.RegisterEntryPoint<GameManager>();
+        builder.RegisterComponentInHierarchy<UIPresenter>();
     }
 }
