@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using R3;
-using System.Linq;
-using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// プレイヤーとNPCの基底クラス
@@ -12,16 +11,13 @@ public abstract class BasePlayer : MonoBehaviour
 {
     [SerializeField] protected int maxMentalPower = 20;
     [SerializeField] protected int maxHandSize = 5;
-    [SerializeField] protected Transform handContainer; // 手札を配置するコンテナ
-    [SerializeField] protected Card cardPrefab; // カードのプレハブ
+    [SerializeField] protected Hand hand; // 手札管理クラス
     
-    // デッキと手札
+    // デッキと精神力
     private readonly List<CardData> _deck = new ();
-    protected readonly ReactiveProperty<List<Card>> Hand = new (new List<Card>());
-    protected readonly ReactiveProperty<Card> selectedCard = new (null);
     private readonly ReactiveProperty<int> _mentalPower = new ();
     
-    public ReadOnlyReactiveProperty<Card> SelectedCard => selectedCard;
+    public ReadOnlyReactiveProperty<Card> SelectedCard => hand.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public int MaxMentalPower => maxMentalPower;
     
@@ -29,6 +25,9 @@ public abstract class BasePlayer : MonoBehaviour
     {
         // 精神力を最大値で初期化
         _mentalPower.Value = maxMentalPower;
+        
+        // 手札のカード選択イベントを購読
+        hand.OnCardSelected += OnCardSelected;
     }
     
     /// <summary>
@@ -60,44 +59,35 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public virtual void DrawCard(int count = 1)
     {
+        DrawCardAsync(count).Forget();
+    }
+    
+    /// <summary>
+    /// カードを引く（アニメーション付き）
+    /// </summary>
+    protected virtual async UniTask DrawCardAsync(int count = 1)
+    {
+        var cardDataList = new List<CardData>();
+        
         for (var i = 0; i < count; i++)
         {
-            if (_deck.Count == 0 || Hand.Value.Count >= maxHandSize) break;
+            if (_deck.Count == 0 || hand.Count >= maxHandSize) break;
             
             var cardData = _deck[0];
             _deck.RemoveAt(0);
-            
-            // カードオブジェクトを生成
-            var cardObject = CreateCardObject(cardData);
-            Hand.Value.Add(cardObject);
+            cardDataList.Add(cardData);
         }
         
-        // ReactivePropertyを更新
-        Hand.ForceNotify();
-        ArrangeHand();
+        // 手札クラスにカードを追加（アニメーション付き）
+        await hand.AddCardsAsync(cardDataList);
     }
     
     /// <summary>
-    /// カードオブジェクトを生成
-    /// </summary>
-    protected virtual Card CreateCardObject(CardData cardData)
-    {
-        var cardObject = Instantiate(cardPrefab, handContainer);
-        cardObject.Init(cardData);
-        
-        // カードクリックイベントを登録
-        if (cardObject.TryGetComponent<Button>(out var button))
-            button.onClick.AddListener(() => OnCardSelected(cardObject));
-        
-        return cardObject;
-    }
-    
-    /// <summary>
-    /// 手札を整列
+    /// 手札を整列（Handクラスに委譲）
     /// </summary>
     protected virtual void ArrangeHand()
     {
-        // 子クラスで実装
+        // Handクラスで自動的に処理される
     }
     
     /// <summary>
@@ -105,7 +95,8 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     protected virtual void OnCardSelected(Card card)
     {
-        selectedCard.Value = card;
+        // Handクラスで既に選択状態は管理されているため、
+        // 子クラスで必要な追加処理があれば実装
     }
     
     /// <summary>
@@ -145,13 +136,10 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public virtual void PlaySelectedCard()
     {
-        if (!selectedCard.Value) return;
+        var selectedCard = hand.SelectedCard.CurrentValue;
+        if (!selectedCard) return;
         
-        var playedCard = selectedCard.Value;
-        Hand.Value.Remove(playedCard);
-        Hand.ForceNotify();
-        
-        selectedCard.Value = null;
-        ArrangeHand();
+        // 手札からカードを削除
+        hand.RemoveCard(selectedCard);
     }
 }

@@ -435,6 +435,7 @@ GameObject:
   m_Component:
   - component: {fileID: 242816801}
   - component: {fileID: 242816800}
+  - component: {fileID: 242816802}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -456,10 +457,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMentalPower: 20
   maxHandSize: 5
-  handContainer: {fileID: 359829453}
-  cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
-  cardSpacing: 150
-  cardAngle: 5
+  hand: {fileID: 242816802}
 --- !u!4 &242816801
 Transform:
   m_ObjectHideFlags: 0
@@ -475,6 +473,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &242816802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242816799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5f09a91c856f4764a9b7d221963eba0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handContainer: {fileID: 359829453}
+  cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  deckPosition: {fileID: 1051276008}
+  maxHandSize: 5
+  cardSpacing: 150
+  cardAngle: 5
 --- !u!1 &266725919
 GameObject:
   m_ObjectHideFlags: 0
@@ -571,7 +587,7 @@ GameObject:
   m_Component:
   - component: {fileID: 359829453}
   m_Layer: 5
-  m_Name: PlayerDeck
+  m_Name: PlayerHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6317,6 +6333,7 @@ RectTransform:
   - {fileID: 771159072}
   - {fileID: 293733585}
   - {fileID: 1406153002}
+  - {fileID: 1051276008}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6418,7 +6435,7 @@ GameObject:
   m_Component:
   - component: {fileID: 696993723}
   m_Layer: 5
-  m_Name: EnemyDeck
+  m_Name: EnemyHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6714,6 +6731,7 @@ GameObject:
   m_Component:
   - component: {fileID: 889872062}
   - component: {fileID: 889872061}
+  - component: {fileID: 889872063}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -6735,8 +6753,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMentalPower: 20
   maxHandSize: 5
-  handContainer: {fileID: 696993723}
-  cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  hand: {fileID: 889872063}
 --- !u!4 &889872062
 Transform:
   m_ObjectHideFlags: 0
@@ -6752,6 +6769,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &889872063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889872060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5f09a91c856f4764a9b7d221963eba0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handContainer: {fileID: 696993723}
+  cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
+  deckPosition: {fileID: 1051276008}
+  maxHandSize: 5
+  cardSpacing: 150
+  cardAngle: 5
 --- !u!1 &890866790
 GameObject:
   m_ObjectHideFlags: 0
@@ -6957,6 +6992,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08ff77b3328e243858a317c63345a977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1051276007
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1051276008}
+  - component: {fileID: 1051276010}
+  - component: {fileID: 1051276009}
+  m_Layer: 5
+  m_Name: Deck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1051276008
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051276007}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 595253103}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -450, y: 50}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1051276009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051276007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1051276010
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051276007}
+  m_CullTransparentMesh: 1
 --- !u!1 &1126778711
 GameObject:
   m_ObjectHideFlags: 0
