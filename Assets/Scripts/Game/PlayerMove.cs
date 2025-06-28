@@ -58,9 +58,11 @@ public class PlayerMove
     /// <returns>崩壊確率（0.0～1.0）</returns>
     public float GetCollapseChance()
     {
-        // 精神ベット値に基づいて崩壊確率を計算
-        // ベット0: 0%, ベット1: 5%, ベット2: 10%, ..., ベット7: 35%
-        return MentalBet * 0.05f;
+        var threshold = SelectedCard.CardData.CollapseThreshold;
+        if (MentalBet < threshold) return 0f; // 閾値未満では崩壊しない
+        
+        // 閾値を超えた場合、崩壊確率を計算
+        return (MentalBet - threshold) * 0.2f;
     }
     
     /// <summary>
