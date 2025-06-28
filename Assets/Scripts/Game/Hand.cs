@@ -66,7 +66,6 @@ public class Hand : MonoBehaviour
         foreach (var cardData in cardDataList)
         {
             await AddCardAsync(cardData);
-            await UniTask.Delay(50); // 少し間を置く
         }
     }
     

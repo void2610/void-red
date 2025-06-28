@@ -38,26 +38,27 @@ public class CardPoolService
     }
     
     /// <summary>
-    /// 複数のランダムなカードを取得（重複なし）
+    /// 複数のランダムなカードを取得（重複あり）
     /// </summary>
     /// <param name="count">取得するカード数</param>
     /// <returns>ランダムなカードのリスト</returns>
     public List<CardData> GetRandomCards(int count)
     {
         if (count <= 0) return new List<CardData>();
-        if (count >= _availableCards.Count) return new List<CardData>(_availableCards);
-        
-        // Fisher-Yatesシャッフルアルゴリズムを使用
-        var shuffled = new List<CardData>(_availableCards);
-        for (var i = 0; i < shuffled.Count; i++)
+        if (_availableCards.Count == 0)
         {
-            var temp = shuffled[i];
-            var randomIndex = Random.Range(i, shuffled.Count);
-            shuffled[i] = shuffled[randomIndex];
-            shuffled[randomIndex] = temp;
+            Debug.LogWarning("利用可能なカードがありません");
+            return new List<CardData>();
         }
         
-        return shuffled.Take(count).ToList();
+        var result = new List<CardData>();
+        for (var i = 0; i < count; i++)
+        {
+            var randomIndex = Random.Range(0, _availableCards.Count);
+            result.Add(_availableCards[randomIndex]);
+        }
+        
+        return result;
     }
     
     /// <summary>
