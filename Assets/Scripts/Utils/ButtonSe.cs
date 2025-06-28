@@ -65,6 +65,9 @@ namespace Void2610.UnityTemplate
             if ((_button != null && !_button.interactable) || clickSe == null) 
                 return;
             
+            if (!gameObject.activeInHierarchy || !_audioSource || !_audioSource.enabled)
+                return;
+            
             PlaySound(clickSe, clickVolume);
         }
         
@@ -73,7 +76,7 @@ namespace Void2610.UnityTemplate
         /// </summary>
         private void PlaySound(AudioClip clip, float volume)
         {
-            if (clip == null) return;
+            if (!clip || !_audioSource || !_audioSource.enabled) return;
             
             _audioSource.clip = clip;
             _audioSource.volume = volume;
