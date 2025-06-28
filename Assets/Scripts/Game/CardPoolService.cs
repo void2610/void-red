@@ -8,18 +8,17 @@ using System.Linq;
 /// </summary>
 public class CardPoolService
 {
-    private readonly AllCardDataList _allCardDataList;
+    private readonly AllCardData _allCardData;
     private readonly List<CardData> _availableCards;
     
     /// <summary>
     /// コンストラクタ（AllCardDataListをDIで受け取る）
     /// </summary>
-    /// <param name="allCardDataList">全カードデータリスト</param>
-    public CardPoolService(AllCardDataList allCardDataList)
+    /// <param name="allCardData">全カードデータリスト</param>
+    public CardPoolService(AllCardData allCardData)
     {
-        _allCardDataList = allCardDataList;
-        _allCardDataList.RegisterAllCards(); // 全カードを登録
-        _availableCards = new List<CardData>(_allCardDataList.CardList);
+        _allCardData = allCardData;
+        _availableCards = new List<CardData>(_allCardData.CardList);
     }
     
     /// <summary>
@@ -30,7 +29,6 @@ public class CardPoolService
     {
         if (_availableCards.Count == 0)
         {
-            Debug.LogWarning("利用可能なカードがありません");
             return null;
         }
         
@@ -48,7 +46,6 @@ public class CardPoolService
         if (count <= 0) return new List<CardData>();
         if (_availableCards.Count == 0)
         {
-            Debug.LogWarning("利用可能なカードがありません");
             return new List<CardData>();
         }
         
@@ -90,5 +87,5 @@ public class CardPoolService
     /// <summary>
     /// 全カード数を取得
     /// </summary>
-    public int TotalCardCount => _allCardDataList.Count;
+    public int TotalCardCount => _allCardData.Count;
 }

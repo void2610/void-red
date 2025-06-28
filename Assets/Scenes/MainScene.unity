@@ -6933,7 +6933,8 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  allCardDataList: {fileID: 11400000, guid: 075876f7cb3fc4a0ba6a5498533fcd46, type: 2}
+  allCardData: {fileID: 11400000, guid: 075876f7cb3fc4a0ba6a5498533fcd46, type: 2}
+  allThemeData: {fileID: 11400000, guid: 5679fc83a0723432a91d3c598ccbc458, type: 2}
 --- !u!1 &889872060
 GameObject:
   m_ObjectHideFlags: 0

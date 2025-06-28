@@ -337,12 +337,9 @@ public class Hand : MonoBehaviour
     {
         var previousCard = _selectedCard.Value;
         
-        Debug.Log($"SetSelectedCard: new={card?.name}, previous={previousCard?.name}");
-        
         // 前に選択されていたカードのハイライトを解除
         if (previousCard && previousCard != card)
         {
-            Debug.Log($"Removing highlight from: {previousCard.name}");
             HighlightCard(previousCard, false);
         }
         
@@ -351,7 +348,6 @@ public class Hand : MonoBehaviour
         // 新しいカードをハイライト
         if (card)
         {
-            Debug.Log($"Adding highlight to: {card.name}");
             HighlightCard(card, true);
         }
         

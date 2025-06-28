@@ -142,9 +142,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         // プレイヤーの選択を表示
         await UIManager.Instance.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardData.CardName} を{_playerMove.PlayStyle.ToJapaneseString()}で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
         
-        // デバッグログで詳細を表示
-        Debug.Log($"プレイヤーの選択 - {_playerMove}");
-        
         // 少し間を置いてから敵フェーズに移行
         await UniTask.Delay(500);
         ChangeState(GameState.EnemyCardSelection);

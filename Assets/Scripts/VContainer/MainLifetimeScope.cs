@@ -4,18 +4,26 @@ using VContainer.Unity;
 
 public class MainLifetimeScope : LifetimeScope
 {
-    [Header("ゲーム設定")]
-    [SerializeField] private AllCardDataList allCardDataList;
+    [SerializeField] private AllCardData allCardData;
+    [SerializeField] private AllThemeData allThemeData;
+    
+    private void RegisterAllData()
+    {
+        #if UNITY_EDITOR
+        allCardData.RegisterAllCards();
+        allThemeData.RegisterAllThemes();
+        #endif
+    }
     
     protected override void Configure(IContainerBuilder builder)
     {
-        // AllCardDataListをインスタンスとして登録
-        builder.RegisterInstance(allCardDataList);
+        builder.RegisterInstance(allCardData);
+        builder.RegisterInstance(allThemeData);
+        RegisterAllData();
         
-        // CardPoolServiceをシングルトンとして登録
         builder.Register<CardPoolService>(Lifetime.Singleton);
+        builder.Register<ThemeService>(Lifetime.Singleton);
         
-        // GameManagerをシングルトンとして登録
         builder.RegisterComponentInHierarchy<GameManager>();
     }
 }

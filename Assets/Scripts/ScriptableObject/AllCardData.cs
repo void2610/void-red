@@ -9,8 +9,8 @@ using UnityEditor;
 /// <summary>
 /// 全てのCardDataを管理するScriptableObject
 /// </summary>
-[CreateAssetMenu(fileName = "AllCardDataList", menuName = "VoidRed/All Card Data List")]
-public class AllCardDataList : ScriptableObject
+[CreateAssetMenu(fileName = "AllCardData", menuName = "VoidRed/All Card Data")]
+public class AllCardData : ScriptableObject
 {
     [SerializeField] private List<CardData> cardList = new ();
     
