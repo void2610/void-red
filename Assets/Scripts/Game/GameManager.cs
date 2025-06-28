@@ -4,14 +4,16 @@ using R3;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using VContainer;
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     [Header("ゲーム設定")]
-    [SerializeField] private AllCardDataList allCardDataList;
     [SerializeField] private Player player;
     [SerializeField] private Enemy enemy;
     
+    // DIされるサービス
+    [Inject] private readonly CardPoolService _cardPoolService;
     
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<CardStatus> _currentTheme = new (null);
@@ -26,7 +28,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        allCardDataList.RegisterAllCards();
     }
     
     private void Start()
@@ -40,10 +41,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private void InitializeGame()
     {
         // カードデッキを初期化
-        if (allCardDataList && allCardDataList.Count > 0)
+        if (_cardPoolService.AvailableCardCount > 0)
         {
-            var playerDeck = allCardDataList.GetRandomCards(10);
-            var npcDeck = allCardDataList.GetRandomCards(10);
+            var playerDeck = _cardPoolService.GetRandomCards(10);
+            var npcDeck = _cardPoolService.GetRandomCards(10);
             
             player.InitializeDeck(playerDeck);
             enemy.InitializeDeck(npcDeck);

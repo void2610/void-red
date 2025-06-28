@@ -39,7 +39,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue;
     
-    // 精神ベットの定数
     private const int MIN_MENTAL_BET = 0;
     private const int MAX_MENTAL_BET = 7;
 
@@ -156,68 +155,28 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
         }
     }
     
-    protected override void Awake()
-    {
-        base.Awake();
-        announcementBackground.gameObject.SetActive(false);
-        announcementText.gameObject.SetActive(false);
-        
-        // プレイボタンの初期化
-        playButton.onClick.AddListener(OnPlayButtonClicked);
-        playButton.gameObject.SetActive(false);
-        
-        // プレイスタイルボタンの初期化
-        InitializePlayStyleButtons();
-        // 精神ベットボタンの初期化
-        InitializeMentalBetButtons();
-    }
-    
-    /// <summary>
-    /// プレイスタイルボタンの初期化
-    /// </summary>
-    private void InitializePlayStyleButtons()
-    {
-        // デフォルトで「迷い」を選択
-        _selectedPlayStyle = PlayStyle.Hesitation;
-        
-        if (hesitationButton)
-        {
-            hesitationButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Hesitation));
-        }
-        
-        if (impulseButton)
-        {
-            impulseButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Impulse));
-        }
-        
-        if (convictionButton)
-        {
-            convictionButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Conviction));
-        }
-    }
-    
     /// <summary>
     /// プレイスタイルが選択された時の処理
     /// </summary>
     private void OnPlayStyleSelected(PlayStyle playStyle)
     {
         _selectedPlayStyle = playStyle;
-        UpdatePlayStyleButtonColors();
-        UpdatePlayStyleSelectedText();
+        UpdatePlayStyleButtonColors(playStyle);
+        playStyleSelectedText.text = $"出し方: {_selectedPlayStyle.ToJapaneseString()}";
     }
     
     /// <summary>
     /// プレイスタイルボタンの色を更新
     /// </summary>
-    private void UpdatePlayStyleButtonColors()
+    private void UpdatePlayStyleButtonColors(PlayStyle playStyle)
     {
         // 全ボタンをデフォルト色にリセット
-        ResetButtonColor(hesitationButton);
-        ResetButtonColor(impulseButton);
-        ResetButtonColor(convictionButton);
+        hesitationButton.GetComponent<Image>().color = Color.white;
+        impulseButton.GetComponent<Image>().color = Color.white;
+        convictionButton.GetComponent<Image>().color = Color.white;
         
         // 選択されたボタンをハイライト
-        Button selectedButton = _selectedPlayStyle switch
+        var selectedButton = playStyle switch
         {
             PlayStyle.Hesitation => hesitationButton,
             PlayStyle.Impulse => impulseButton,
@@ -225,72 +184,22 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
             _ => hesitationButton
         };
         
-        HighlightButton(selectedButton);
+        selectedButton.GetComponent<Image>().color = new Color(0.8f, 1f, 0.8f, 1f); // 淡い緑
     }
     
-    /// <summary>
-    /// ボタンをデフォルト色にリセット
-    /// </summary>
-    private void ResetButtonColor(Button button)
-    {
-        if (!button) return;
-        
-        var colors = button.colors;
-        colors.normalColor = Color.white;
-        button.colors = colors;
-    }
+
     
-    /// <summary>
-    /// ボタンをハイライト
-    /// </summary>
-    private void HighlightButton(Button button)
-    {
-        if (!button) return;
-        
-        var colors = button.colors;
-        colors.normalColor = new Color(0.8f, 1f, 0.8f, 1f); // 淡い緑
-        button.colors = colors;
-    }
     
-    /// <summary>
-    /// 選択されたプレイスタイルのテキストを更新
-    /// </summary>
-    private void UpdatePlayStyleSelectedText()
-    {
-        if (playStyleSelectedText)
-        {
-            playStyleSelectedText.text = $"出し方: {_selectedPlayStyle.ToJapaneseString()}";
-        }
-    }
-    
-    /// <summary>
-    /// 精神ベットボタンの初期化
-    /// </summary>
-    private void InitializeMentalBetButtons()
-    {
-        if (mentalBetPlusButton)
-        {
-            mentalBetPlusButton.onClick.AddListener(OnMentalBetPlus);
-        }
-        
-        if (mentalBetMinusButton)
-        {
-            mentalBetMinusButton.onClick.AddListener(OnMentalBetMinus);
-        }
-        
-        UpdateMentalBetDisplay();
-    }
     
     /// <summary>
     /// 精神ベットのプラスボタンが押された時の処理
     /// </summary>
     private void OnMentalBetPlus()
     {
-        if (_mentalBetValue < MAX_MENTAL_BET)
-        {
-            _mentalBetValue++;
-            UpdateMentalBetDisplay();
-        }
+        if (_mentalBetValue >= MAX_MENTAL_BET) return;
+        
+        _mentalBetValue++;
+        UpdateMentalBetDisplay();
     }
     
     /// <summary>
@@ -298,11 +207,10 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     /// </summary>
     private void OnMentalBetMinus()
     {
-        if (_mentalBetValue > MIN_MENTAL_BET)
-        {
-            _mentalBetValue--;
-            UpdateMentalBetDisplay();
-        }
+        if (_mentalBetValue <= MIN_MENTAL_BET) return;
+        
+        _mentalBetValue--;
+        UpdateMentalBetDisplay();
     }
     
     /// <summary>
@@ -330,10 +238,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     /// </summary>
     public void ShowPlayButton()
     {
-        UpdatePlayStyleButtonColors();
-        UpdatePlayStyleSelectedText();
-        UpdateMentalBetDisplay();
-        
         playButton.gameObject.SetActive(true);
     }
     
@@ -351,6 +255,26 @@ public class UIManager : SingletonMonoBehaviour<UIManager>
     public int GetMentalBetValue()
     {
         return _mentalBetValue;
+    }
+    
+    protected override void Awake()
+    {
+        base.Awake();
+        announcementBackground.gameObject.SetActive(false);
+        announcementText.gameObject.SetActive(false);
+        
+        playButton.onClick.AddListener(OnPlayButtonClicked);
+        playButton.gameObject.SetActive(false);
+        
+        mentalBetPlusButton.onClick.AddListener(OnMentalBetPlus);
+        mentalBetMinusButton.onClick.AddListener(OnMentalBetMinus);
+        
+        _selectedPlayStyle = PlayStyle.Hesitation;
+        hesitationButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Hesitation));
+        impulseButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Impulse));
+        convictionButton.onClick.AddListener(() => OnPlayStyleSelected(PlayStyle.Conviction));
+        
+        UpdateMentalBetDisplay();
     }
     
     private new void OnDestroy()
