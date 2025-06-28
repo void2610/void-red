@@ -25,6 +25,32 @@
 - LitMotion: 高性能アニメーション（文字列アニメーション含む）
 - UniTask: 非同期処理
 
+### 簡略化MVPパターン
+
+#### アーキテクチャ概要
+```
+Presenter層 (上位管理)
+├── UIPresenter (UI統合管理)
+└── GameManager (ゲームフロー制御)
+    │
+    ▼
+View層 (表示+基本ロジック)
+├── CardView (カード表示+アニメーション)
+├── HandView (手札管理+配置)
+└── 各種UIView (Theme, Announcement等)
+    │
+    ▼
+Model層 (データ)
+├── CardData, PlayerMove
+└── ThemeData, CardStatus等
+```
+
+#### 設計方針
+- **適切な粒度**: 過度な分離を避け、実用的なレベルで責務分離
+- **自己完結性**: 各Viewが必要な機能（アニメーション等）を内包
+- **シンプルな依存関係**: 複雑な依存性注入を排除
+- **Unity親和性**: MonoBehaviourベースの自然な構造
+
 ### カードゲーム設計
 
 #### 基本要素
@@ -32,12 +58,18 @@
   - CardStatus: 許し、拒絶、空白の3つのfloatパラメータ
   - ScoreMultiplier: カード固有の倍率
   - CollapseThreshold: 崩壊閾値
-- **Card**: MonoBehaviourでUIと効果を統合
-- **Hand**: カード表示とアニメーション管理の独立クラス
-- **PlayerMove**: プレイヤーの手（カード、プレイスタイル、精神ベット）をまとめたクラス
+- **CardView**: カードの表示とアニメーション（簡略化MVP）
+  - LitMotionによる自己完結的なアニメーション
+  - R3によるリアクティブイベント処理
+- **HandView**: 手札管理とカード配置（簡略化MVP）
+  - 扇状配置とアニメーション制御
+  - カード選択状態の一元管理
+- **PlayerMove**: プレイヤーの手（CardData、プレイスタイル、精神ベット）
+  - UIに依存しない純粋なデータクラス
 
 #### 精神力システム
 - **BasePlayer**: プレイヤーとエネミー共通の基底クラス
+  - HandViewを直接参照（シンプルな構造）
   - 最大精神力20からスタート
   - 精神ベットで消費、ゲーム進行で自動回復
   - 精神力不足時のベット制限
@@ -74,6 +106,7 @@
 - **CardPoolService**: カードプール管理
 - **ThemeService**: テーマ選択管理
 - 両サービスともVContainerでSingleton登録
+- ❌ CardAnimationService（削除済み - CardView内蔵）
 
 ### UI/UX設計
 - **段階的操作**: カード選択→ボタン表示→確定の段階的フロー
@@ -131,6 +164,13 @@ Assets/Scripts/Example.cs(11,9): error CS0103: The name 'NonExistentMethod' does
 
 ## 実装完了機能
 
+### 簡略化MVPアーキテクチャ
+- ✅ CardView（表示+アニメーション統合）
+- ✅ HandView（手札管理+配置）
+- ✅ UIPresenter（UI統合管理）
+- ✅ BasePlayer簡素化（HandView直接参照）
+- ✅ PlayerMove純粋データ化（CardData保持）
+
 ### 精神力システム
 - ✅ MP管理（消費/回復）
 - ✅ UI表示（現在/最大）
@@ -147,6 +187,7 @@ Assets/Scripts/Example.cs(11,9): error CS0103: The name 'NonExistentMethod' does
 - ✅ スコア倍率
 - ✅ 崩壊閾値
 - ✅ 崩壊システム
+- ✅ 自己完結アニメーション
 
 ### UI/UX改善
 - ✅ 段階的ボタン表示
@@ -157,3 +198,4 @@ Assets/Scripts/Example.cs(11,9): error CS0103: The name 'NonExistentMethod' does
 - ✅ Subscription管理簡素化
 - ✅ メモリリーク対策
 - ✅ 重複実行防止
+- ✅ 複雑な依存性注入の排除
