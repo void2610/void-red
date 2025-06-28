@@ -30,8 +30,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         base.Awake();
     }
     
-    private void Start()
+    private async UniTaskVoid Start()
     {
+        await UniTask.Delay(1000);
         InitializeGame();
     }
     

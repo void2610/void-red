@@ -14,19 +14,9 @@ public class Enemy : BasePlayer
     {
         if (hand.Count == 0) return null;
         
-        var selectedCard = SelectRandomCard();
-        // AIが選択したカードを設定（Handクラス経由）
+        var cards = hand.Cards.CurrentValue;
+        var selectedCard = cards[Random.Range(0, cards.Count)];
         hand.SetSelectedCard(selectedCard);
         return selectedCard;
-    }
-    
-    /// <summary>
-    /// ランダムにカードを選択
-    /// </summary>
-    private Card SelectRandomCard()
-    {
-        var cards = hand.Cards.CurrentValue;
-        var randomIndex = Random.Range(0, cards.Count);
-        return cards[randomIndex];
     }
 }

@@ -316,6 +316,7 @@ GameObject:
   - component: {fileID: 159546610}
   - component: {fileID: 159546609}
   - component: {fileID: 159546608}
+  - component: {fileID: 159546611}
   m_Layer: 5
   m_Name: Impulse
   m_TagString: Untagged
@@ -425,6 +426,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 159546606}
   m_CullTransparentMesh: 1
+--- !u!114 &159546611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159546606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &242816799
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,7 +510,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   deckPosition: {fileID: 1051276008}
   maxHandSize: 5
-  cardSpacing: 150
+  cardSpacing: 85
   cardAngle: 5
 --- !u!1 &266725919
 GameObject:
@@ -624,6 +645,7 @@ GameObject:
   - component: {fileID: 387609711}
   - component: {fileID: 387609710}
   - component: {fileID: 387609709}
+  - component: {fileID: 387609712}
   m_Layer: 5
   m_Name: Conviction
   m_TagString: Untagged
@@ -733,6 +755,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 387609707}
   m_CullTransparentMesh: 1
+--- !u!114 &387609712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387609707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &399360233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,6 +1244,7 @@ GameObject:
   - component: {fileID: 524478635}
   - component: {fileID: 524478634}
   - component: {fileID: 524478633}
+  - component: {fileID: 524478636}
   m_Layer: 5
   m_Name: MinusButton
   m_TagString: Untagged
@@ -1311,6 +1354,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 524478631}
   m_CullTransparentMesh: 1
+--- !u!114 &524478636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524478631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &525348654
 GameObject:
   m_ObjectHideFlags: 0
@@ -1323,6 +1386,7 @@ GameObject:
   - component: {fileID: 525348658}
   - component: {fileID: 525348657}
   - component: {fileID: 525348656}
+  - component: {fileID: 525348659}
   m_Layer: 5
   m_Name: Hesitation
   m_TagString: Untagged
@@ -1432,6 +1496,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 525348654}
   m_CullTransparentMesh: 1
+--- !u!114 &525348659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525348654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &537741475
 GameObject:
   m_ObjectHideFlags: 0
@@ -6375,14 +6459,14 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 731645807}
+  - {fileID: 1051276008}
   - {fileID: 359829453}
   - {fileID: 696993723}
+  - {fileID: 731645807}
   - {fileID: 1749416359}
   - {fileID: 771159072}
   - {fileID: 293733585}
   - {fileID: 1406153002}
-  - {fileID: 1051276008}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6834,7 +6918,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 9027256954344151676, guid: 90aea7d65f43740d19d32c8bd214272f, type: 3}
   deckPosition: {fileID: 1051276008}
   maxHandSize: 5
-  cardSpacing: 150
+  cardSpacing: 85
   cardAngle: 5
 --- !u!1 &890866790
 GameObject:
@@ -7128,6 +7212,7 @@ GameObject:
   - component: {fileID: 1126778715}
   - component: {fileID: 1126778714}
   - component: {fileID: 1126778713}
+  - component: {fileID: 1126778716}
   m_Layer: 5
   m_Name: PlusButton
   m_TagString: Untagged
@@ -7237,6 +7322,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126778711}
   m_CullTransparentMesh: 1
+--- !u!114 &1126778716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126778711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &1258626839
 GameObject:
   m_ObjectHideFlags: 0
@@ -7965,6 +8070,7 @@ GameObject:
   - component: {fileID: 1749416362}
   - component: {fileID: 1749416361}
   - component: {fileID: 1749416360}
+  - component: {fileID: 1749416363}
   m_Layer: 5
   m_Name: PlayButton
   m_TagString: Untagged
@@ -8074,6 +8180,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1749416358}
   m_CullTransparentMesh: 1
+--- !u!114 &1749416363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749416358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ecdaa4bc9993409d8adaef02b208e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSe: {fileID: 0}
+  hoverVolume: 1
+  clickSe: {fileID: 8300000, guid: 65782246a68804adcb7848433e575d95, type: 3}
+  clickVolume: 0.4
+  randomizePitch: 1
+  minPitch: 0.9
+  maxPitch: 1.1
+  hoverCooldown: 0.1
 --- !u!1 &1809374232
 GameObject:
   m_ObjectHideFlags: 0

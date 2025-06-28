@@ -28,6 +28,9 @@ public class Hand : MonoBehaviour
     private readonly ReactiveProperty<List<Card>> _cards = new(new List<Card>());
     private readonly ReactiveProperty<Card> _selectedCard = new(null);
     
+    // カードの元の位置を記憶
+    private readonly Dictionary<Card, float> _originalYPositions = new();
+    
     // イベント
     public event Action<Card> OnCardSelected;
     
@@ -52,7 +55,13 @@ public class Hand : MonoBehaviour
         SeManager.Instance.PlaySe("Card");
         
         // 手札を再配置
-        ArrangeCards();
+        await ArrangeCardsAsync();
+        
+        // 選択中のカードがあれば再度ハイライト
+        if (_selectedCard.Value)
+        {
+            HighlightCard(_selectedCard.Value, true);
+        }
         
         // ReactivePropertyを更新
         _cards.ForceNotify();
@@ -65,7 +74,8 @@ public class Hand : MonoBehaviour
     {
         foreach (var cardData in cardDataList)
         {
-            await AddCardAsync(cardData);
+            AddCardAsync(cardData).Forget();
+            await UniTask.Delay(250);
         }
     }
     
@@ -74,14 +84,60 @@ public class Hand : MonoBehaviour
     /// </summary>
     public void RemoveCard(Card card)
     {
-        if (_cards.Value.Remove(card))
+        RemoveCardAsync(card).Forget();
+    }
+    
+    /// <summary>
+    /// カードを手札から削除（アニメーション付き）
+    /// </summary>
+    private async UniTask RemoveCardAsync(Card card)
+    {
+        if (!_cards.Value.Contains(card)) return;
+        
+        // カードを削除
+        _cards.Value.Remove(card);
+        if (_selectedCard.Value == card)
+            _selectedCard.Value = null;
+        
+        // 元の位置情報も削除
+        _originalYPositions.Remove(card);
+        
+        // カードの削除アニメーション
+        var rectTransform = card.GetComponent<RectTransform>();
+        if (rectTransform)
         {
-            if (_selectedCard.Value == card)
-                _selectedCard.Value = null;
+            // 上に移動しながらスケール縮小
+            var currentPos = rectTransform.anchoredPosition;
+            var targetPos = new Vector2(currentPos.x, currentPos.y + 100f);
+            
+            var moveTask = LMotion.Create(currentPos, targetPos, 0.3f)
+                .WithEase(Ease.InCubic)
+                .BindToAnchoredPosition(rectTransform)
+                .AddTo(card.gameObject)
+                .ToUniTask();
                 
-            ArrangeCards();
-            _cards.ForceNotify();
+            var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.5f, 0.3f)
+                .WithEase(Ease.InCubic)
+                .BindToLocalScale(rectTransform)
+                .AddTo(card.gameObject)
+                .ToUniTask();
+                
+            await UniTask.WhenAll(moveTask, scaleTask);
         }
+        
+        // カードオブジェクトを破棄
+        Destroy(card.gameObject);
+        
+        // 残りのカードを再配置
+        await ArrangeCardsAsync();
+        
+        // 選択中のカードがあれば再度ハイライト
+        if (_selectedCard.Value)
+        {
+            HighlightCard(_selectedCard.Value, true);
+        }
+        
+        _cards.ForceNotify();
     }
     
     /// <summary>
@@ -126,7 +182,26 @@ public class Hand : MonoBehaviour
     /// </summary>
     public void SetSelectedCard(Card card)
     {
+        var previousCard = _selectedCard.Value;
+        
+        Debug.Log($"SetSelectedCard: new={card?.name}, previous={previousCard?.name}");
+        
+        // 前に選択されていたカードのハイライトを解除
+        if (previousCard && previousCard != card)
+        {
+            Debug.Log($"Removing highlight from: {previousCard.name}");
+            HighlightCard(previousCard, false);
+        }
+        
         _selectedCard.Value = card;
+        
+        // 新しいカードをハイライト
+        if (card)
+        {
+            Debug.Log($"Adding highlight to: {card.name}");
+            HighlightCard(card, true);
+        }
+        
         OnCardSelected?.Invoke(card);
     }
     
@@ -167,13 +242,14 @@ public class Hand : MonoBehaviour
     /// <summary>
     /// 手札を扇状に配置
     /// </summary>
-    private void ArrangeCards()
+    private async UniTask ArrangeCardsAsync()
     {
         var cardCount = _cards.Value.Count;
         if (cardCount == 0) return;
         
         // 中心から左右に配置
         var startX = -(cardCount - 1) * cardSpacing * 0.5f;
+        var animationTasks = new List<UniTask>();
         
         for (int i = 0; i < cardCount; i++)
         {
@@ -184,13 +260,45 @@ public class Hand : MonoBehaviour
             var rectTransform = card.GetComponent<RectTransform>();
             if (rectTransform)
             {
-                rectTransform.anchoredPosition = new Vector2(startX + i * cardSpacing, 0);
+                // 基本のY位置は0
+                var targetPosition = new Vector2(startX + i * cardSpacing, 0);
+                var targetRotation = Quaternion.Euler(0, 0, -(i - (cardCount - 1) * 0.5f) * cardAngle);
                 
-                // 扇状に角度をつける
-                var angle = (i - (cardCount - 1) * 0.5f) * cardAngle;
-                rectTransform.rotation = Quaternion.Euler(0, 0, -angle);
+                // 元のY位置を記憶（新しいカードの場合のみ）
+                if (!_originalYPositions.ContainsKey(card))
+                {
+                    _originalYPositions[card] = 0;
+                }
+                
+                // 位置のアニメーション
+                var moveTask = LMotion.Create(rectTransform.anchoredPosition, targetPosition, 0.3f)
+                    .WithEase(Ease.OutCubic)
+                    .BindToAnchoredPosition(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                
+                // 回転のアニメーション
+                var rotateTask = LMotion.Create(rectTransform.rotation, targetRotation, 0.3f)
+                    .WithEase(Ease.OutCubic)
+                    .BindToRotation(rectTransform)
+                    .AddTo(card.gameObject)
+                    .ToUniTask();
+                
+                animationTasks.Add(moveTask);
+                animationTasks.Add(rotateTask);
             }
         }
+        
+        // 全てのアニメーションが完了するまで待つ
+        await UniTask.WhenAll(animationTasks);
+    }
+    
+    /// <summary>
+    /// 手札を扇状に配置（同期版）
+    /// </summary>
+    private void ArrangeCards()
+    {
+        ArrangeCardsAsync().Forget();
     }
     
     /// <summary>
@@ -203,10 +311,21 @@ public class Hand : MonoBehaviour
         var rectTransform = card.GetComponent<RectTransform>();
         if (rectTransform)
         {
-            // 選択時は少し上に移動
+            // 元のY位置を取得（記憶されていない場合は0）
+            float originalY = _originalYPositions.ContainsKey(card) ? _originalYPositions[card] : 0f;
+            
+            // デバッグログ
+            Debug.Log($"HighlightCard: {card.name}, highlight: {highlight}, originalY: {originalY}, currentY: {rectTransform.anchoredPosition.y}");
+            
+            // 選択時は少し上に移動、非選択時は元の位置に戻る
             var currentPos = rectTransform.anchoredPosition;
-            currentPos.y = highlight ? 30f : 0f;
-            rectTransform.anchoredPosition = currentPos;
+            var targetPos = new Vector2(currentPos.x, highlight ? originalY + 30f : originalY);
+            
+            // 位置のアニメーション
+            LMotion.Create(currentPos, targetPos, 0.2f)
+                .WithEase(Ease.OutCubic)
+                .BindToAnchoredPosition(rectTransform)
+                .AddTo(card.gameObject);
         }
     }
 }
