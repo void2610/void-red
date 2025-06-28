@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
@@ -22,11 +23,9 @@ public abstract class BasePlayer : MonoBehaviour
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public int MaxMentalPower => maxMentalPower;
     
-    protected virtual void Awake()
-    {
-        // 精神力を最大値で初期化
-        _mentalPower.Value = maxMentalPower;
-    }
+    public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
+    public void SetHandInteractable(bool interactable) => handView.SetInteractable(interactable);
+    public void RestoreMentalPower(int amount) => _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, maxMentalPower);
     
     /// <summary>
     /// デッキを初期化
@@ -39,60 +38,16 @@ public abstract class BasePlayer : MonoBehaviour
     }
     
     /// <summary>
-    /// デッキをシャッフル
-    /// </summary>
-    protected void ShuffleDeck()
-    {
-        for (var i = 0; i < _deck.Count; i++)
-        {
-            var temp = _deck[i];
-            var randomIndex = Random.Range(i, _deck.Count);
-            _deck[i] = _deck[randomIndex];
-            _deck[randomIndex] = temp;
-        }
-    }
-    
-    public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
-    
-    /// <summary>
-    /// カードを引く（アニメーション付き）
-    /// </summary>
-    private async UniTask DrawCardAsync(int count = 1)
-    {
-        var cardDataList = new List<CardData>();
-        
-        for (var i = 0; i < count; i++)
-        {
-            if (_deck.Count == 0 || handView.Count >= maxHandSize) break;
-            
-            var cardData = _deck[0];
-            _deck.RemoveAt(0);
-            cardDataList.Add(cardData);
-        }
-        
-        await handView.AddCardsAsync(cardDataList);
-    }
-    
-    /// <summary>
     /// 精神力を消費する
     /// </summary>
     /// <param name="amount">消費する精神力</param>
     /// <returns>消費に成功したかどうか</returns>
-    public bool ConsumeMentalPower(int amount)
+    public void ConsumeMentalPower(int amount)
     {
-        if (_mentalPower.Value < amount) return false;
+        if (_mentalPower.Value < amount) return;
         
         _mentalPower.Value -= amount;
-        return true;
-    }
-    
-    /// <summary>
-    /// 精神力を回復する
-    /// </summary>
-    /// <param name="amount">回復する精神力</param>
-    public void RestoreMentalPower(int amount)
-    {
-        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, maxMentalPower);
+        return;
     }
     
     /// <summary>
@@ -118,16 +73,6 @@ public abstract class BasePlayer : MonoBehaviour
     }
     
     /// <summary>
-    /// カードをデッキに戻す
-    /// </summary>
-    /// <param name="cardData">戻すカードデータ</param>
-    protected void ReturnCardToDeck(CardData cardData)
-    {
-        _deck.Add(cardData);
-        ShuffleDeck();
-    }
-    
-    /// <summary>
     /// 選択したカードを崩壊させる
     /// </summary>
     public void CollapseSelectedCard()
@@ -145,34 +90,64 @@ public abstract class BasePlayer : MonoBehaviour
     public async UniTask ReturnHandToDeck()
     {
         // 現在の手札のカードデータを取得
-        var cardDataList = new List<CardData>();
-        
-        foreach (var cardView in handView.Cards.CurrentValue)
-        {
-            if (cardView?.CardData)
-            {
-                cardDataList.Add(cardView.CardData);
-            }
-        }
-        
+        var cardDataList = handView.Cards.CurrentValue.Select(cardView => cardView.CardData).ToList();
+
         // 手札をデッキに戻すアニメーション
         await handView.ReturnCardsToDeck();
         
         // カードデータをデッキに追加
-        foreach (var cardData in cardDataList)
-        {
-            _deck.Add(cardData);
-        }
+        _deck.AddRange(cardDataList);
         
         // デッキをシャッフル
         ShuffleDeck();
     }
     
     /// <summary>
-    /// 手札のインタラクト可能状態を設定
+    /// デッキをシャッフル
     /// </summary>
-    public void SetHandInteractable(bool interactable)
+    private void ShuffleDeck()
     {
-        handView.SetInteractable(interactable);
+        for (var i = 0; i < _deck.Count; i++)
+        {
+            var temp = _deck[i];
+            var randomIndex = Random.Range(i, _deck.Count);
+            _deck[i] = _deck[randomIndex];
+            _deck[randomIndex] = temp;
+        }
+    }
+    
+    /// <summary>
+    /// カードを引く（アニメーション付き）
+    /// </summary>
+    private async UniTask DrawCardAsync(int count = 1)
+    {
+        var cardDataList = new List<CardData>();
+        
+        for (var i = 0; i < count; i++)
+        {
+            if (_deck.Count == 0 || handView.Count >= maxHandSize) break;
+            
+            var cardData = _deck[0];
+            _deck.RemoveAt(0);
+            cardDataList.Add(cardData);
+        }
+        
+        await handView.AddCardsAsync(cardDataList);
+    }
+
+    /// <summary>
+    /// カードをデッキに戻す
+    /// </summary>
+    /// <param name="cardData">戻すカードデータ</param>
+    private void ReturnCardToDeck(CardData cardData)
+    {
+        _deck.Add(cardData);
+        ShuffleDeck();
+    }
+    
+    protected virtual void Awake()
+    {
+        // 精神力を最大値で初期化
+        _mentalPower.Value = maxMentalPower;
     }
 }
