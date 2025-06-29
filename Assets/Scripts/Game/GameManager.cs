@@ -186,14 +186,14 @@ public class GameManager: IStartable
         await UniTask.Delay(1000);
         
         // AIでカードを選択
-        var npcCard = _enemy.SelectCardByAI();
+        var npcCard = _enemy.GetRandomCardDataFromHand();
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
         var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
         var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット
         
         // NPCの精神力を消費
         _enemy.ConsumeMentalPower(npcMentalBet);
-        _npcMove = new PlayerMove(npcCard.CardData, npcPlayStyle, npcMentalBet);
+        _npcMove = new PlayerMove(npcCard, npcPlayStyle, npcMentalBet);
         
         // NPCの選択を表示
         await _uiPresenter.ShowAnnouncement($"NPCが {_npcMove.SelectedCard.CardName} を「{_npcMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_npcMove.MentalBet}）", 1.0f);

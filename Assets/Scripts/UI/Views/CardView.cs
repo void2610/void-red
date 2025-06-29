@@ -5,6 +5,7 @@ using R3;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// カードの表示と基本的なロジックを担当するViewクラス
@@ -194,6 +195,8 @@ public class CardView : MonoBehaviour
             .WithEase(Ease.OutCubic)
             .BindToAnchoredPosition(_rectTransform)
             .AddTo(gameObject);
+        
+        if (highlight) SeManager.Instance.PlaySe("Card");
     }
     
     /// <summary>

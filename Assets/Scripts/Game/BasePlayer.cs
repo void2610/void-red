@@ -9,23 +9,29 @@ using Cysharp.Threading.Tasks;
 /// カードデッキを持ち、カード選択の基本機能を提供
 /// 簡略化されたMVPパターンでHandViewを直接使用
 /// </summary>
-public abstract class BasePlayer : MonoBehaviour
+public abstract class BasePlayer
 {
-    [SerializeField] protected int maxMentalPower = 20;
-    [SerializeField] protected int maxHandSize = 3;
-    [SerializeField] protected HandView handView;
-    
-    public ReadOnlyReactiveProperty<CardView> SelectedCard => handView?.SelectedCard;
+    public ReadOnlyReactiveProperty<CardView> SelectedCard => _handView?.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
-    public int MaxMentalPower => maxMentalPower;
+    public int MaxMentalPower => MAX_MENTAL_POWER;
     
-    private DeckModel _deckModel;
+    private const int MAX_MENTAL_POWER = 20;
+    private const int MAX_HAND_SIZE = 3;
+    
     private readonly ReactiveProperty<int> _mentalPower = new ();
+    private DeckModel _deckModel;
+    private readonly HandView _handView;
     
     public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
-    public void SetHandInteractable(bool interactable) => handView.SetInteractable(interactable);
-    public void RestoreMentalPower(int amount) => _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, maxMentalPower);
-    
+    public void SetHandInteractable(bool interactable) => _handView.SetInteractable(interactable);
+    public void RestoreMentalPower(int amount) => _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, MAX_MENTAL_POWER);
+
+    public BasePlayer(HandView handView)
+    {
+        _handView = handView;
+        _mentalPower.Value = MAX_MENTAL_POWER;
+    }
+        
     /// <summary>
     /// デッキを初期化
     /// </summary>
@@ -34,17 +40,22 @@ public abstract class BasePlayer : MonoBehaviour
         _deckModel = new DeckModel(cardDataList);
     }
     
+    public CardData GetRandomCardDataFromHand()
+    {
+        // 手札からランダムにカードを選択
+        var randomIndex = Random.Range(0, _handView.Count);
+        return _handView.Cards.CurrentValue[randomIndex].CardData;
+    }
+    
     /// <summary>
     /// 精神力を消費する
     /// </summary>
     /// <param name="amount">消費する精神力</param>
-    /// <returns>消費に成功したかどうか</returns>
     public void ConsumeMentalPower(int amount)
     {
         if (_mentalPower.Value < amount) return;
         
         _mentalPower.Value -= amount;
-        return;
     }
     
     /// <summary>
@@ -53,17 +64,17 @@ public abstract class BasePlayer : MonoBehaviour
     /// <param name="shouldCollapse">カードが崩壊するかどうか</param>
     public void PlaySelectedCard(bool shouldCollapse)
     {
-        var selectedCard = handView.SelectedCard.CurrentValue;
+        var selectedCard = _handView.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
         // 手札からカードを削除
         if (shouldCollapse)
         {
-            handView.CollapseCard(selectedCard);
+            _handView.CollapseCard(selectedCard);
         }
         else
         {
-            handView.RemoveCard(selectedCard);
+            _handView.RemoveCard(selectedCard);
             // 崩壊しない場合はデッキに戻す
             _deckModel.ReturnCard(selectedCard.CardData);
         }
@@ -74,11 +85,11 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public void CollapseSelectedCard()
     {
-        var selectedCard = handView.SelectedCard.CurrentValue;
+        var selectedCard = _handView.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
         // 崩壊演出で手札からカードを削除
-        handView.CollapseCard(selectedCard);
+        _handView.CollapseCard(selectedCard);
     }
     
     /// <summary>
@@ -87,10 +98,10 @@ public abstract class BasePlayer : MonoBehaviour
     public async UniTask ReturnHandToDeck()
     {
         // 現在の手札のカードデータを取得
-        var cardDataList = handView.Cards.CurrentValue.Select(cardView => cardView.CardData).ToList();
+        var cardDataList = _handView.Cards.CurrentValue.Select(cardView => cardView.CardData).ToList();
 
         // 手札をデッキに戻すアニメーション
-        await handView.ReturnCardsToDeck();
+        await _handView.ReturnCardsToDeck();
         
         // カードデータをデッキに追加
         _deckModel.ReturnCards(cardDataList);
@@ -105,18 +116,13 @@ public abstract class BasePlayer : MonoBehaviour
         
         for (var i = 0; i < count; i++)
         {
-            if (_deckModel.IsEmpty || handView.Count >= maxHandSize) break;
+            if (_deckModel.IsEmpty || _handView.Count >= MAX_HAND_SIZE) break;
             
             var cardData = _deckModel.DrawCard();
             if (cardData) cardDataList.Add(cardData);
         }
         
-        await handView.AddCardsAsync(cardDataList);
+        await _handView.AddCardsAsync(cardDataList);
     }
 
-    protected virtual void Awake()
-    {
-        // 精神力を最大値で初期化
-        _mentalPower.Value = maxMentalPower;
-    }
 }

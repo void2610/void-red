@@ -26,7 +26,7 @@ public class UIPresenter : MonoBehaviour
     private MentalBetView _mentalBetView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
     private int _mentalBetValue;
-    private Player _player;
+    [Inject] private Player _player;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
     public async UniTask ShowAnnouncement(string message, float duration = 2f) => await _announcementView.DisplayAnnouncement(message, duration);
@@ -78,7 +78,6 @@ public class UIPresenter : MonoBehaviour
         _playButtonView = FindFirstObjectByType<PlayButtonView>();
         _playStyleView = FindFirstObjectByType<PlayStyleView>();
         _mentalBetView = FindFirstObjectByType<MentalBetView>();
-        _player = FindFirstObjectByType<Player>();
     }
     
     private void Start()
