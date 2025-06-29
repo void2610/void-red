@@ -6,4 +6,5 @@ using UnityEngine;
 /// </summary>
 public class Player : BasePlayer
 {
+    public Player(HandView handView) : base(handView) { }
 }

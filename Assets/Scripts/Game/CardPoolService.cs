@@ -8,6 +8,9 @@ using System.Linq;
 /// </summary>
 public class CardPoolService
 {
+    public int AvailableCardCount => _availableCards.Count;
+    public int TotalCardCount => _allCardData.Count;
+    
     private readonly AllCardData _allCardData;
     private readonly List<CardData> _availableCards;
     
@@ -79,13 +82,4 @@ public class CardPoolService
         return _availableCards.FirstOrDefault(card => card.CardName == cardName);
     }
     
-    /// <summary>
-    /// 利用可能なカード数を取得
-    /// </summary>
-    public int AvailableCardCount => _availableCards.Count;
-    
-    /// <summary>
-    /// 全カード数を取得
-    /// </summary>
-    public int TotalCardCount => _allCardData.Count;
 }

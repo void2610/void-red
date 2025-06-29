@@ -7,16 +7,5 @@ using System.Linq;
 /// </summary>
 public class Enemy : BasePlayer
 {
-    /// <summary>
-    /// AIによるカード選択
-    /// </summary>
-    public Card SelectCardByAI()
-    {
-        if (hand.Count == 0) return null;
-        
-        var cards = hand.Cards.CurrentValue;
-        var selectedCard = cards[Random.Range(0, cards.Count)];
-        hand.SetSelectedCard(selectedCard);
-        return selectedCard;
-    }
+    public Enemy(HandView handView) : base(handView) { }
 }
