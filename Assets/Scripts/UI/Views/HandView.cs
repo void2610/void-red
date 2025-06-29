@@ -33,6 +33,7 @@ public class HandView : MonoBehaviour
     private readonly ReactiveProperty<List<CardView>> _cards = new(new List<CardView>());
     private readonly ReactiveProperty<CardView> _selectedCard = new(null);
     private readonly Subject<CardView> _onCardSelected = new();
+    private CardViewFactory _cardViewFactory;
     
     /// <summary>
     /// カードのインタラクト可能状態を設定
@@ -196,20 +197,13 @@ public class HandView : MonoBehaviour
     /// </summary>
     private CardView CreateCardObject(CardData cardData)
     {
-        var cardObject = Instantiate(cardPrefab, handContainer);
-        cardObject.Initialize(cardData);
-        
-        // カードクリックイベントを登録
-        cardObject.OnClicked.Subscribe(SelectCard).AddTo(cardObject);
-        cardObject.SetInteractable(isInteractable);
-        
-        return cardObject;
+        return _cardViewFactory.CreateHandCard(cardData, handContainer, OnCardClicked, this.gameObject, isInteractable);
     }
     
     /// <summary>
-    /// カードを選択（内部用）
+    /// カードがクリックされたときの処理
     /// </summary>
-    private void SelectCard(CardView card)
+    private void OnCardClicked(CardView card)
     {
         SetSelectedCard(card);
     }
@@ -269,6 +263,11 @@ public class HandView : MonoBehaviour
         await UniTask.WhenAll(animationTasks);
     }
     
+    
+    private void Awake()
+    {
+        _cardViewFactory = new CardViewFactory(cardPrefab);
+    }
     
     private void OnDestroy()
     {
