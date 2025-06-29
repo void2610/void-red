@@ -19,7 +19,7 @@ public abstract class BasePlayer : MonoBehaviour
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public int MaxMentalPower => maxMentalPower;
     
-    private readonly List<CardData> _deck = new ();
+    private DeckModel _deckModel;
     private readonly ReactiveProperty<int> _mentalPower = new ();
     
     public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
@@ -31,9 +31,7 @@ public abstract class BasePlayer : MonoBehaviour
     /// </summary>
     public void InitializeDeck(List<CardData> cardDataList)
     {
-        _deck.Clear();
-        _deck.AddRange(cardDataList);
-        ShuffleDeck();
+        _deckModel = new DeckModel(cardDataList);
     }
     
     /// <summary>
@@ -67,7 +65,7 @@ public abstract class BasePlayer : MonoBehaviour
         {
             handView.RemoveCard(selectedCard);
             // 崩壊しない場合はデッキに戻す
-            ReturnCardToDeck(selectedCard.CardData);
+            _deckModel.ReturnCard(selectedCard.CardData);
         }
     }
     
@@ -95,24 +93,7 @@ public abstract class BasePlayer : MonoBehaviour
         await handView.ReturnCardsToDeck();
         
         // カードデータをデッキに追加
-        _deck.AddRange(cardDataList);
-        
-        // デッキをシャッフル
-        ShuffleDeck();
-    }
-    
-    /// <summary>
-    /// デッキをシャッフル
-    /// </summary>
-    private void ShuffleDeck()
-    {
-        for (var i = 0; i < _deck.Count; i++)
-        {
-            var temp = _deck[i];
-            var randomIndex = Random.Range(i, _deck.Count);
-            _deck[i] = _deck[randomIndex];
-            _deck[randomIndex] = temp;
-        }
+        _deckModel.ReturnCards(cardDataList);
     }
     
     /// <summary>
@@ -124,26 +105,15 @@ public abstract class BasePlayer : MonoBehaviour
         
         for (var i = 0; i < count; i++)
         {
-            if (_deck.Count == 0 || handView.Count >= maxHandSize) break;
+            if (_deckModel.IsEmpty || handView.Count >= maxHandSize) break;
             
-            var cardData = _deck[0];
-            _deck.RemoveAt(0);
-            cardDataList.Add(cardData);
+            var cardData = _deckModel.DrawCard();
+            if (cardData) cardDataList.Add(cardData);
         }
         
         await handView.AddCardsAsync(cardDataList);
     }
 
-    /// <summary>
-    /// カードをデッキに戻す
-    /// </summary>
-    /// <param name="cardData">戻すカードデータ</param>
-    private void ReturnCardToDeck(CardData cardData)
-    {
-        _deck.Add(cardData);
-        ShuffleDeck();
-    }
-    
     protected virtual void Awake()
     {
         // 精神力を最大値で初期化
