@@ -71,7 +71,7 @@ public class GameManager: IStartable
     /// <summary>
     /// ステートを変更
     /// </summary>
-    public void ChangeState(GameState newState)
+    private void ChangeState(GameState newState)
     {
         _currentState.Value = newState;
         switch (newState)
