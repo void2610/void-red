@@ -11,7 +11,6 @@ using VContainer.Unity;
 /// </summary>
 public class UIPresenter : MonoBehaviour
 {
-    // 依存性注入されるサービス
     [Inject] private readonly CardPoolService _cardPoolService;
     [Inject] private readonly ThemeService _themeService;
     

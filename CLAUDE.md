@@ -1,201 +1,186 @@
-# void-red プロジェクト固有の開発ガイドライン
+# CLAUDE.md
 
-## Unity開発における注意点
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Respond in Japanese and avoid excessive comments. When refactoring, implement clean replacements rather than maintaining backward compatibility.
 
-### Unityオブジェクトのnullチェック
-- RiderでUnityオブジェクトのnullチェック時に「Unity オブジェクトの有効期間を暗黙的にチェックしています」という警告が出る
-- `if (obj != null)` ではなく `if (obj)` を使用する
-- `if (obj == null)` ではなく `if (!obj)` を使用する
-- 例：
-  ```csharp
-  // ❌ 警告が出る
-  if (cardButton != null)
-  if (_cardData == null) return;
-  
-  // ✅ 推奨
-  if (cardButton)
-  if (!_cardData) return;
-  ```
+## Unity Project Overview
 
-## プロジェクト構成
+void-red is a Unity card game project using Unity 6000.0.37f1 with VContainer for dependency injection, R3 for reactive programming, LitMotion for animations, and UniTask for async operations.
 
-### VContainer + R3 + LitMotion + UniTask 構成
-- VContainer: 依存性注入（Singleton管理）
-- R3: リアクティブプログラミング（ReactiveProperty）
-- LitMotion: 高性能アニメーション（文字列アニメーション含む）
-- UniTask: 非同期処理
+## Core Commands
 
-### 簡略化MVPパターン
-
-#### アーキテクチャ概要
-```
-Presenter層 (上位管理)
-├── UIPresenter (UI統合管理)
-└── GameManager (ゲームフロー制御)
-    │
-    ▼
-View層 (表示+基本ロジック)
-├── CardView (カード表示+アニメーション)
-├── HandView (手札管理+配置)
-└── 各種UIView (Theme, Announcement等)
-    │
-    ▼
-Model層 (データ)
-├── CardData, PlayerMove
-└── ThemeData, CardStatus等
-```
-
-#### 設計方針
-- **適切な粒度**: 過度な分離を避け、実用的なレベルで責務分離
-- **自己完結性**: 各Viewが必要な機能（アニメーション等）を内包
-- **シンプルな依存関係**: 複雑な依存性注入を排除
-- **Unity親和性**: MonoBehaviourベースの自然な構造
-
-### カードゲーム設計
-
-#### 基本要素
-- **CardData**: ScriptableObjectでカード情報を定義
-  - CardStatus: 許し、拒絶、空白の3つのfloatパラメータ
-  - ScoreMultiplier: カード固有の倍率
-  - CollapseThreshold: 崩壊閾値
-- **CardView**: カードの表示とアニメーション（簡略化MVP）
-  - LitMotionによる自己完結的なアニメーション
-  - R3によるリアクティブイベント処理
-- **HandView**: 手札管理とカード配置（簡略化MVP）
-  - 扇状配置とアニメーション制御
-  - カード選択状態の一元管理
-- **PlayerMove**: プレイヤーの手（CardData、プレイスタイル、精神ベット）
-  - UIに依存しない純粋なデータクラス
-
-#### 精神力システム
-- **BasePlayer**: プレイヤーとエネミー共通の基底クラス
-  - HandViewを直接参照（シンプルな構造）
-  - 最大精神力20からスタート
-  - 精神ベットで消費、ゲーム進行で自動回復
-  - 精神力不足時のベット制限
-- **精神ベット**: 1-7の範囲でベット可能
-- **UI表示**: "現在精神力 / 最大精神力" 形式
-
-#### テーマシステム
-- **ThemeData**: ScriptableObjectでテーマ情報を定義
-  - CardStatus: テーマの効果値
-  - Title: プレイヤーに表示されるタイトル（数値は非表示）
-- **ThemeService**: テーマ選択を管理するサービス
-- **AllThemeData**: テーマのコレクション管理
-
-#### カード崩壊システム
-- **閾値システム**: カードごとに崩壊閾値を設定
-- **崩壊確率**: 閾値未満では崩壊しない、閾値を超えると崩壊確率が上昇
-- **永続削除**: 崩壊したカードはデッキから永久に削除
-
-#### スコア計算
-```csharp
-スコア = テーマ一致度 × 精神ベット × カード倍率
-一致度 = 1.0 + (1.0 - (距離 / √3)) × 0.5
-```
-
-#### ゲームフロー
-1. **テーマアナウンス**: ランダムテーマ選択、文字列アニメーション表示
-2. **プレイヤーフェーズ**: カード選択→プレイボタン表示→確定
-3. **エネミーフェーズ**: AI自動選択
-4. **評価フェーズ**: スコア計算と表示
-5. **結果表示**: 勝敗判定、崩壊判定、カード処理
-6. **新ターン**: カードをデッキに戻して再配布
-
-### Service層設計
-- **CardPoolService**: カードプール管理
-- **ThemeService**: テーマ選択管理
-- 両サービスともVContainerでSingleton登録
-- ❌ CardAnimationService（削除済み - CardView内蔵）
-
-### UI/UX設計
-- **段階的操作**: カード選択→ボタン表示→確定の段階的フロー
-- **アニメーション**: LitMotionによるテーマテキストの徐々表示
-- **状態管理**: プレイボタンの適切な表示/非表示制御
-- **音響処理**: ButtonSeでGameObject非アクティブ時のエラー対策
-
-### nullチェックのガイドライン
-- SerializeFieldやInspectorで事前に設定すべき要素（GameManager、Player、Enemy、UIManager等）に対するnullチェックは避ける
-- これらの要素がnullの場合は設定ミスであり、NullReferenceExceptionが発生して然るべき
-- nullチェックを行うのは、ランタイム中に動的に設定される要素のみ
-  - 例：動的に生成/破棄されるオブジェクト、ネットワークから取得するデータ、ユーザー入力によって変化する値など
-- `?.` や `??` 演算子の過剰な使用は避け、コードの可読性を重視する
-
-### 非同期処理のガイドライン
-- **UniTask使用**: 軽量で高性能な非同期処理
-- **Subscription管理**: 複雑なイベント購読は避け、シンプルなポーリングを優先
-- **状態監視**: `UniTask.Yield()`による軽量なポーリングパターン
-- **キャンセレーション**: 適切なCancellationToken管理
-
-## Unity開発ツール
-
-### unity-compile.sh
-Unityのコンパイルエラーをチェックし、コンパイルをトリガーするシンプルなツール。
-
-#### 使用方法
 ```bash
-# コンパイルエラーのチェック
-./unity-tools/unity-compile.sh check .
-
-# コンパイルをトリガー（Unity Editorでcmd+Rを実行）
-./unity-tools/unity-compile.sh trigger .
-
-# コンパイル後にエラーチェック
+# Compile and check errors
 ./unity-tools/unity-compile.sh trigger . && sleep 3 && ./unity-tools/unity-compile.sh check .
+
+# Check compilation errors only
+./unity-tools/unity-compile.sh check .
 ```
 
-#### 出力例
-```bash
-# エラーなしの場合
-📋 Checking Unity log: /Users/user/Library/Logs/Unity/Editor.log
-✅ No recent compilation errors detected
-📝 Last compile status: CompileScripts: 1.603ms
+## Architecture: Simplified MVP Pattern
 
-# エラーありの場合
-📋 Checking Unity log: /Users/user/Library/Logs/Unity/Editor.log
-❌ Recent compilation errors found:
-Assets/Scripts/Example.cs(11,9): error CS0103: The name 'NonExistentMethod' does not exist in the current context
+The project uses a pragmatic MVP pattern optimized for Unity development:
+
+```
+Presenter Layer (High-level control)
+├── UIPresenter     → Manages all UI components
+└── GameManager     → Controls game flow (IStartable)
+    │
+View Layer (Display + Self-contained logic)  
+├── CardView        → Card display + animations
+├── HandView        → Hand management + arrangement
+└── UI Views        → Theme, Announcement, PlayButton, etc.
+    │
+Model Layer (Pure data)
+├── CardData        → ScriptableObject card definitions
+├── PlayerMove      → Turn data (CardData, PlayStyle, bet)
+└── ThemeData       → ScriptableObject theme definitions
 ```
 
-#### 注意事項
-- Unity Editorが起動している必要がある
-- macOS専用（AppleScriptを使用）
-- triggerコマンドはUnityエディターを最前面に移動させる
+### Key Design Principles
+- **Appropriate Granularity**: Avoid over-separation; Views contain their own animations
+- **Direct References**: HandView is directly referenced by BasePlayer (no complex DI)
+- **Unity-First**: Leverage MonoBehaviour patterns naturally
+- **Data Purity**: Models (PlayerMove) hold data, not UI references
 
-## 実装完了機能
+## Critical Implementation Details
 
-### 簡略化MVPアーキテクチャ
-- ✅ CardView（表示+アニメーション統合）
-- ✅ HandView（手札管理+配置）
-- ✅ UIPresenter（UI統合管理）
-- ✅ BasePlayer簡素化（HandView直接参照）
-- ✅ PlayerMove純粋データ化（CardData保持）
+### VContainer Setup
+```csharp
+// MainLifetimeScope.cs pattern
+builder.RegisterInstance(player);
+builder.RegisterInstance(enemy);
+builder.Register<CardPoolService>(Lifetime.Singleton);
+builder.Register<ThemeService>(Lifetime.Singleton);
+builder.RegisterEntryPoint<GameManager>();
+builder.RegisterComponentInHierarchy<UIPresenter>();
+```
 
-### 精神力システム
-- ✅ MP管理（消費/回復）
-- ✅ UI表示（現在/最大）
-- ✅ ベット制限
-- ✅ デバッグログ
+### Game Flow State Machine
+GameManager uses GameState enum: ThemeAnnouncement → PlayerCardSelection → EnemyCardSelection → Evaluation → ResultDisplay
 
-### テーマシステム  
-- ✅ ThemeData ScriptableObject
-- ✅ ThemeService
-- ✅ 文字列アニメーション
-- ✅ 数値非表示UI
+### Card Animation System
+CardView contains all animations using LitMotion:
+- PlayDrawAnimation: Deck to hand
+- PlayRemoveAnimation: Normal removal or collapse effect
+- PlayArrangeAnimation: Hand positioning
+- PlayReturnToDeckAnimation: Hand to deck
+- SetHighlight: Selection state
 
-### カード拡張
-- ✅ スコア倍率
-- ✅ 崩壊閾値
-- ✅ 崩壊システム
-- ✅ 自己完結アニメーション
+### Reactive Patterns
+```csharp
+// R3 pattern for card selection
+public ReadOnlyReactiveProperty<CardView> SelectedCard => handView?.SelectedCard;
 
-### UI/UX改善
-- ✅ 段階的ボタン表示
-- ✅ 適切な非表示制御
-- ✅ AudioSource エラー対策
+// Event subscription
+handView.OnCardSelected.Subscribe(OnCardSelected).AddTo(this);
+```
 
-### パフォーマンス最適化
-- ✅ Subscription管理簡素化
-- ✅ メモリリーク対策
-- ✅ 重複実行防止
-- ✅ 複雑な依存性注入の排除
+### Score Calculation
+```csharp
+Score = MatchRate × MentalBet × CardMultiplier
+MatchRate = 1.0 + (1.0 - (Distance / √3)) × 0.5
+```
+
+## Unity-Specific Guidelines
+
+### Null Checking
+```csharp
+// ❌ Avoid for Unity objects (causes Rider warnings)
+if (cardButton != null)
+
+// ✅ Correct Unity pattern
+if (cardButton)
+if (!_cardData) return;
+```
+
+### Inspector Dependencies
+Don't null-check SerializeField components that should be set in Inspector. Let NullReferenceException indicate configuration errors.
+
+### Async Operations
+Use UniTask for all async operations. Prefer `.Forget()` for fire-and-forget operations.
+
+## Scene Structure
+
+- **TitleScene**: Entry point with TitleMenu
+- **MainScene**: Game scene with Player, Enemy, UIPresenter components
+
+## Dependencies
+
+Key packages from manifest.json:
+- VContainer (hadashiA/VContainer)
+- R3 (Cysharp/R3)
+- UniTask (Cysharp/UniTask)
+- LitMotion (AnnulusGames/LitMotion)
+- Unity Template (void2610/my-unity-template)
+
+## Development Workflow
+
+1. Make code changes
+2. Unity auto-compiles on focus
+3. Use unity-compile.sh to verify compilation
+4. Test in Unity Editor
+5. Build for WebGL deployment
+
+## Common Patterns
+
+### Adding New UI Components
+1. Create View class extending MonoBehaviour
+2. Add to UIPresenter with [SerializeField]
+3. Implement display logic in View
+4. Control from UIPresenter
+
+### Modifying Game Flow
+1. Update GameState enum if needed
+2. Modify state transitions in GameManager.ChangeState()
+3. Handle new states appropriately
+
+## Coding Guidelines
+
+### Class Member Declaration Order
+Follow this order when declaring class members (based on CardView.cs):
+
+1. **SerializeField** - Inspector設定可能なフィールド（[Header]でグループ化）
+2. **public プロパティ** - 外部アクセス可能なプロパティ
+3. **定数** - const, static readonly等の定数定義
+4. **private フィールド** - 内部状態管理用フィールド
+5. **public メソッド** - 外部から呼び出されるメソッド（Initialize, Play~Animation, Set~等）
+6. **private メソッド** - 内部処理用メソッド（UpdateDisplay, OnCardClicked等）
+7. **Unity イベント関数** - Awake, Start, Update等（呼び出し順序で記述）
+8. **クリーンアップ関数** - OnDestroy, Dispose等
+
+```csharp
+public class ExampleView : MonoBehaviour
+{
+    // 1. SerializeField
+    [Header("UIコンポーネント")]
+    [SerializeField] private Button button;
+    [SerializeField] private TextMeshProUGUI text;
+    
+    // 2. public プロパティ
+    public bool IsEnabled { get; private set; }
+    public Observable<Unit> OnClicked => _onClicked;
+    
+    // 3. 定数
+    private const float ANIMATION_DURATION = 0.5f;
+    private static readonly Vector3 DEFAULT_SCALE = Vector3.one;
+    
+    // 4. private フィールド
+    private readonly Subject<Unit> _onClicked = new();
+    private bool _isInitialized;
+    
+    // 5. public メソッド
+    public void Initialize() { }
+    public void SetEnabled(bool enabled) { }
+    
+    // 6. private メソッド
+    private void UpdateDisplay() { }
+    private void OnButtonClicked() { }
+    
+    // 7. Unity イベント関数
+    private void Awake() { }
+    private void Start() { }
+    
+    // 8. クリーンアップ関数
+    private void OnDestroy() { }
+}
+```

@@ -14,12 +14,10 @@ public class AnnouncementView : MonoBehaviour
     [SerializeField] private Image announcementBackground;
     [SerializeField] private TextMeshProUGUI announcementText;
     
-    // アニメーション定数
     private const float FADE_IN_DURATION = 0.3f;
     private const float FADE_OUT_DURATION = 0.3f;
     private const float SLIDE_DISTANCE = 350f;
     
-    // 現在実行中のアナウンスメントのキャンセレーショントークン
     private CancellationTokenSource _currentAnnouncementCts;
 
     /// <summary>

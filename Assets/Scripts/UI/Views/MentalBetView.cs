@@ -14,11 +14,9 @@ public class MentalBetView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mentalBetValueText;
     [SerializeField] private TextMeshProUGUI mentalPowerText;
     
-    // ベット値が変更されたことを通知するSubject
-    private readonly Subject<int> _mentalBetChanged = new();
     public Observable<int> MentalBetChanged => _mentalBetChanged;
     
-    // 現在のベット値
+    private readonly Subject<int> _mentalBetChanged = new();
     private int _currentBetValue = 0;
     
     /// <summary>

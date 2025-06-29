@@ -15,13 +15,12 @@ public abstract class BasePlayer : MonoBehaviour
     [SerializeField] protected int maxHandSize = 3;
     [SerializeField] protected HandView handView;
     
-    // デッキと精神力
-    private readonly List<CardData> _deck = new ();
-    private readonly ReactiveProperty<int> _mentalPower = new ();
-    
     public ReadOnlyReactiveProperty<CardView> SelectedCard => handView?.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public int MaxMentalPower => maxMentalPower;
+    
+    private readonly List<CardData> _deck = new ();
+    private readonly ReactiveProperty<int> _mentalPower = new ();
     
     public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
     public void SetHandInteractable(bool interactable) => handView.SetInteractable(interactable);

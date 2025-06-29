@@ -15,28 +15,24 @@ using Void2610.UnityTemplate;
 public class HandView : MonoBehaviour
 {
     [Header("手札設定")]
-    [SerializeField] private Transform handContainer; // 手札を配置するコンテナ
-    [SerializeField] private CardView cardPrefab; // カードのプレハブ
-    [SerializeField] private Transform deckPosition; // デッキの位置（アニメーション開始位置）
+    [SerializeField] private Transform handContainer;
+    [SerializeField] private CardView cardPrefab;
+    [SerializeField] private Transform deckPosition;
     [SerializeField] private int maxHandSize = 3;
     
     [Header("配置設定")]
-    [SerializeField] private float cardSpacing = 150f; // カード間の間隔
-    [SerializeField] private float cardAngle = 5f; // カードの角度
-    [SerializeField] private bool isInteractable = true; // カードが選択可能かどうか
+    [SerializeField] private float cardSpacing = 150f;
+    [SerializeField] private float cardAngle = 5f;
+    [SerializeField] private bool isInteractable = true;
     
-    // 手札のカードリスト
-    private readonly ReactiveProperty<List<CardView>> _cards = new(new List<CardView>());
-    private readonly ReactiveProperty<CardView> _selectedCard = new(null);
-    
-    // イベント
-    private readonly Subject<CardView> _onCardSelected = new();
     public Observable<CardView> OnCardSelected => _onCardSelected;
-    
-    // プロパティ
     public ReadOnlyReactiveProperty<List<CardView>> Cards => _cards;
     public ReadOnlyReactiveProperty<CardView> SelectedCard => _selectedCard;
     public int Count => _cards.Value.Count;
+    
+    private readonly ReactiveProperty<List<CardView>> _cards = new(new List<CardView>());
+    private readonly ReactiveProperty<CardView> _selectedCard = new(null);
+    private readonly Subject<CardView> _onCardSelected = new();
     
     /// <summary>
     /// カードのインタラクト可能状態を設定

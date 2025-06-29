@@ -19,91 +19,26 @@ public class CardView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI rejectionText;
     [SerializeField] private TextMeshProUGUI blankText;
     [SerializeField] private Button cardButton;
-    [SerializeField] private RectTransform rectTransform;
     
-    // データとイベント
-    private CardData _cardData;
+    public CardData CardData { get; private set; }
+    public Observable<CardView> OnClicked => _onClicked;
+    
     private readonly Subject<CardView> _onClicked = new();
     private Vector2 _originalPosition;
+    private RectTransform _rectTransform;
     
-    // プロパティ
-    public CardData CardData => _cardData;
-    public Observable<CardView> OnClicked => _onClicked;
-    public RectTransform RectTransform => rectTransform;
-    
-    private void Awake()
-    {
-        if (!rectTransform) rectTransform = GetComponent<RectTransform>();
-    }
+    public void SetInteractable(bool interactable) => cardButton.interactable = interactable;
+    public void UpdateOriginalPosition(Vector2 position) => _originalPosition = position;
     
     /// <summary>
     /// カードデータを設定して初期化
     /// </summary>
     public void Initialize(CardData cardData)
     {
-        _cardData = cardData;
-        _originalPosition = rectTransform.anchoredPosition;
+        CardData = cardData;
+        _originalPosition = _rectTransform.anchoredPosition;
         UpdateDisplay();
-        SetupEvents();
-    }
-    
-    /// <summary>
-    /// 表示を更新
-    /// </summary>
-    private void UpdateDisplay()
-    {
-        if (!_cardData) return;
-        
-        // カード名を設定
-        cardNameText.text = _cardData.CardName;
-        
-        // カード画像を設定
-        if (_cardData.CardImage)
-        {
-            cardImage.sprite = _cardData.CardImage;
-        }
-        
-        // 効果パラメータを設定
-        var effect = _cardData.Effect;
-        forgivenessText.text = $"許し: {effect.Forgiveness:F1}";
-        rejectionText.text = $"拒絶: {effect.Rejection:F1}";
-        blankText.text = $"空白: {effect.Blank:F1}";
-    }
-    
-    /// <summary>
-    /// イベントの設定
-    /// </summary>
-    private void SetupEvents()
-    {
-        if (cardButton)
-        {
-            cardButton.onClick.AddListener(OnCardClicked);
-        }
-    }
-    
-    /// <summary>
-    /// カードがクリックされた時の処理
-    /// </summary>
-    private void OnCardClicked()
-    {
-        _onClicked.OnNext(this);
-    }
-    
-    /// <summary>
-    /// インタラクト可能状態を設定
-    /// </summary>
-    public void SetInteractable(bool interactable)
-    {
-        if (cardButton)
-            cardButton.interactable = interactable;
-    }
-    
-    /// <summary>
-    /// 元の位置を更新
-    /// </summary>
-    public void UpdateOriginalPosition(Vector2 position)
-    {
-        _originalPosition = position;
+        cardButton.onClick.AddListener(OnCardClicked);
     }
     
     /// <summary>
@@ -112,19 +47,19 @@ public class CardView : MonoBehaviour
     public async UniTask PlayDrawAnimation(Vector2 startPosition)
     {
         // 開始位置を設定
-        rectTransform.anchoredPosition = startPosition;
-        rectTransform.localScale = Vector3.one * 0.1f;
+        _rectTransform.anchoredPosition = startPosition;
+        _rectTransform.localScale = Vector3.one * 0.1f;
         
         // 移動とスケールのアニメーション
         var moveTask = LMotion.Create(startPosition, _originalPosition, 0.5f)
             .WithEase(Ease.OutBack)
-            .BindToAnchoredPosition(rectTransform)
+            .BindToAnchoredPosition(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
             
         var scaleTask = LMotion.Create(Vector3.one * 0.1f, Vector3.one, 0.5f)
             .WithEase(Ease.OutBack)
-            .BindToLocalScale(rectTransform)
+            .BindToLocalScale(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
         
@@ -143,26 +78,26 @@ public class CardView : MonoBehaviour
                 UnityEngine.Random.Range(-200f, 200f),
                 UnityEngine.Random.Range(100f, 300f)
             );
-            var currentPos = rectTransform.anchoredPosition;
+            var currentPos = _rectTransform.anchoredPosition;
             var targetPos = currentPos + randomDirection;
             
             var moveTask = LMotion.Create(currentPos, targetPos, 0.5f)
                 .WithEase(Ease.OutCubic)
-                .BindToAnchoredPosition(rectTransform)
+                .BindToAnchoredPosition(_rectTransform)
                 .AddTo(gameObject)
                 .ToUniTask();
                 
-            var startRotation = rectTransform.rotation;
+            var startRotation = _rectTransform.rotation;
             var targetRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-360f, 360f));
             var rotateTask = LMotion.Create(startRotation, targetRotation, 0.5f)
                 .WithEase(Ease.OutCubic)
-                .BindToRotation(rectTransform)
+                .BindToRotation(_rectTransform)
                 .AddTo(gameObject)
                 .ToUniTask();
                 
             var scaleTask = LMotion.Create(Vector3.one, Vector3.zero, 0.5f)
                 .WithEase(Ease.InCubic)
-                .BindToLocalScale(rectTransform)
+                .BindToLocalScale(_rectTransform)
                 .AddTo(gameObject)
                 .ToUniTask();
                 
@@ -171,18 +106,18 @@ public class CardView : MonoBehaviour
         else
         {
             // 通常の削除アニメーション：上に移動しながらスケール縮小
-            var currentPos = rectTransform.anchoredPosition;
+            var currentPos = _rectTransform.anchoredPosition;
             var targetPos = new Vector2(currentPos.x, currentPos.y + 100f);
             
             var moveTask = LMotion.Create(currentPos, targetPos, 0.3f)
                 .WithEase(Ease.InCubic)
-                .BindToAnchoredPosition(rectTransform)
+                .BindToAnchoredPosition(_rectTransform)
                 .AddTo(gameObject)
                 .ToUniTask();
                 
             var scaleTask = LMotion.Create(Vector3.one, Vector3.one * 0.5f, 0.3f)
                 .WithEase(Ease.InCubic)
-                .BindToLocalScale(rectTransform)
+                .BindToLocalScale(_rectTransform)
                 .AddTo(gameObject)
                 .ToUniTask();
                 
@@ -198,16 +133,16 @@ public class CardView : MonoBehaviour
         _originalPosition = targetPosition;
         
         // 位置のアニメーション
-        var moveTask = LMotion.Create(rectTransform.anchoredPosition, targetPosition, 0.3f)
+        var moveTask = LMotion.Create(_rectTransform.anchoredPosition, targetPosition, 0.3f)
             .WithEase(Ease.OutCubic)
-            .BindToAnchoredPosition(rectTransform)
+            .BindToAnchoredPosition(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
         
         // 回転のアニメーション
-        var rotateTask = LMotion.Create(rectTransform.rotation, targetRotation, 0.3f)
+        var rotateTask = LMotion.Create(_rectTransform.rotation, targetRotation, 0.3f)
             .WithEase(Ease.OutCubic)
-            .BindToRotation(rectTransform)
+            .BindToRotation(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
         
@@ -219,26 +154,26 @@ public class CardView : MonoBehaviour
     /// </summary>
     public async UniTask PlayReturnToDeckAnimation(Vector2 deckPosition)
     {
-        var currentPos = rectTransform.anchoredPosition;
-        var currentScale = rectTransform.localScale;
-        var currentRotation = rectTransform.rotation;
+        var currentPos = _rectTransform.anchoredPosition;
+        var currentScale = _rectTransform.localScale;
+        var currentRotation = _rectTransform.rotation;
         
         // 移動、スケール、回転のアニメーション
         var moveTask = LMotion.Create(currentPos, deckPosition, 0.4f)
             .WithEase(Ease.InCubic)
-            .BindToAnchoredPosition(rectTransform)
+            .BindToAnchoredPosition(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
             
         var scaleTask = LMotion.Create(currentScale, Vector3.one * 0.1f, 0.4f)
             .WithEase(Ease.InCubic)
-            .BindToLocalScale(rectTransform)
+            .BindToLocalScale(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
             
         var rotateTask = LMotion.Create(currentRotation, Quaternion.identity, 0.4f)
             .WithEase(Ease.InCubic)
-            .BindToRotation(rectTransform)
+            .BindToRotation(_rectTransform)
             .AddTo(gameObject)
             .ToUniTask();
         
@@ -251,14 +186,47 @@ public class CardView : MonoBehaviour
     public void SetHighlight(bool highlight)
     {
         // 選択時は少し上に移動、非選択時は元の位置に戻る
-        var currentPos = rectTransform.anchoredPosition;
+        var currentPos = _rectTransform.anchoredPosition;
         var targetPos = new Vector2(currentPos.x, highlight ? _originalPosition.y + 30f : _originalPosition.y);
         
         // 位置のアニメーション
         LMotion.Create(currentPos, targetPos, 0.2f)
             .WithEase(Ease.OutCubic)
-            .BindToAnchoredPosition(rectTransform)
+            .BindToAnchoredPosition(_rectTransform)
             .AddTo(gameObject);
+    }
+    
+    /// <summary>
+    /// 表示を更新
+    /// </summary>
+    private void UpdateDisplay()
+    {
+        if (!CardData) return;
+        
+        // カード名を設定
+        cardNameText.text = CardData.CardName;
+        
+        // カード画像を設定
+        cardImage.sprite = CardData.CardImage;
+        
+        // 効果パラメータを設定
+        var effect = CardData.Effect;
+        forgivenessText.text = $"許し: {effect.Forgiveness:F1}";
+        rejectionText.text = $"拒絶: {effect.Rejection:F1}";
+        blankText.text = $"空白: {effect.Blank:F1}";
+    }
+    
+    /// <summary>
+    /// カードがクリックされた時の処理
+    /// </summary>
+    private void OnCardClicked()
+    {
+        _onClicked.OnNext(this);
+    }
+    
+    private void Awake()
+    {
+        _rectTransform = this.GetComponent<RectTransform>();
     }
     
     private void OnDestroy()

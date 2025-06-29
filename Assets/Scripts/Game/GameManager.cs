@@ -7,25 +7,18 @@ using UnityEngine;
 
 public class GameManager: IStartable
 {
-    // DIされるサービスとコンポーネント
+    public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
+    
     private readonly CardPoolService _cardPoolService;
     private readonly ThemeService _themeService;
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
-    
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
-    
-    // プレイヤーとNPCの手
     private PlayerMove _playerMove;
     private PlayerMove _npcMove;
-    
-    // 実行中フラグ（重複実行防止）
     private bool _isProcessing = false;
-    
-    // プロパティ
-    public ReadOnlyReactiveProperty<GameState> CurrentState => _currentState;
     
     /// <summary>
     /// コンストラクタ（依存性注入）
