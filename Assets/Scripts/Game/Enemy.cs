@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Linq;
-
 /// <summary>
 /// NPCクラス
 /// AIによって制御される対戦相手を表す

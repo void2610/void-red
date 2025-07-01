@@ -1,4 +1,5 @@
 using R3;
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VContainer;
@@ -145,7 +146,15 @@ public class GameManager: IStartable
         }
         
         // プレイボタンが押されるのを待つ
-        await _uiPresenter.PlayButtonClicked.FirstAsync();
+        try
+        {
+            await _uiPresenter.PlayButtonClicked.FirstAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            // PlayButtonが破棄された場合は処理を中断
+            return;
+        }
         
         _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
@@ -159,7 +168,7 @@ public class GameManager: IStartable
         
         // 精神力を消費
         _player.ConsumeMentalPower(mentalBet);
-        _playerMove = new PlayerMove(finalSelectedCard.CardData, playStyle, mentalBet);
+        _playerMove = new PlayerMove(finalSelectedCard, playStyle, mentalBet);
         
         // プレイヤーの選択を表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーが {_playerMove.SelectedCard.CardName} を「{_playerMove.PlayStyle.ToJapaneseString()}」で選択（精神ベット: {_playerMove.MentalBet}）", 1.0f);
@@ -187,6 +196,7 @@ public class GameManager: IStartable
         
         // AIでカードを選択
         var npcCard = _enemy.GetRandomCardDataFromHand();
+        _enemy.SelectCard(npcCard);
         // NPCの手を作成（NPCもランダムなプレイスタイルと精神ベットを選択）
         var npcPlayStyle = (PlayStyle)UnityEngine.Random.Range(0, 3);
         var npcMentalBet = UnityEngine.Random.Range(1, Mathf.Min(6, _enemy.MentalPower.CurrentValue + 1)); // NPCの精神力範囲内でベット

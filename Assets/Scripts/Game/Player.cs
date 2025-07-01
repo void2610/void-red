@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>
 /// プレイヤークラス
 /// ユーザーが操作するプレイヤーを表す

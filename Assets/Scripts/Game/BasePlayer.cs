@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
+using System;
 
 /// <summary>
 /// プレイヤーとNPCの基底クラス
@@ -13,7 +14,7 @@ public abstract class BasePlayer
 {
     public ReadOnlyReactiveProperty<CardView> SelectedCard => _handView?.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
-    public int MaxMentalPower => MAX_MENTAL_POWER;
+    public static int MaxMentalPower => MAX_MENTAL_POWER;
     
     private const int MAX_MENTAL_POWER = 20;
     private const int MAX_HAND_SIZE = 3;
