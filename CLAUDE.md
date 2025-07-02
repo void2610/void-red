@@ -16,31 +16,58 @@ void-red is a Unity card game project using Unity 6000.0.37f1 with VContainer fo
 ./unity-tools/unity-compile.sh check .
 ```
 
-## Architecture: Simplified MVP Pattern
+## Architecture: 2層構造MVP Pattern
 
-The project uses a pragmatic MVP pattern optimized for Unity development:
+The project uses a practical 2-layer MVP pattern optimized for Unity development:
 
 ```
-Presenter Layer (High-level control)
-├── UIPresenter     → Manages all UI components
-└── GameManager     → Controls game flow (IStartable)
+Presenter Layer (統合制御)
+├── PlayerPresenter → カード管理 + UI制御 + ゲームロジック統合
+├── UIPresenter     → UI Views統合管理 + イベント処理
+└── GameManager     → ゲーム進行制御 (IStartable)
     │
-View Layer (Display + Self-contained logic)  
-├── CardView        → Card display + animations
-├── HandView        → Hand management + arrangement
-└── UI Views        → Theme, Announcement, PlayButton, etc.
+Model Layer (データ管理)
+├── PlayerModel     → 精神力などプレイヤー属性のみ
+├── HandModel       → 手札データ (R3 Reactive)
+├── DeckModel       → デッキデータ
+└── Data Objects    → CardData, ThemeData, PlayerMove等
     │
-Model Layer (Pure data)
-├── CardData        → ScriptableObject card definitions
-├── PlayerMove      → Turn data (CardData, PlayStyle, bet)
-└── ThemeData       → ScriptableObject theme definitions
+View Layer (UI表示・アニメーション)
+├── HandView        → 手札表示 + カードアニメーション
+├── CardView        → 個別カード表示 + アニメーション
+└── UI Views        → Theme, Announcement, PlayButton等
+    │
+Services/Logic Layer (サービス・ロジック)
+├── CardPoolService → カードプール管理
+├── ThemeService    → テーマデータ管理
+├── ScoreCalculator → スコア計算ロジック (static)
+└── CollapseJudge   → カード崩壊判定ロジック (static)
 ```
+
+### 責任分離の詳細
+
+**PlayerPresenter (統合プレゼンター)**
+- HandModel, DeckModel, PlayerModelの直接管理
+- HandViewとの連携によるUI制御
+- カード操作ロジック（ドロー、プレイ、選択）
+- 精神力管理との統合
+
+**PlayerModel (プレイヤー属性)**
+- 精神力のみの管理
+- 将来の拡張用（スコア、レベル等）
+- ReactivePropertyによるリアクティブ性
+
+**UI系 (UIPresenter + Views)**
+- UIPresenterが各Viewを統合管理
+- R3 Observableによるイベント通信
+- MonoBehaviourパターンの活用
 
 ### Key Design Principles
-- **Appropriate Granularity**: Avoid over-separation; Views contain their own animations
-- **Direct References**: HandView is directly referenced by BasePlayer (no complex DI)
-- **Unity-First**: Leverage MonoBehaviour patterns naturally
-- **Data Purity**: Models (PlayerMove) hold data, not UI references
+- **適切な粒度**: 過度な分離を避け、実用的なバランス
+- **統合プレゼンター**: PlayerPresenterがカード関連を一元管理
+- **責任の明確化**: カード管理とプレイヤー属性の分離
+- **Unity-First**: MonoBehaviourパターンの自然な活用
+- **リアクティブ設計**: R3による状態変更の伝播
 
 ## Critical Implementation Details
 
