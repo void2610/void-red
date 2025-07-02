@@ -60,7 +60,7 @@ public class UIPresenter : MonoBehaviour
             _mentalBetValue = currentMentalPower;
         
         // MentalBetViewに表示を委譲
-        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, BasePlayer.MaxMentalPower, MIN_MENTAL_BET, MAX_MENTAL_BET);
+        _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, PlayerPresenter.MaxMentalPower, MIN_MENTAL_BET, MAX_MENTAL_BET);
     }
     
     private void SetupViewEvents()

@@ -137,12 +137,10 @@ public class GameManager: IStartable
                 return;
             
             var selectedCard = _player.SelectedCard.CurrentValue;
-            if (selectedCard != null)
-            {
-                // カードが選択されたらプレイボタンを表示
-                _uiPresenter.ShowPlayButton();
-                break;
-            }
+            if (!selectedCard) continue;
+            // カードが選択されたらプレイボタンを表示
+            _uiPresenter.ShowPlayButton();
+            break;
         }
         
         // プレイボタンが押されるのを待つ
@@ -159,8 +157,7 @@ public class GameManager: IStartable
         _uiPresenter.HidePlayButton();
         // 選択されたカードを再取得
         var finalSelectedCard = _player.SelectedCard.CurrentValue;
-        if (finalSelectedCard == null)
-            return;
+        if (!finalSelectedCard) return;
         
         // プレイヤーの手を作成
         var playStyle = _uiPresenter.GetSelectedPlayStyle();

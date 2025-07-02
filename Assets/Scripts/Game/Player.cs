@@ -2,7 +2,8 @@
 /// プレイヤークラス
 /// ユーザーが操作するプレイヤーを表す
 /// </summary>
-public class Player : BasePlayer
+public class Player : PlayerPresenter
 {
-    public Player(HandView handView) : base(handView) { }
+    public Player(HandView handView, int maxHandSize = 3) 
+        : base(handView, maxHandSize) { }
 }

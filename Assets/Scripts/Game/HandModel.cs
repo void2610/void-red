@@ -67,6 +67,16 @@ public class HandModel
     }
     
     /// <summary>
+    /// 指定したカードが手札にあるかチェック
+    /// </summary>
+    /// <param name="card">チェックするカード</param>
+    /// <returns>手札にあるかどうか</returns>
+    public bool HasCard(CardData card)
+    {
+        return _cards.Value.Contains(card);
+    }
+    
+    /// <summary>
     /// カードを削除
     /// </summary>
     /// <param name="card">削除するカード</param>
