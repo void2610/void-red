@@ -10,7 +10,6 @@ public class ThemeData : ScriptableObject
     [SerializeField] private string title;
     [SerializeField] private CardStatus cardStatus;
     
-    // プロパティ
     public string Title => title;
     public CardStatus CardStatus => cardStatus;
 }

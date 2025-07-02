@@ -1,0 +1,189 @@
+@startuml void-red UI Class Diagram
+
+title void-red カードゲーム UI関連クラス図
+
+skinparam class {
+    BackgroundColor<<Presenter>> #E1F5FE
+    BackgroundColor<<View>> #E8F5E8
+    BackgroundColor<<Service>> #FFF3E0
+    BackgroundColor<<Manager>> #FFE0E0
+}
+
+package "UI Presenters" {
+    class UIPresenter <<Presenter>> {
+        - CardPoolService _cardPoolService
+        - ThemeService _themeService
+        - Player _player
+        - ThemeView _themeView
+        - AnnouncementView _announcementView
+        - PlayButtonView _playButtonView
+        - PlayStyleView _playStyleView
+        - MentalBetView _mentalBetView
+        - PlayStyle _selectedPlayStyle
+        - int _mentalBetValue
+        --
+        UIメインプレゼンター
+        ・各種Viewの統合管理
+        ・ゲーム中のUI制御
+        ・プレイヤー入力処理
+        ・VContainer依存性注入
+    }
+}
+
+package "UI Views" {
+    class ThemeView <<View>> {
+        - TextMeshProUGUI themeText
+        --
+        テーマ表示View
+        ・テーマタイトル表示
+        ・文字アニメーション
+        ・LitMotion使用
+    }
+
+    class AnnouncementView <<View>> {
+        - TextMeshProUGUI announcementText
+        - CanvasGroup canvasGroup
+        --
+        アナウンス表示View
+        ・メッセージ表示
+        ・フェードイン/アウト
+        ・一時的な通知
+    }
+
+    class PlayButtonView <<View>> {
+        - Button playButton
+        - Subject<Unit> _playButtonClicked
+        --
+        プレイボタンView
+        ・カード提出ボタン
+        ・表示/非表示制御
+        ・クリックイベント発行
+    }
+
+    class PlayStyleView <<View>> {
+        - Button hesitationButton
+        - Button impulseButton
+        - Button convictionButton
+        - TextMeshProUGUI playStyleSelectedText
+        - Subject<PlayStyle> _playStyleSelected
+        --
+        プレイスタイル選択View
+        ・3つのスタイル選択
+        ・躊躇/衝動/確信
+        ・選択状態の表示
+        ・R3 Observable
+    }
+
+    class MentalBetView <<View>> {
+        - Button mentalBetPlusButton
+        - Button mentalBetMinusButton
+        - TextMeshProUGUI mentalBetValueText
+        - TextMeshProUGUI mentalPowerText
+        - Subject<int> _mentalBetChanged
+        --
+        精神ベットView
+        ・ベット値の増減
+        ・精神力表示
+        ・上限/下限チェック
+        ・R3 Observable
+    }
+}
+
+package "Title Scene" {
+    class TitleMenu <<View>> {
+        - Button _startButton
+        --
+        タイトルメニュー
+        ・ゲーム開始ボタン
+        ・シーン遷移
+        ・タイトル画面UI
+    }
+}
+
+package "Services" {
+    class CardPoolService <<Service>> {
+        - AllCardData _allCardData
+        --
+        カードプールサービス
+        ・カードデータ管理
+        ・ランダムカード取得
+        ・カードプール生成
+    }
+
+    class ThemeService <<Service>> {
+        - AllThemeData _allThemeData
+        --
+        テーマサービス
+        ・テーマデータ管理
+        ・ランダムテーマ取得
+        ・テーマリスト管理
+    }
+}
+
+package "Game Manager" {
+    class GameManager <<Manager>> {
+        - Player _player
+        - Enemy _enemy
+        - CardPoolService _cardPoolService
+        - ThemeService _themeService
+        - UIPresenter _uiPresenter
+        - GameState _currentState
+        --
+        ゲーム進行管理
+        ・ステートマシン
+        ・ゲームフロー制御
+        ・IStartableエントリー
+        ・VContainer管理
+    }
+}
+
+package "Data Types" {
+    enum PlayStyle {
+        Hesitation
+        Impulse
+        Conviction
+        --
+        プレイスタイル
+        ・躊躇
+        ・衝動
+        ・確信
+    }
+
+    enum GameState {
+        ThemeAnnouncement
+        PlayerCardSelection
+        EnemyCardSelection
+        Evaluation
+        ResultDisplay
+        --
+        ゲーム状態
+        ・進行ステート
+    }
+}
+
+' 関係
+UIPresenter *-- ThemeView : 所有
+UIPresenter *-- AnnouncementView : 所有
+UIPresenter *-- PlayButtonView : 所有
+UIPresenter *-- PlayStyleView : 所有
+UIPresenter *-- MentalBetView : 所有
+
+UIPresenter ..> CardPoolService : 使用
+UIPresenter ..> ThemeService : 使用
+UIPresenter ..> Player : 参照
+
+GameManager ..> UIPresenter : 制御
+GameManager ..> CardPoolService : 使用
+GameManager ..> ThemeService : 使用
+GameManager ..> Player : 制御
+GameManager ..> Enemy : 制御
+
+PlayStyleView ..> PlayStyle : 使用
+GameManager ..> GameState : 使用
+
+' Observable関係
+PlayButtonView --> UIPresenter : Observable<Unit>
+PlayStyleView --> UIPresenter : Observable<PlayStyle>
+MentalBetView --> UIPresenter : Observable<int>
+
+@enduml

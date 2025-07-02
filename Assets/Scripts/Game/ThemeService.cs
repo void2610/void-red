@@ -8,6 +8,9 @@ using System.Linq;
 /// </summary>
 public class ThemeService
 {
+    public int AvailableThemeCount => _availableThemes.Count;
+    public int TotalThemeCount => _allThemeData.Count;
+    
     private readonly AllThemeData _allThemeData;
     private readonly List<ThemeData> _availableThemes;
     
@@ -107,13 +110,4 @@ public class ThemeService
         return closestTheme;
     }
     
-    /// <summary>
-    /// 利用可能なテーマ数を取得
-    /// </summary>
-    public int AvailableThemeCount => _availableThemes.Count;
-    
-    /// <summary>
-    /// 全テーマ数を取得
-    /// </summary>
-    public int TotalThemeCount => _allThemeData.Count;
 }

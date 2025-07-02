@@ -8,11 +8,10 @@ using UnityEngine;
 [Serializable]
 public class CardStatus
 {
-    [SerializeField] private float forgiveness; // 許し
-    [SerializeField] private float rejection;   // 拒絶  
-    [SerializeField] private float blank;       // 空白
+    [SerializeField] private float forgiveness;
+    [SerializeField] private float rejection;
+    [SerializeField] private float blank;
     
-    // プロパティ
     public float Forgiveness => forgiveness;
     public float Rejection => rejection;
     public float Blank => blank;

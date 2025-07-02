@@ -1,24 +1,25 @@
 using UnityEngine;
 
 /// <summary>
+/// ゲームの状態を表すEnum
+/// </summary>
+public enum GameState
+{
+    ThemeAnnouncement,  // お題発表
+    PlayerCardSelection, // プレイヤーカード選択
+    EnemyCardSelection,  // 敵カード選択
+    Evaluation,         // 評価
+    ResultDisplay       // 勝敗表示
+}
+
+/// <summary>
 /// カードの出し方を表すenum
 /// </summary>
 public enum PlayStyle
 {
-    /// <summary>
-    /// 迷い
-    /// </summary>
-    Hesitation = 0,
-    
-    /// <summary>
-    /// 衝動
-    /// </summary>
-    Impulse = 1,
-    
-    /// <summary>
-    /// 確信
-    /// </summary>
-    Conviction = 2
+    Hesitation, // 迷い
+    Impulse, // 衝動
+    Conviction // 確信
 }
 
 /// <summary>

@@ -1,0 +1,166 @@
+@startuml void-red Card Player Class Diagram Final
+
+title void-red カードゲーム カード・プレイヤー関連クラス図 (最終版)
+
+skinparam class {
+    BackgroundColor<<Presenter>> #E1F5FE
+    BackgroundColor<<Model>> #F3E5F5
+    BackgroundColor<<View>> #E8F5E8
+    BackgroundColor<<Data>> #FFF3E0
+}
+
+package "Presenter Layer" {
+    abstract class PlayerPresenter <<Presenter>> {
+        - PlayerModel _playerModel
+        - HandModel _handModel
+        - DeckModel _deckModel
+        - HandView _handView
+        --
+        統合プレゼンター
+        ・カード管理 (HandModel, DeckModel)
+        ・UI制御 (HandView)
+        ・ゲームロジック
+        ・プレイヤー属性統合
+    }
+
+    class Player <<Presenter>> {
+        --
+        具体的プレイヤー
+        ・ユーザーが操作
+        ・PlayerPresenterを継承
+        ・ユーザー入力対応
+    }
+
+    class Enemy <<Presenter>> {
+        --
+        AI敵プレイヤー
+        ・AIによる自動制御
+        ・PlayerPresenterを継承
+        ・ランダム・戦略的行動
+    }
+}
+
+package "Model Layer" {
+    class PlayerModel <<Model>> {
+        - ReactiveProperty<int> _mentalPower
+        --
+        プレイヤー固有属性
+        ・精神力管理のみ
+        ・将来拡張: スコア、レベル等
+        ・ReactiveProperty使用
+    }
+
+    class HandModel <<Model>> {
+        - List<CardData> _cards
+        - ReactiveProperty<CardData> _selectedCard
+        - ReactiveProperty<int> _selectedIndex
+        - int _maxHandSize
+        --
+        手札データ管理
+        ・R3 Reactive
+        ・選択状態管理
+        ・カードリスト操作
+        ・最大枚数制限
+    }
+
+    class DeckModel <<Model>> {
+        - List<CardData> _cards
+        --
+        デッキデータ管理
+        ・カードの山札
+        ・ドロー・シャッフル
+        ・カード返却機能
+        ・枚数管理
+    }
+}
+
+package "View Layer" {
+    class HandView <<View>> {
+        - List<CardView> _cardViews
+        - CardViewFactory _cardViewFactory
+        - Subject<int> _onCardClicked
+        --
+        UI表示・アニメーション
+        ・MonoBehaviour
+        ・カードドロー・配置演出
+        ・ユーザー入力受付
+        ・HandModelとバインド
+    }
+
+    class CardView <<View>> {
+        - RectTransform _rectTransform
+        - CardData _cardData
+        - Vector2 _originalPosition
+        --
+        個別カード表示
+        ・1枚のカード表現
+        ・アニメーション実行
+        ・クリック検出
+        ・ハイライト表示
+    }
+}
+
+package "Data Layer" {
+    class CardData <<Data>> {
+        - string cardName
+        - CardStatus status
+        - Sprite image
+        - float scoreMultiplier
+        - int collapseThreshold
+        --
+        カード情報
+        ・ScriptableObject
+        ・許し/拒絶/空白の効果値
+        ・スコア倍率・崩壊閾値
+        ・画像・名前データ
+    }
+
+    class CardStatus <<Data>> {
+        - float forgiveness
+        - float rejection
+        - float blank
+        --
+        カード効果値
+        ・3次元効果パラメータ
+        ・距離計算機能
+        ・ゲーム判定の基礎
+        ・Forgiveness/Rejection/Blank
+    }
+}
+
+package "Factory & Services" {
+    class CardViewFactory {
+        - CardView _cardViewPrefab
+        --
+        カードビュー生成
+        ・CardViewインスタンス作成
+        ・設定の統一化
+        ・依存関係の注入
+        ・Factory Pattern
+    }
+}
+
+' 継承関係
+Player --|> PlayerPresenter
+Enemy --|> PlayerPresenter
+
+' コンポジション関係
+PlayerPresenter *-- PlayerModel
+PlayerPresenter *-- HandModel
+PlayerPresenter *-- DeckModel
+
+' 依存関係
+PlayerPresenter ..> HandView : 制御
+HandView ..> HandModel : バインド
+HandView *-- CardViewFactory
+CardView ..> CardData : 表示
+CardViewFactory ..> CardView : 生成
+CardData *-- CardStatus : 所有
+
+' 関連
+HandView --> CardView : 複数管理
+HandModel --> CardData : リスト格納
+DeckModel --> CardData : リスト格納
+
+
+@enduml

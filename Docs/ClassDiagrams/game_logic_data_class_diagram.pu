@@ -1,0 +1,175 @@
+@startuml void-red Game Logic Data Class Diagram
+
+title void-red カードゲーム ゲームロジック・データ管理クラス図
+
+skinparam class {
+    BackgroundColor<<Logic>> #FFE0E0
+    BackgroundColor<<Data>> #FFF3E0
+    BackgroundColor<<Container>> #E0E0FF
+    BackgroundColor<<Enum>> #F0F8FF
+    BackgroundColor<<ScriptableObject>> #E8F8E8
+}
+
+package "Game Logic" {
+    class ScoreCalculator <<Logic>> {
+        --
+        スコア計算ロジック
+        ・静的クラス
+        ・一致度×精神ベット×倍率
+        ・距離計算によるスコア算出
+        ・テーマとの適合度評価
+    }
+
+    class CollapseJudge <<Logic>> {
+        --
+        崩壊判定ロジック
+        ・静的クラス
+        ・ベット値と閾値の比較
+        ・崩壊確率計算
+        ・ランダム判定実行
+    }
+
+    class PlayerMove <<Data>> {
+        - CardData selectedCard
+        - PlayStyle playStyle
+        - int mentalBet
+        --
+        プレイヤーの手
+        ・1ターンの選択内容
+        ・カード+スタイル+ベット
+        ・不変データクラス
+        ・ゲーム評価の基礎
+    }
+}
+
+package "Enums & Extensions" {
+    enum GameState <<Enum>> {
+        ThemeAnnouncement
+        PlayerCardSelection
+        EnemyCardSelection
+        Evaluation
+        ResultDisplay
+        --
+        ゲーム進行状態
+        ・5つのフェーズ
+        ・ステートマシン制御
+    }
+
+    enum PlayStyle <<Enum>> {
+        Hesitation
+        Impulse
+        Conviction
+        --
+        カードの出し方
+        ・迷い/衝動/確信
+        ・3つのスタイル
+    }
+
+    class PlayStyleExtensions <<Logic>> {
+        --
+        PlayStyle拡張メソッド
+        ・日本語変換
+        ・説明文取得
+        ・静的拡張クラス
+    }
+}
+
+package "ScriptableObject Data" {
+    class AllCardData <<ScriptableObject>> {
+        - List<CardData> cardList
+        --
+        全カードデータ管理
+        ・カードリスト保持
+        ・ランダム取得機能
+        ・エディター自動登録
+        ・プール生成の基礎
+    }
+
+    class AllThemeData <<ScriptableObject>> {
+        - List<ThemeData> themeList
+        --
+        全テーマデータ管理
+        ・テーマリスト保持
+        ・ランダム取得機能
+        ・距離計算による検索
+        ・エディター自動登録
+    }
+
+    class ThemeData <<ScriptableObject>> {
+        - string title
+        - CardStatus cardStatus
+        --
+        テーマ情報
+        ・テーマタイトル
+        ・目標CardStatus
+        ・ScriptableObject
+    }
+}
+
+package "VContainer Configuration" {
+    class MainLifetimeScope <<Container>> {
+        - AllCardData allCardData
+        - AllThemeData allThemeData
+        - HandView playerHandView
+        - HandView enemyHandView
+        - Player _player
+        - Enemy _enemy
+        --
+        メインゲーム依存性注入
+        ・Player/Enemy生成
+        ・データインスタンス登録
+        ・サービス登録
+        ・GameManager/UIPresenter登録
+    }
+
+    class RootLifetimeScope <<Container>> {
+        --
+        ルート依存性注入
+        ・グローバル設定
+        ・シーン共通インスタンス
+    }
+
+    class TitleLifetimeScope <<Container>> {
+        --
+        タイトル依存性注入
+        ・タイトル画面専用設定
+        ・シーン固有サービス
+    }
+}
+
+' 使用関係
+ScoreCalculator ..> CardData : 使用
+ScoreCalculator ..> CardStatus : 使用
+CollapseJudge ..> CardData : 使用
+PlayerMove *-- CardData : 所有
+PlayerMove *-- PlayStyle : 所有
+
+' 拡張関係
+PlayStyleExtensions ..> PlayStyle : 拡張
+
+' 管理関係
+AllCardData --> CardData : リスト管理
+AllThemeData --> ThemeData : リスト管理
+ThemeData *-- CardStatus : 所有
+
+' VContainer関係
+MainLifetimeScope ..> AllCardData : 登録
+MainLifetimeScope ..> AllThemeData : 登録
+MainLifetimeScope ..> Player : 生成・登録
+MainLifetimeScope ..> Enemy : 生成・登録
+MainLifetimeScope ..> CardPoolService : 登録
+MainLifetimeScope ..> ThemeService : 登録
+MainLifetimeScope ..> GameManager : エントリーポイント
+MainLifetimeScope ..> UIPresenter : コンポーネント登録
+
+' サービス使用関係
+CardPoolService ..> AllCardData : 使用
+ThemeService ..> AllThemeData : 使用
+
+' ゲームロジック使用関係
+GameManager ..> ScoreCalculator : 使用
+GameManager ..> CollapseJudge : 使用
+GameManager ..> PlayerMove : 使用
+GameManager ..> GameState : 使用
+
+@enduml
