@@ -226,8 +226,9 @@ public class HandView : MonoBehaviour
     /// </summary>
     private async UniTask RemoveCardViewAsync(CardView cardView)
     {
-        await cardView.PlayRemoveAnimation(false);
-        Destroy(cardView.gameObject);
+        cardView.PlayRemoveAndDestroy(false);
+        // アニメーション完了まで待機（通常削除は0.3秒）
+        await UniTask.Delay(300);
     }
     
     /// <summary>
@@ -260,36 +261,31 @@ public class HandView : MonoBehaviour
     /// </summary>
     public async UniTask ReturnCardsToDeck()
     {
+        if (_cardViews.Count == 0 || !deckPosition) return;
         
         // デッキ位置をhandContainer基準の座標に変換
         var deckLocalPos = GetDeckLocalPosition();
         
-        // 各カードを順次デッキに戻す
+        // カード数を保存（待機時間計算用）
+        var cardCount = _cardViews.Count;
+        
+        // 各カードにデッキ戻りアニメーションを指示（自己削除付き）
         for (var i = 0; i < _cardViews.Count; i++)
         {
             var cardView = _cardViews[i];
             if (cardView)
             {
-                var returnTask = cardView.PlayReturnToDeckAnimation(deckLocalPos);
-                returnTask.Forget(); // fire-and-forget
-                await UniTask.Delay(100); // 100ms間隔で次のカード
+                var delay = i * 0.1f; // 0.1秒間隔で順次開始
+                cardView.PlayReturnToDeckAndDestroy(deckLocalPos, delay);
             }
         }
         
-        // 最後のアニメーション完了まで待機
-        await UniTask.Delay(500); // 十分な時間を確保
-        
-        // CardViewオブジェクトを削除
-        foreach (var cardView in _cardViews)
-        {
-            if (cardView && cardView.gameObject)
-            {
-                Destroy(cardView.gameObject);
-            }
-        }
-        
-        // リストをクリア
+        // リストをクリア（CardViewは自己削除するので参照のみクリア）
         _cardViews.Clear();
+        
+        // 最後のカードのアニメーション完了まで待機
+        var totalAnimationTime = (cardCount - 1) * 0.1f + 0.4f; // 最後のカードの遅延 + アニメーション時間
+        await UniTask.Delay((int)(totalAnimationTime * 1000));
     }
     
     /// <summary>
@@ -302,8 +298,14 @@ public class HandView : MonoBehaviour
         var cardView = _cardViews[cardIndex];
         if (!cardView) return;
         
-        // 崩壊アニメーションを再生
-        await cardView.PlayRemoveAnimation(true);
+        // リストから削除
+        _cardViews.RemoveAt(cardIndex);
+        
+        // 崩壊アニメーションを開始（自己削除付き）
+        cardView.PlayRemoveAndDestroy(true);
+        
+        // アニメーション完了まで待機（崩壊は0.5秒）
+        await UniTask.Delay(500);
     }
     
     /// <summary>

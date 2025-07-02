@@ -127,6 +127,20 @@ public class CardView : MonoBehaviour
     }
     
     /// <summary>
+    /// 削除アニメーション後に自己削除
+    /// </summary>
+    public void PlayRemoveAndDestroy(bool isCollapse = false)
+    {
+        PlayRemoveAndDestroyAsync(isCollapse).Forget();
+    }
+    
+    private async UniTask PlayRemoveAndDestroyAsync(bool isCollapse)
+    {
+        await PlayRemoveAnimation(isCollapse);
+        Destroy(gameObject);
+    }
+    
+    /// <summary>
     /// 配置アニメーション
     /// </summary>
     public async UniTask PlayArrangeAnimation(Vector2 targetPosition, Quaternion targetRotation)
@@ -179,6 +193,26 @@ public class CardView : MonoBehaviour
             .ToUniTask();
         
         await UniTask.WhenAll(moveTask, scaleTask, rotateTask);
+    }
+    
+    /// <summary>
+    /// デッキに戻って自己削除するアニメーション
+    /// </summary>
+    public void PlayReturnToDeckAndDestroy(Vector2 deckPosition, float delay = 0f)
+    {
+        PlayReturnToDeckAndDestroyAsync(deckPosition, delay).Forget();
+    }
+    
+    private async UniTask PlayReturnToDeckAndDestroyAsync(Vector2 deckPosition, float delay)
+    {
+        // 遅延がある場合は待機
+        if (delay > 0) await UniTask.Delay((int)(delay * 1000));
+        
+        // アニメーション再生
+        await PlayReturnToDeckAnimation(deckPosition);
+        
+        // 自己削除
+        Destroy(gameObject);
     }
     
     /// <summary>
