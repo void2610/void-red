@@ -6,33 +6,46 @@ using Cysharp.Threading.Tasks;
 using System;
 
 /// <summary>
-/// プレイヤーとNPCの基底クラス
-/// カードデッキを持ち、カード選択の基本機能を提供
-/// 簡略化されたMVPパターンでHandViewを直接使用
+/// プレイヤーとNPCの基底クラス（Presenterとして機能）
+/// HandModelとHandViewを仲介し、ゲームロジックを制御
 /// </summary>
-public abstract class BasePlayer
+public abstract class BasePlayer : IDisposable
 {
-    public ReadOnlyReactiveProperty<CardView> SelectedCard => _handView?.SelectedCard;
+    // 公開プロパティ
+    public ReadOnlyReactiveProperty<CardData> SelectedCard => _handModel.SelectedCard;
     public ReadOnlyReactiveProperty<int> MentalPower => _mentalPower;
     public static int MaxMentalPower => MAX_MENTAL_POWER;
+    public int HandCount => _handModel.Count;
     
+    // 定数
     private const int MAX_MENTAL_POWER = 20;
-    private const int MAX_HAND_SIZE = 3;
     
-    private readonly ReactiveProperty<int> _mentalPower = new ();
-    private DeckModel _deckModel;
+    // プライベートフィールド
+    private readonly ReactiveProperty<int> _mentalPower = new();
+    private readonly HandModel _handModel;
     private readonly HandView _handView;
+    private readonly CompositeDisposable _disposables = new();
+    private DeckModel _deckModel;
     
-    public void DrawCard(int count = 1) => DrawCardAsync(count).Forget();
-    public void SetHandInteractable(bool interactable) => _handView.SetInteractable(interactable);
-    public void RestoreMentalPower(int amount) => _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, MAX_MENTAL_POWER);
-
-    public BasePlayer(HandView handView)
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="handView">対応するHandView</param>
+    protected BasePlayer(HandView handView)
     {
         _handView = handView;
+        _handModel = new HandModel(3); // 最大手札数3
         _mentalPower.Value = MAX_MENTAL_POWER;
-    }
         
+        // HandViewとHandModelをバインド
+        _handView.BindModel(_handModel);
+        
+        // Viewのイベントを購読
+        _handView.OnCardClicked
+            .Subscribe(_handModel.SelectCardAt)
+            .AddTo(_disposables);
+    }
+    
     /// <summary>
     /// デッキを初期化
     /// </summary>
@@ -41,43 +54,59 @@ public abstract class BasePlayer
         _deckModel = new DeckModel(cardDataList);
     }
     
-    public CardData GetRandomCardDataFromHand()
-    {
-        // 手札からランダムにカードを選択
-        var randomIndex = Random.Range(0, _handView.Count);
-        return _handView.Cards.CurrentValue[randomIndex].CardData;
-    }
+    public void DrawCard(int c = 1) => DrawCardAsync(c).Forget();
+    public CardData GetRandomCardDataFromHand() => _handModel.GetRandomCard();
+    public void SelectCard(CardData cardData) => _handModel.SelectCard(cardData);
+    public void SetHandInteractable(bool interactable) => _handView.SetInteractable(interactable);
+    public void SelectCardAt(int index) => _handModel.SelectCardAt(index);
+    public void DeselectCard() => _handModel.DeselectCard();
     
     /// <summary>
-    /// 精神力を消費する
+    /// カードを引く(待機可能)
     /// </summary>
-    /// <param name="amount">消費する精神力</param>
+    public async UniTask DrawCardAsync(int count = 1)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            if (_deckModel.IsEmpty || _handModel.Count >= _handModel.MaxHandSize) 
+                break;
+            
+            var cardData = _deckModel.DrawCard();
+            if (cardData)
+            {
+                // TODO: 手札に追加できなかった時にデッキに戻す処理が必要？
+                _handModel.TryAddCard(cardData);
+                if (i < count - 1) await UniTask.Delay(100);
+            }
+        }
+        
+        // 全てのカード追加後、アニメーション完了まで待機
+        if (count > 0) await UniTask.Delay(600);
+    }
+    
     public void ConsumeMentalPower(int amount)
     {
         if (_mentalPower.Value < amount) return;
-        
         _mentalPower.Value -= amount;
     }
     
-    /// <summary>
-    /// 選択したカードをプレイ
-    /// </summary>
-    /// <param name="shouldCollapse">カードが崩壊するかどうか</param>
+    public void RestoreMentalPower(int amount)
+    {
+        _mentalPower.Value = Mathf.Min(_mentalPower.Value + amount, MAX_MENTAL_POWER);
+    }
+    
     public void PlaySelectedCard(bool shouldCollapse)
     {
-        var selectedCard = _handView.SelectedCard.CurrentValue;
+        var selectedCard = _handModel.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
-        // 手札からカードを削除
-        if (shouldCollapse)
+        // 手札から削除
+        _handModel.TryRemoveCard(selectedCard);
+        
+        if (!shouldCollapse && _deckModel != null)
         {
-            _handView.CollapseCard(selectedCard);
-        }
-        else
-        {
-            _handView.RemoveCard(selectedCard);
             // 崩壊しない場合はデッキに戻す
-            _deckModel.ReturnCard(selectedCard.CardData);
+            _deckModel.ReturnCard(selectedCard);
         }
     }
     
@@ -86,44 +115,40 @@ public abstract class BasePlayer
     /// </summary>
     public void CollapseSelectedCard()
     {
-        var selectedCard = _handView.SelectedCard.CurrentValue;
+        var selectedCard = _handModel.SelectedCard.CurrentValue;
         if (!selectedCard) return;
         
-        // 崩壊演出で手札からカードを削除
-        _handView.CollapseCard(selectedCard);
+        // 選択されたカードのインデックスを取得
+        var selectedIndex = _handModel.SelectedIndex.CurrentValue;
+        
+        // 手札から削除
+        _handModel.TryRemoveCard(selectedCard);
+        
+        // 崩壊アニメーションを再生
+        if (selectedIndex >= 0)
+        {
+            _handView.PlayCollapseAnimation(selectedIndex).Forget();
+        }
     }
     
-    /// <summary>
-    /// 手札をデッキに戻す
-    /// </summary>
     public async UniTask ReturnHandToDeck()
     {
-        // 現在の手札のカードデータを取得
-        var cardDataList = _handView.Cards.CurrentValue.Select(cardView => cardView.CardData).ToList();
-
-        // 手札をデッキに戻すアニメーション
+        // 手札のカードを取得
+        var handCards = _handModel.TakeAllCards();
+        
+        // デッキに戻すアニメーション
         await _handView.ReturnCardsToDeck();
         
         // カードデータをデッキに追加
-        _deckModel.ReturnCards(cardDataList);
+        _deckModel.ReturnCards(handCards);
     }
     
     /// <summary>
-    /// カードを引く（アニメーション付き）
+    /// リソースの解放
     /// </summary>
-    private async UniTask DrawCardAsync(int count = 1)
+    public virtual void Dispose()
     {
-        var cardDataList = new List<CardData>();
-        
-        for (var i = 0; i < count; i++)
-        {
-            if (_deckModel.IsEmpty || _handView.Count >= MAX_HAND_SIZE) break;
-            
-            var cardData = _deckModel.DrawCard();
-            if (cardData) cardDataList.Add(cardData);
-        }
-        
-        await _handView.AddCardsAsync(cardDataList);
+        _disposables?.Dispose();
+        _mentalPower?.Dispose();
     }
-
 }
