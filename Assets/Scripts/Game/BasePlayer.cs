@@ -133,11 +133,14 @@ public abstract class BasePlayer : IDisposable
     
     public async UniTask ReturnHandToDeck()
     {
-        // 手札のカードを取得
-        var handCards = _handModel.TakeAllCards();
+        // 手札のカードを取得（データのみ、表示は残す）
+        var handCards = _handModel.GetAllCards();
         
         // デッキに戻すアニメーション
         await _handView.ReturnCardsToDeck();
+        
+        // 手札データをクリア
+        _handModel.Clear();
         
         // カードデータをデッキに追加
         _deckModel.ReturnCards(handCards);

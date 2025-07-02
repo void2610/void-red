@@ -138,10 +138,19 @@ public class HandModel
     /// <summary>
     /// 手札をクリア
     /// </summary>
-    private void Clear()
+    public void Clear()
     {
         _cards.Value = new List<CardData>();
         _selectedIndex.Value = -1;
+    }
+    
+    /// <summary>
+    /// 全てのカードを取得（クリアしない）
+    /// </summary>
+    /// <returns>カードリストのコピー</returns>
+    public List<CardData> GetAllCards()
+    {
+        return new List<CardData>(_cards.Value);
     }
     
     /// <summary>
