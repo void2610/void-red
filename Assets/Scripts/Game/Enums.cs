@@ -54,4 +54,32 @@ public static class PlayStyleExtensions
             _ => ""
         };
     }
+    
+    /// <summary>
+    /// PlayStyleのスコア倍率を取得
+    /// </summary>
+    public static float GetScoreMultiplier(this PlayStyle playStyle)
+    {
+        return playStyle switch
+        {
+            PlayStyle.Hesitation => 0.8f,  // 迷い：スコア低減、崩壊率低
+            PlayStyle.Impulse => 1.0f,     // 衝動：標準
+            PlayStyle.Conviction => 1.3f,  // 確信：スコア増加、崩壊率高
+            _ => 1.0f
+        };
+    }
+    
+    /// <summary>
+    /// PlayStyleの崩壊率倍率を取得
+    /// </summary>
+    public static float GetCollapseMultiplier(this PlayStyle playStyle)
+    {
+        return playStyle switch
+        {
+            PlayStyle.Hesitation => 0.5f,  // 迷い：崩壊率低
+            PlayStyle.Impulse => 1.0f,     // 衝動：標準
+            PlayStyle.Conviction => 1.8f,  // 確信：崩壊率高
+            _ => 1.0f
+        };
+    }
 }

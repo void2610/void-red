@@ -40,6 +40,6 @@ public class PlayerMove
     /// <returns>崩壊するかどうか</returns>
     public bool ShouldCollapse()
     {
-        return CollapseJudge.ShouldCollapse(SelectedCard, MentalBet);
+        return CollapseJudge.ShouldCollapse(this);
     }
 }
