@@ -16,9 +16,7 @@ public class CardView : MonoBehaviour
     [Header("UIコンポーネント")]
     [SerializeField] private Image cardImage;
     [SerializeField] private TextMeshProUGUI cardNameText;
-    [SerializeField] private TextMeshProUGUI forgivenessText;
-    [SerializeField] private TextMeshProUGUI rejectionText;
-    [SerializeField] private TextMeshProUGUI blankText;
+    [SerializeField] private TextMeshProUGUI attributeText;
     [SerializeField] private Button cardButton;
     
     public CardData CardData { get; private set; }
@@ -246,11 +244,21 @@ public class CardView : MonoBehaviour
         // カード画像を設定
         cardImage.sprite = CardData.CardImage;
         
-        // 効果パラメータを設定
-        var effect = CardData.Effect;
-        forgivenessText.text = $"許し: {effect.Forgiveness:F1}";
-        rejectionText.text = $"拒絶: {effect.Rejection:F1}";
-        blankText.text = $"空白: {effect.Blank:F1}";
+        // 属性を設定
+        var attributeName = CardData.Attribute switch
+        {
+            CardAttribute.Forgiveness => "赦し",
+            CardAttribute.Rejection => "拒絶",
+            CardAttribute.Hope => "希望",
+            CardAttribute.Despair => "絶望",
+            CardAttribute.Trust => "信頼",
+            CardAttribute.Doubt => "疑念",
+            CardAttribute.Acceptance => "受容",
+            CardAttribute.Silence => "沈黙",
+            _ => "不明"
+        };
+        
+        attributeText.text = attributeName;
     }
     
     /// <summary>

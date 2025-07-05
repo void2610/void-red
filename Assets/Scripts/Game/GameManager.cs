@@ -228,11 +228,11 @@ public class GameManager: IStartable
         _isProcessing = true; // 処理開始フラグ
         
         // スコアを計算（テーマとの一致度 × 精神ベット）
-        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
-        if (currentThemeStatus == null) return;
+        var currentThemeAttribute = _currentTheme.CurrentValue?.TargetAttribute;
+        if (currentThemeAttribute == null) return;
         
-        var playerScore = playerMove.GetScore(currentThemeStatus);
-        var npcScore = npcMove.GetScore(currentThemeStatus);
+        var playerScore = playerMove.GetScore(currentThemeAttribute.Value);
+        var npcScore = npcMove.GetScore(currentThemeAttribute.Value);
         
         // 評価結果を順次表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
@@ -262,11 +262,11 @@ public class GameManager: IStartable
         _isProcessing = true; // 処理開始フラグ
         
         // スコアで勝敗判定（スコアが高い方が勝利）
-        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
-        if (currentThemeStatus == null) return;
+        var currentThemeAttribute = _currentTheme.CurrentValue?.TargetAttribute;
+        if (currentThemeAttribute == null) return;
         
-        var playerScore = _playerMove.GetScore(currentThemeStatus);
-        var npcScore = _npcMove.GetScore(currentThemeStatus);
+        var playerScore = _playerMove.GetScore(currentThemeAttribute.Value);
+        var npcScore = _npcMove.GetScore(currentThemeAttribute.Value);
         
         string result;
         if (playerScore > npcScore)

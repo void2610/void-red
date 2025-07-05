@@ -8,8 +8,8 @@ public class ThemeData : ScriptableObject
 {
     [Header("テーマ情報")]
     [SerializeField] private string title;
-    [SerializeField] private CardStatus cardStatus;
+    [SerializeField] private CardAttribute targetAttribute;
     
     public string Title => title;
-    public CardStatus CardStatus => cardStatus;
+    public CardAttribute TargetAttribute => targetAttribute;
 }

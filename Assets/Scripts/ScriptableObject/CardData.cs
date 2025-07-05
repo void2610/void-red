@@ -7,13 +7,13 @@ using UnityEngine;
 public class CardData : ScriptableObject
 {
     [SerializeField] private string cardName;
-    [SerializeField] private CardStatus status;
+    [SerializeField] private CardAttribute attribute;
     [SerializeField] private Sprite image;
     [SerializeField] private float scoreMultiplier = 1.0f;
     [SerializeField] private int collapseThreshold = 3;
     
     public string CardName => cardName;
-    public CardStatus Effect => status;
+    public CardAttribute Attribute => attribute;
     public Sprite CardImage => image;
     public float ScoreMultiplier => scoreMultiplier;
     public int CollapseThreshold => collapseThreshold;

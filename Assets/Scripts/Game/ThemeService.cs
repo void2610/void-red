@@ -82,32 +82,4 @@ public class ThemeService
     {
         return _availableThemes.FirstOrDefault(theme => theme.name == themeName);
     }
-    
-    /// <summary>
-    /// 指定されたCardStatusに最も近いテーマを取得
-    /// </summary>
-    /// <param name="targetStatus">対象のCardStatus</param>
-    /// <returns>最も近いテーマ</returns>
-    public ThemeData GetClosestTheme(CardStatus targetStatus)
-    {
-        if (_availableThemes.Count == 0 || targetStatus == null) return null;
-        
-        ThemeData closestTheme = null;
-        float minDistance = float.MaxValue;
-        
-        foreach (var theme in _availableThemes)
-        {
-            if (theme.CardStatus == null) continue;
-            
-            var distance = theme.CardStatus.GetDistanceTo(targetStatus);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestTheme = theme;
-            }
-        }
-        
-        return closestTheme;
-    }
-    
 }

@@ -37,11 +37,11 @@ public class PlayerMove
     /// <summary>
     /// スコアを計算（ScoreCalculatorを使用）
     /// </summary>
-    /// <param name="theme">テーマのカードステータス</param>
+    /// <param name="themeAttribute">テーマの属性</param>
     /// <returns>計算されたスコア</returns>
-    public float GetScore(CardStatus theme)
+    public float GetScore(CardAttribute themeAttribute)
     {
-        return ScoreCalculator.CalculateScore(SelectedCard, MentalBet, theme);
+        return ScoreCalculator.CalculateScore(SelectedCard, MentalBet, themeAttribute);
     }
     
     /// <summary>
