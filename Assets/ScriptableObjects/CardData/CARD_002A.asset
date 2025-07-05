@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
-  m_Name: Test5
+  m_Name: CARD_002A
   m_EditorClassIdentifier: 
-  cardName: test5
-  status:
-    forgiveness: 0.5
-    rejection: 0.5
-    blank: 0
-  image: {fileID: 3282445745578411008, guid: b6e5e816a7c054f3c83538393f7440ad, type: 3}
+  cardId: CARD_002A
+  cardName: "\u3072\u3068\u5319\u306E\u8D66\u3057"
+  attribute: 0
+  image: {fileID: 7997582342637487317, guid: 061f3dd17d35f4669bf0bcb0ced3c1b0, type: 3}
+  scoreMultiplier: 1
+  collapseThreshold: 3

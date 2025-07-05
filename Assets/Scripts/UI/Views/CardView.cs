@@ -248,13 +248,11 @@ public class CardView : MonoBehaviour
         var attributeName = CardData.Attribute switch
         {
             CardAttribute.Forgiveness => "赦し",
+            CardAttribute.Anger => "怒り",
+            CardAttribute.Anxiety => "不安",
             CardAttribute.Rejection => "拒絶",
+            CardAttribute.Loss => "喪失",
             CardAttribute.Hope => "希望",
-            CardAttribute.Despair => "絶望",
-            CardAttribute.Trust => "信頼",
-            CardAttribute.Doubt => "疑念",
-            CardAttribute.Acceptance => "受容",
-            CardAttribute.Silence => "沈黙",
             _ => "不明"
         };
         

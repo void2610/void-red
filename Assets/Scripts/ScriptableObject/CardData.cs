@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Card", menuName = "VoidRed/Card Data")]
 public class CardData : ScriptableObject
 {
+    [SerializeField] private string cardId;
     [SerializeField] private string cardName;
     [SerializeField] private CardAttribute attribute;
     [SerializeField] private Sprite image;

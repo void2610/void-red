@@ -5,18 +5,14 @@ public enum CardAttribute
 {
     /// <summary>赦し</summary>
     Forgiveness,
+    /// <summary>怒り</summary>
+    Anger,
+    /// <summary>不安</summary>
+    Anxiety,
     /// <summary>拒絶</summary>
     Rejection,
+    /// <summary>喪失</summary>
+    Loss,
     /// <summary>希望</summary>
-    Hope,
-    /// <summary>絶望</summary>
-    Despair,
-    /// <summary>信頼</summary>
-    Trust,
-    /// <summary>疑念</summary>
-    Doubt,
-    /// <summary>受容</summary>
-    Acceptance,
-    /// <summary>沈黙</summary>
-    Silence
+    Hope
 }
