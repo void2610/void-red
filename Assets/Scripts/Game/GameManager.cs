@@ -51,8 +51,8 @@ public class GameManager: IStartable
         await UniTask.Delay(500);
         
         // カードデッキを初期化
-        var playerDeck = _cardPoolService.GetRandomCards(10);
-        var npcDeck = _cardPoolService.GetRandomCards(10);
+        var playerDeck = _cardPoolService.GetRandomCards(5);
+        var npcDeck = _cardPoolService.GetRandomCards(5);
         
         _player.InitializeDeck(playerDeck);
         _enemy.InitializeDeck(npcDeck);

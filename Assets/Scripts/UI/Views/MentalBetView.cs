@@ -17,7 +17,7 @@ public class MentalBetView : MonoBehaviour
     public Observable<int> MentalBetChanged => _mentalBetChanged;
     
     private readonly Subject<int> _mentalBetChanged = new();
-    private int _currentBetValue = 0;
+    private int _currentBetValue = 1;
     
     /// <summary>
     /// 精神ベット表示を更新
