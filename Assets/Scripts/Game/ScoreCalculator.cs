@@ -9,18 +9,17 @@ public static class ScoreCalculator
     /// <summary>
     /// プレイヤーの手のスコアを計算
     /// </summary>
-    /// <param name="selectedCard">選択されたカード</param>
-    /// <param name="mentalBet">精神ベット値</param>
-    /// <param name="themeAttribute">テーマの属性</param>
+    /// <param name="move">プレイヤーの手（カード選択、プレイスタイル、精神ベット）</param>
+    /// <param name="theme">テーマデータ</param>
     /// <returns>計算されたスコア</returns>
-    public static float CalculateScore(CardData selectedCard, int mentalBet, CardAttribute themeAttribute)
+    public static float CalculateScore(PlayerMove move, ThemeData theme)
     {
-        if (!selectedCard) return 0f;
+        if (move == null || !theme) return 0f;
         
-        // 属性が一致する場合は1.5倍、一致しない場合は1.0倍
-        var matchRate = selectedCard.Attribute == themeAttribute ? 1.5f : 1.0f;
+        // テーマから該当属性の倍率を取得
+        var attributeMultiplier = theme.GetMultiplier(move.SelectedCard.Attribute);
         
-        // スコア = 一致度 × 精神ベット × カード固有の倍率
-        return matchRate * mentalBet * selectedCard.ScoreMultiplier;
+        // スコア = 属性倍率 × 精神ベット × カード固有の倍率
+        return attributeMultiplier * move.MentalBet * move.SelectedCard.ScoreMultiplier;
     }
 }

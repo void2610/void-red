@@ -35,16 +35,6 @@ public class PlayerMove
     }
     
     /// <summary>
-    /// スコアを計算（ScoreCalculatorを使用）
-    /// </summary>
-    /// <param name="themeAttribute">テーマの属性</param>
-    /// <returns>計算されたスコア</returns>
-    public float GetScore(CardAttribute themeAttribute)
-    {
-        return ScoreCalculator.CalculateScore(SelectedCard, MentalBet, themeAttribute);
-    }
-    
-    /// <summary>
     /// カードが崩壊するかどうかを判定
     /// </summary>
     /// <returns>崩壊するかどうか</returns>
