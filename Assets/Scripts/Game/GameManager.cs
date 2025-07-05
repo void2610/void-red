@@ -280,8 +280,8 @@ public class GameManager: IStartable
         await _uiPresenter.ShowAnnouncement(result, 2f);
         
         // カード崩壊判定
-        var playerCollapse = _playerMove.ShouldCollapse();
-        var npcCollapse = _npcMove.ShouldCollapse();
+        var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
+        var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
         
         // 崩壊結果を表示
         if (playerCollapse || npcCollapse)

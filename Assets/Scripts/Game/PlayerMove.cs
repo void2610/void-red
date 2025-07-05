@@ -33,13 +33,4 @@ public class PlayerMove
         PlayStyle = playStyle;
         MentalBet = mentalBet;
     }
-    
-    /// <summary>
-    /// カードが崩壊するかどうかを判定
-    /// </summary>
-    /// <returns>崩壊するかどうか</returns>
-    public bool ShouldCollapse()
-    {
-        return CollapseJudge.ShouldCollapse(this);
-    }
 }
