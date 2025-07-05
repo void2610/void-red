@@ -8,22 +8,6 @@ using UnityEditor;
 [CustomPropertyDrawer(typeof(CardAttribute))]
 public class CardAttributePropertyDrawer : PropertyDrawer
 {
-    /// <summary>
-    /// 属性の日本語名を取得
-    /// </summary>
-    private static string GetAttributeJapaneseName(CardAttribute attribute)
-    {
-        return attribute switch
-        {
-            CardAttribute.Forgiveness => "赦し",
-            CardAttribute.Anger => "怒り",
-            CardAttribute.Anxiety => "不安",
-            CardAttribute.Rejection => "拒絶",
-            CardAttribute.Loss => "喪失",
-            CardAttribute.Hope => "希望",
-            _ => "不明"
-        };
-    }
     
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -39,7 +23,7 @@ public class CardAttributePropertyDrawer : PropertyDrawer
         for (int i = 0; i < enumValues.Length; i++)
         {
             var value = (CardAttribute)enumValues.GetValue(i);
-            var japaneseName = GetAttributeJapaneseName(value);
+            var japaneseName = value.ToJapaneseName();
             options[i] = $"{value} ({japaneseName})";
         }
         

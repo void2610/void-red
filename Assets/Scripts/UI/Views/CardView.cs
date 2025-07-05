@@ -245,18 +245,7 @@ public class CardView : MonoBehaviour
         cardImage.sprite = CardData.CardImage;
         
         // 属性を設定
-        var attributeName = CardData.Attribute switch
-        {
-            CardAttribute.Forgiveness => "赦し",
-            CardAttribute.Anger => "怒り",
-            CardAttribute.Anxiety => "不安",
-            CardAttribute.Rejection => "拒絶",
-            CardAttribute.Loss => "喪失",
-            CardAttribute.Hope => "希望",
-            _ => "不明"
-        };
-        
-        attributeText.text = attributeName;
+        attributeText.text = CardData.Attribute.ToJapaneseName();
     }
     
     /// <summary>
