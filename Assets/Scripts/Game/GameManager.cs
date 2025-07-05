@@ -51,8 +51,8 @@ public class GameManager: IStartable
         await UniTask.Delay(500);
         
         // カードデッキを初期化
-        var playerDeck = _cardPoolService.GetRandomCards(10);
-        var npcDeck = _cardPoolService.GetRandomCards(10);
+        var playerDeck = _cardPoolService.GetRandomCards(5);
+        var npcDeck = _cardPoolService.GetRandomCards(5);
         
         _player.InitializeDeck(playerDeck);
         _enemy.InitializeDeck(npcDeck);
@@ -227,12 +227,12 @@ public class GameManager: IStartable
     {
         _isProcessing = true; // 処理開始フラグ
         
-        // スコアを計算（テーマとの一致度 × 精神ベット）
-        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
-        if (currentThemeStatus == null) return;
+        // スコアを計算（テーマ倍率 × 精神ベット）
+        var currentTheme = _currentTheme.CurrentValue;
+        if (!currentTheme) return;
         
-        var playerScore = playerMove.GetScore(currentThemeStatus);
-        var npcScore = npcMove.GetScore(currentThemeStatus);
+        var playerScore = ScoreCalculator.CalculateScore(playerMove, currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(npcMove, currentTheme);
         
         // 評価結果を順次表示
         await _uiPresenter.ShowAnnouncement($"プレイヤーのスコア: {playerScore:F2}", 1f);
@@ -262,11 +262,11 @@ public class GameManager: IStartable
         _isProcessing = true; // 処理開始フラグ
         
         // スコアで勝敗判定（スコアが高い方が勝利）
-        var currentThemeStatus = _currentTheme.CurrentValue?.CardStatus;
-        if (currentThemeStatus == null) return;
+        var currentTheme = _currentTheme.CurrentValue;
+        if (!currentTheme) return;
         
-        var playerScore = _playerMove.GetScore(currentThemeStatus);
-        var npcScore = _npcMove.GetScore(currentThemeStatus);
+        var playerScore = ScoreCalculator.CalculateScore(_playerMove, currentTheme);
+        var npcScore = ScoreCalculator.CalculateScore(_npcMove, currentTheme);
         
         string result;
         if (playerScore > npcScore)
@@ -280,8 +280,8 @@ public class GameManager: IStartable
         await _uiPresenter.ShowAnnouncement(result, 2f);
         
         // カード崩壊判定
-        var playerCollapse = _playerMove.ShouldCollapse();
-        var npcCollapse = _npcMove.ShouldCollapse();
+        var playerCollapse = CollapseJudge.ShouldCollapse(_playerMove);
+        var npcCollapse = CollapseJudge.ShouldCollapse(_npcMove);
         
         // 崩壊結果を表示
         if (playerCollapse || npcCollapse)

@@ -78,29 +78,4 @@ public class AllThemeData : ScriptableObject
         
         return shuffled.Take(count).ToList();
     }
-    
-    /// <summary>
-    /// 指定されたCardStatusに最も近いテーマを取得
-    /// </summary>
-    public ThemeData GetClosestTheme(CardStatus targetStatus)
-    {
-        if (themeList.Count == 0 || targetStatus == null) return null;
-        
-        ThemeData closestTheme = null;
-        float minDistance = float.MaxValue;
-        
-        foreach (var theme in themeList)
-        {
-            if (theme.CardStatus == null) continue;
-            
-            var distance = theme.CardStatus.GetDistanceTo(targetStatus);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestTheme = theme;
-            }
-        }
-        
-        return closestTheme;
-    }
 }

@@ -16,7 +16,7 @@ public class UIPresenter : MonoBehaviour
     
     public Observable<Unit> PlayButtonClicked => _playButtonView.PlayButtonClicked;
     
-    private const int MIN_MENTAL_BET = 0;
+    private const int MIN_MENTAL_BET = 1;
     private const int MAX_MENTAL_BET = 7;
     
     private ThemeView _themeView;
@@ -25,7 +25,7 @@ public class UIPresenter : MonoBehaviour
     private PlayStyleView _playStyleView;
     private MentalBetView _mentalBetView;
     private PlayStyle _selectedPlayStyle = PlayStyle.Hesitation;
-    private int _mentalBetValue;
+    private int _mentalBetValue = 1;
     [Inject] private Player _player;
 
     public void SetTheme(ThemeData theme) => _themeView.DisplayTheme(theme.Title);
@@ -55,9 +55,11 @@ public class UIPresenter : MonoBehaviour
     {
         var currentMentalPower = _player.MentalPower.CurrentValue;
         
-        // 現在のベット値が精神力を超えている場合は調整
+        // 現在のベット値が精神力を超えている場合や最小値を下回る場合は調整
         if (_mentalBetValue > currentMentalPower)
             _mentalBetValue = currentMentalPower;
+        if (_mentalBetValue < MIN_MENTAL_BET)
+            _mentalBetValue = MIN_MENTAL_BET;
         
         // MentalBetViewに表示を委譲
         _mentalBetView.UpdateDisplay(_mentalBetValue, currentMentalPower, PlayerPresenter.MaxMentalPower, MIN_MENTAL_BET, MAX_MENTAL_BET);

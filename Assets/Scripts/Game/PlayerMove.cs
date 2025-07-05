@@ -33,23 +33,4 @@ public class PlayerMove
         PlayStyle = playStyle;
         MentalBet = mentalBet;
     }
-    
-    /// <summary>
-    /// スコアを計算（ScoreCalculatorを使用）
-    /// </summary>
-    /// <param name="theme">テーマのカードステータス</param>
-    /// <returns>計算されたスコア</returns>
-    public float GetScore(CardStatus theme)
-    {
-        return ScoreCalculator.CalculateScore(SelectedCard, MentalBet, theme);
-    }
-    
-    /// <summary>
-    /// カードが崩壊するかどうかを判定
-    /// </summary>
-    /// <returns>崩壊するかどうか</returns>
-    public bool ShouldCollapse()
-    {
-        return CollapseJudge.ShouldCollapse(SelectedCard, MentalBet);
-    }
 }
