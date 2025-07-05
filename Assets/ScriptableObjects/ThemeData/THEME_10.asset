@@ -10,10 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e825166e0c2c14bab83629c2b18411fc, type: 3}
-  m_Name: Test1
+  m_Name: THEME_10
   m_EditorClassIdentifier: 
-  title: test1
-  cardStatus:
-    forgiveness: 1
-    rejection: 0
-    blank: 0
+  title: "\u540C\u3058\u3082\u306E\u3092\u898B\u3066\u3044\u305F\u306F\u305A\u3060\u3063\u305F"
+  attributeMultipliers:
+    _serializedList:
+    - key: 0
+      value: 1.2
+    - key: 1
+      value: 1.3
+    - key: 2
+      value: 1.4
+    - key: 3
+      value: 1.2
+    - key: 4
+      value: 1.2
+    - key: 5
+      value: 1
