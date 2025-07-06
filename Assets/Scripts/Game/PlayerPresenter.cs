@@ -16,6 +16,7 @@ public abstract class PlayerPresenter : IDisposable
     public static int MaxMentalPower => PlayerModel.MaxMentalPower;
     public int HandCount => _handModel.Count;
     public int MaxHandSize => _handModel.MaxHandSize;
+    public DeckModel DeckModel => _deckModel;
     
     // プライベートフィールド
     private readonly PlayerModel _playerModel;
