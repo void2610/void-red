@@ -9,6 +9,7 @@ public class DeckModel
 {
     public int Count => _deck.Count;
     public bool IsEmpty => _deck.Count == 0;
+    public List<CardData> AllCards => new List<CardData>(_deck);
     
     private readonly List<CardData> _deck = new();
     
@@ -122,5 +123,17 @@ public class DeckModel
     public List<CardData> GetDeckContents()
     {
         return new List<CardData>(_deck);
+    }
+    
+    /// <summary>
+    /// 指定したインデックスのカードを別のカードで置き換える
+    /// </summary>
+    /// <param name="index">置き換えるカードのインデックス</param>
+    /// <param name="newCard">新しいカード</param>
+    public void ReplaceCard(int index, CardData newCard)
+    {
+        if (index < 0 || index >= _deck.Count || !newCard) return;
+        
+        _deck[index] = newCard;
     }
 }

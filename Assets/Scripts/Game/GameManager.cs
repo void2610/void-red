@@ -15,6 +15,8 @@ public class GameManager: IStartable
     private readonly UIPresenter _uiPresenter;
     private readonly Player _player;
     private readonly Enemy _enemy;
+    private readonly StatsTracker _statsTracker;
+    private readonly EvolutionManager _evolutionManager;
     private readonly ReactiveProperty<GameState> _currentState = new (GameState.ThemeAnnouncement);
     private readonly ReactiveProperty<ThemeData> _currentTheme = new (null);
     private PlayerMove _playerMove;
@@ -29,13 +31,17 @@ public class GameManager: IStartable
         ThemeService themeService,
         UIPresenter uiPresenter,
         Player player,
-        Enemy enemy)
+        Enemy enemy,
+        StatsTracker statsTracker,
+        EvolutionManager evolutionManager)
     {
         _cardPoolService = cardPoolService;
         _themeService = themeService;
         _uiPresenter = uiPresenter;
         _player = player;
         _enemy = enemy;
+        _statsTracker = statsTracker;
+        _evolutionManager = evolutionManager;
     }
     
     public void Start()
@@ -322,6 +328,17 @@ public class GameManager: IStartable
         _player.DrawCard(3);
         await UniTask.Delay(500);
         _enemy.DrawCard(3);
+        
+        // ゲーム結果を統計に記録
+        var playerWon = playerScore > npcScore;
+        _statsTracker.RecordGameResult(playerWon, _playerMove, _npcMove, playerCollapse, npcCollapse);
+        
+        // 進化・劣化チェック
+        var hasEvolution = _evolutionManager.ProcessEvolutions(_player.DeckModel);
+        if (hasEvolution)
+        {
+            await _uiPresenter.ShowAnnouncement("カードが変化しました！", 2.0f);
+        }
         
         // 新しいラウンドの準備時間
         await UniTask.Delay(1000);

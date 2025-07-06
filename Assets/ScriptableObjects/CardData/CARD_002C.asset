@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
+  m_Name: CARD_002C
+  m_EditorClassIdentifier: 
+  cardId: CARD_002C
+  cardName: "\u6298\u308C\u305F\u9375"
+  attribute: 3
+  image: {fileID: 8768680081999629299, guid: 2b714129fed5f4551b0d25ddd4e0a7ed, type: 3}
+  scoreMultiplier: 1
+  collapseThreshold: 3
+  evolutionConditions: []
+  evolutionTarget: {fileID: 0}
+  isTransformationTarget: 1
+  degradationConditions: []
+  degradationTarget: {fileID: 0}
