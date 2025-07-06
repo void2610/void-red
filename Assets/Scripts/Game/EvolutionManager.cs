@@ -41,8 +41,6 @@ public class EvolutionManager
         {
             deckModel.ReplaceCard(index, target);
             evolvedCards.Add((original, target));
-            
-            Debug.Log($"カード進化: {original.CardName} → {target.CardName}");
         }
         
         return evolvedCards;
@@ -60,7 +58,7 @@ public class EvolutionManager
         // デッキ内の全カードをチェック
         var cardsToDegrade = new List<(int index, CardData original, CardData target)>();
         
-        for (int i = 0; i < deckModel.AllCards.Count; i++)
+        for (var i = 0; i < deckModel.AllCards.Count; i++)
         {
             var card = deckModel.AllCards[i];
             if (_statsTracker.CanCardDegrade(card))
@@ -74,8 +72,6 @@ public class EvolutionManager
         {
             deckModel.ReplaceCard(index, target);
             degradedCards.Add((original, target));
-            
-            Debug.Log($"カード劣化: {original.CardName} → {target.CardName}");
         }
         
         return degradedCards;
@@ -109,7 +105,7 @@ public class EvolutionManager
             
             return true;
         }
-        else if (degradedCards.Count > 0)
+        if (degradedCards.Count > 0)
         {
             // 劣化通知（演出は後で実装）
             foreach (var (original, degraded) in degradedCards)

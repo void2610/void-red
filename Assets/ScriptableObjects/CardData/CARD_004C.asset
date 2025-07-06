@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
-  m_Name: CARD_002B
+  m_Name: CARD_004C
   m_EditorClassIdentifier: 
-  cardId: CARD_002B
-  cardName: "\u8D66\u3057\u305F\u65E5"
-  attribute: 0
-  image: {fileID: -6115791374543701301, guid: 9b209ddc08b144650a9039f721ad85bd, type: 3}
+  cardId: CARD_004C
+  cardName: "\u6298\u308A\u7573\u307E\u308C\u305F\u58F0"
+  attribute: 2
+  image: {fileID: -1838374387632110664, guid: 65c0dc7e226574fbfbdadab3b3346bd7, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
   evolutionConditions: []

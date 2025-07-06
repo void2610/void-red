@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardId: CARD_002C
   cardName: "\u6298\u308C\u305F\u9375"
-  attribute: 4
-  image: {fileID: -8612509956576857639, guid: 2847c15586f0a46e282b749e44ec6667, type: 3}
+  attribute: 3
+  image: {fileID: 8768680081999629299, guid: 2b714129fed5f4551b0d25ddd4e0a7ed, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
   evolutionConditions: []

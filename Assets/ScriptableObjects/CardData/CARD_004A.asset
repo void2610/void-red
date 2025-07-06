@@ -18,3 +18,17 @@ MonoBehaviour:
   image: {fileID: -1141947664440965457, guid: a90d281c303794acf9158e67d0033d0e, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
+  evolutionConditions:
+  - conditionType: 4
+    requiredPlayStyle: 1
+    requiredCount: 2
+  - conditionType: 0
+    requiredPlayStyle: 1
+    requiredCount: 2
+  evolutionTarget: {fileID: 11400000, guid: 7ad383a5532d94c388d7b947a6c5757e, type: 2}
+  isTransformationTarget: 0
+  degradationConditions:
+  - conditionType: 1
+    requiredPlayStyle: 2
+    requiredCount: 3
+  degradationTarget: {fileID: 11400000, guid: e0fc958e1d16741e6a114ae6fbc556ba, type: 2}
