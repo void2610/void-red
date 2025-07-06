@@ -113,6 +113,36 @@ public class PlayerStats
     }
     
     /// <summary>
+    /// 劣化条件をチェック（進化条件と同じロジック）
+    /// </summary>
+    /// <param name="cardData">チェック対象のカード</param>
+    /// <param name="condition">劣化条件</param>
+    /// <returns>条件を満たしているかどうか</returns>
+    public bool CheckDegradationCondition(CardData cardData, EvolutionCondition condition)
+    {
+        // 進化条件と同じロジックを使用
+        return CheckEvolutionCondition(cardData, condition);
+    }
+    
+    /// <summary>
+    /// 全ての劣化条件をチェック
+    /// </summary>
+    /// <param name="cardData">チェック対象のカード</param>
+    /// <returns>全ての条件を満たしているかどうか</returns>
+    public bool CheckAllDegradationConditions(CardData cardData)
+    {
+        if (!cardData || !cardData.CanDegrade) return false;
+        
+        foreach (var condition in cardData.DegradationConditions)
+        {
+            if (!CheckDegradationCondition(cardData, condition))
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// <summary>
     /// デバッグ用：統計情報を文字列で取得
     /// </summary>
     public string GetStatsString()

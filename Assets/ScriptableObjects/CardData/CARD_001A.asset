@@ -23,4 +23,9 @@ MonoBehaviour:
     requiredPlayStyle: 1
     requiredCount: 2
   evolutionTarget: {fileID: 11400000, guid: 16f56a4b6822e49e4917ff50562bcb0c, type: 2}
-  isEvolutionCard: 0
+  isTransformationTarget: 0
+  degradationConditions:
+  - conditionType: 0
+    requiredPlayStyle: 0
+    requiredCount: 3
+  degradationTarget: {fileID: 11400000, guid: 96418a77f5ef94e20bf72ebde966a197, type: 2}

@@ -18,7 +18,13 @@ public class CardData : ScriptableObject
     [Header("進化システム")]
     [SerializeField] private List<EvolutionCondition> evolutionConditions = new List<EvolutionCondition>();
     [SerializeField] private CardData evolutionTarget;
-    [SerializeField] private bool isEvolutionCard = false; // 進化後のカードかどうか
+    
+    [Header("カードタイプ")]
+    [SerializeField] private bool isTransformationTarget = false; // 進化・劣化先のカードかどうか（初期デッキには含まない）
+    
+    [Header("劣化システム")]
+    [SerializeField] private List<EvolutionCondition> degradationConditions = new List<EvolutionCondition>();
+    [SerializeField] private CardData degradationTarget;
     
     public string CardId => cardId;
     public string CardName => cardName;
@@ -29,10 +35,18 @@ public class CardData : ScriptableObject
     
     public List<EvolutionCondition> EvolutionConditions => evolutionConditions;
     public CardData EvolutionTarget => evolutionTarget;
-    public bool IsEvolutionCard => isEvolutionCard;
+    public bool IsTransformationTarget => isTransformationTarget;
+    
+    public List<EvolutionCondition> DegradationConditions => degradationConditions;
+    public CardData DegradationTarget => degradationTarget;
     
     /// <summary>
     /// 進化可能かどうかを判定
     /// </summary>
     public bool CanEvolve => evolutionTarget && evolutionConditions.Count > 0;
+    
+    /// <summary>
+    /// 劣化可能かどうかを判定
+    /// </summary>
+    public bool CanDegrade => degradationTarget && degradationConditions.Count > 0;
 }

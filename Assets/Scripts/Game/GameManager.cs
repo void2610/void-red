@@ -333,11 +333,11 @@ public class GameManager: IStartable
         var playerWon = playerScore > npcScore;
         _statsTracker.RecordGameResult(playerWon, _playerMove, _npcMove, playerCollapse, npcCollapse);
         
-        // 進化チェック
+        // 進化・劣化チェック
         var hasEvolution = _evolutionManager.ProcessEvolutions(_player.DeckModel);
         if (hasEvolution)
         {
-            await _uiPresenter.ShowAnnouncement("カードが進化しました！", 2.0f);
+            await _uiPresenter.ShowAnnouncement("カードが変化しました！", 2.0f);
         }
         
         // 新しいラウンドの準備時間

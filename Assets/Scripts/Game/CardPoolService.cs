@@ -21,7 +21,10 @@ public class CardPoolService
     public CardPoolService(AllCardData allCardData)
     {
         _allCardData = allCardData;
-        _availableCards = new List<CardData>(_allCardData.CardList);
+        // 進化・劣化先カードを除外して利用可能カードリストを作成
+        _availableCards = _allCardData.CardList
+            .Where(card => !card.IsTransformationTarget)
+            .ToList();
     }
     
     /// <summary>
@@ -80,6 +83,15 @@ public class CardPoolService
     public CardData GetCardByName(string cardName)
     {
         return _availableCards.FirstOrDefault(card => card.CardName == cardName);
+    }
+    
+    /// <summary>
+    /// 初期デッキに使用可能なカードの数を取得
+    /// </summary>
+    /// <returns>進化・劣化先を除いたカード数</returns>
+    public int GetInitialDeckCardCount()
+    {
+        return _availableCards.Count;
     }
     
 }

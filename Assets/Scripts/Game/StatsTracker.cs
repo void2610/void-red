@@ -60,6 +60,16 @@ public class StatsTracker
     }
     
     /// <summary>
+    /// 劣化条件をチェック
+    /// </summary>
+    /// <param name="cardData">チェック対象のカード</param>
+    /// <returns>劣化可能かどうか</returns>
+    public bool CanCardDegrade(CardData cardData)
+    {
+        return PlayerStats.CheckAllDegradationConditions(cardData);
+    }
+    
+    /// <summary>
     /// 統計データをリセット（デバッグ用）
     /// </summary>
     public void ResetStats()

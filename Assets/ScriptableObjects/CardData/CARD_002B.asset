@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a33cbb2e84d4741ae09b382decdefc, type: 3}
-  m_Name: evolve1
+  m_Name: CARD_002B
   m_EditorClassIdentifier: 
-  cardId: evolve1
-  cardName: "\u523A\u3055\u306A\u3044\u8996\u7DDA"
+  cardId: CARD_002B
+  cardName: "\u8D66\u3057\u305F\u65E5"
   attribute: 4
-  image: {fileID: 3282445745578411008, guid: b6e5e816a7c054f3c83538393f7440ad, type: 3}
+  image: {fileID: -8612509956576857639, guid: 2847c15586f0a46e282b749e44ec6667, type: 3}
   scoreMultiplier: 1
   collapseThreshold: 3
   evolutionConditions: []
   evolutionTarget: {fileID: 0}
-  isEvolutionCard: 1
+  isTransformationTarget: 1
+  degradationConditions: []
+  degradationTarget: {fileID: 0}
