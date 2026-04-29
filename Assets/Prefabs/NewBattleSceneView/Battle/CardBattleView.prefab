@@ -422,7 +422,7 @@ MonoBehaviour:
   handContainer: {fileID: 1130584874181379478}
   draggableCardPrefab: {fileID: 509959113106509033, guid: 8d687ac64e22f465783c1c86a9232ac0, type: 3}
   playerFieldSlot: {fileID: 432148017825742091}
-  enemyCardContainer: {fileID: 4132915178274490396}
+  enemyFieldSlot: {fileID: 7729817542872821245}
   dragLineView: {fileID: 7597871934632960525}
   diamondIndicatorView: {fileID: 7006559270411673534}
   instructionText: {fileID: 6154985389307593111}
@@ -921,14 +921,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5084841076277465734}
     m_Modifications:
-    - target: {fileID: 1920537777211696055, guid: adb03f1a002244b218347d9b45c77d19, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: e953841e3bb394b32903fa0f81d06602, type: 3}
-    - target: {fileID: 1920537777211696055, guid: adb03f1a002244b218347d9b45c77d19, type: 3}
-      propertyPath: m_PreserveAspect
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2637741441048102333, guid: adb03f1a002244b218347d9b45c77d19, type: 3}
       propertyPath: m_Name
       value: EnemyFieldSlot
@@ -1035,6 +1027,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8634084020591558220, guid: adb03f1a002244b218347d9b45c77d19, type: 3}
   m_PrefabInstance: {fileID: 5659192803497047632}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7729817542872821245 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2723738547527293869, guid: adb03f1a002244b218347d9b45c77d19, type: 3}
+  m_PrefabInstance: {fileID: 5659192803497047632}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50d4111b9f478408590bf543ea3badd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6499461989704945670
 PrefabInstance:
   m_ObjectHideFlags: 0

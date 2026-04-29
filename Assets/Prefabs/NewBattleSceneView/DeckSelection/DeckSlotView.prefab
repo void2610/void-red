@@ -167,6 +167,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slotIndex: 0
+  normalSlotSprite: {fileID: 21300000, guid: ff9ca4d5c09c14b1fbb1c7b4ea580f54, type: 3}
+  lockedSlotSprite: {fileID: 21300000, guid: e953841e3bb394b32903fa0f81d06602, type: 3}
+  slotImage: {fileID: 1920537777211696055}
   highlightImage: {fileID: 7421882048613898491}
 --- !u!225 &6600104086567451949
 CanvasGroup:
