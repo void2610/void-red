@@ -2070,7 +2070,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 874d10a8931c142e28c5aa552c9e08ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tutorialData: {fileID: 11400000, guid: e42a846e2da004690b69ed8d26ed9863, type: 2}
+  tutorialData: {fileID: 11400000, guid: 6e476f8e4d4424c47b7096feb1ffac43, type: 2}
 --- !u!4 &1888547331
 Transform:
   m_ObjectHideFlags: 0

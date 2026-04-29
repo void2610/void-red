@@ -563,6 +563,7 @@ public class BattlePresenter : IStartable, ISceneInitializable
 
             var resultText = result == RoundResult.PlayerWin ? "プレイヤー勝利！" : "敵の勝利...";
             BattleUIPresenter.SetBattleInstruction(resultText);
+            BattleUIPresenter.UpdateDiamondIndicators(handler.PlayerWins, handler.EnemyWins);
             Debug.Log($"[BattlePresenter] ラウンド {handler.CurrentRound + 1} 結果: {result}");
 
             // 次へボタン待機

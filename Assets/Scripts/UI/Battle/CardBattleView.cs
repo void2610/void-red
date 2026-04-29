@@ -22,10 +22,13 @@ public class CardBattleView : BasePhaseView
 
     [Header("フィールド")]
     [SerializeField] private DeckSlotView playerFieldSlot;
-    [SerializeField] private Transform enemyCardContainer;
+    [SerializeField] private DeckSlotView enemyFieldSlot;
 
     [Header("ドラッグ演出")]
     [SerializeField] private DragLineView dragLineView;
+
+    [Header("ダイヤモンドインジケータ")]
+    [SerializeField] private DiamondIndicatorView diamondIndicatorView;
 
     [Header("UI要素")]
     [SerializeField] private TextMeshProUGUI instructionText;
@@ -60,6 +63,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>プレイヤーの手札をD&D可能カードとして表示する</summary>
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards) => ShowPlayerHand(availableCards, null);
 
+    /// <summary>ダイヤモンドインジケータを更新する</summary>
+    public void UpdateDiamondIndicators(int playerWins, int enemyWins) => diamondIndicatorView.UpdateIndicators(playerWins, enemyWins);
+
     /// <summary>表示中の手札全体の操作可否を切り替える</summary>
     public void SetHandInteractable(bool interactable)
     {
@@ -83,12 +89,21 @@ public class CardBattleView : BasePhaseView
             : "勝利条件: 数字が大きい方が勝利";
 
         nextButton.gameObject.SetActive(false);
+
+        // ダイヤモンドを未獲得状態にリセット
+        diamondIndicatorView.UpdateIndicators(0, 0);
+
+        // 敵スロットを初期状態でロックしておく
+        enemyFieldSlot.SetLocked(true);
     }
 
     public void ShowPlayerHand(IReadOnlyList<CardModel> availableCards, int? forcedCardIndex)
     {
         ClearPlayerHand();
         handContainer.gameObject.SetActive(true);
+
+        // 選択フェーズ中は敵スロットをロックして使用不可を示す
+        enemyFieldSlot.SetLocked(true);
 
         for (var i = 0; i < availableCards.Count; i++)
         {
@@ -142,7 +157,7 @@ public class CardBattleView : BasePhaseView
         if (_enemyFieldCard)
             Destroy(_enemyFieldCard.gameObject);
 
-        _enemyFieldCard = Instantiate(draggableCardPrefab, enemyCardContainer);
+        _enemyFieldCard = Instantiate(draggableCardPrefab, enemyFieldSlot.CardAnchor);
         _enemyFieldCard.Initialize(enemyCard, 0);
         _enemyFieldCard.ShowBack();
         _enemyFieldCard.CanvasGroup.blocksRaycasts = false;
@@ -168,6 +183,9 @@ public class CardBattleView : BasePhaseView
     /// <summary>両者のカードをオープンする（横並びで比較表示）</summary>
     public void RevealCards(CardModel playerCard, CardModel enemyCard)
     {
+        // 公開時は敵スロットのロックを解除する
+        enemyFieldSlot.SetLocked(false);
+
         // プレイヤーカードの数字を更新（スキル効果による変更を反映）
         var placedCard = playerFieldSlot.PlacedCard;
         if (placedCard)

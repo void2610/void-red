@@ -142,6 +142,7 @@ public class BattleUIPresenter : IStartable, System.IDisposable
     public void SetBattleInstruction(string text) => _cardBattleView.SetInstruction(text);
     public async UniTask WaitForBattleNextAsync() => await _cardBattleView.WaitForNextAsync();
     public void ClearBattleField() => _cardBattleView.ClearField();
+    public void UpdateDiamondIndicators(int playerWins, int enemyWins) => _cardBattleView.UpdateDiamondIndicators(playerWins, enemyWins);
     public void HideBattle() => _cardBattleView.Hide();
 
     public void SetBattlePresenter(BattlePresenter battlePresenter)
