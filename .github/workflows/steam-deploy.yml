@@ -19,6 +19,5 @@ jobs:
       mac-execute-method: CiBuild.BuildMac
       release-branch: test
     secrets:
-      STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
-      STEAM_CONFIG_VDF: ${{ secrets.STEAM_CONFIG_VDF }}
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
       STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
