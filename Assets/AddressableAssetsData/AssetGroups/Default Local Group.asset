@@ -45,8 +45,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b594d596f5d44ae9bcc1ddac1bce797
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_anticipation.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1ec28b5157ad24ab8adde41c5d940224
     m_Address: Assets/Sprites/Input/gamepad/rightstickpress.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ece23801a47946c380d4e7f386c15ee
+    m_Address: Assets/Sprites/Character/Veil/Normal.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -95,6 +105,26 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a3e106454cc3471d926891838a601d2
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_disgust.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e1f7472ba04945d697976e9ffc49a90
+    m_Address: Assets/Sprites/Character/Alv/Mask_card.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e45fb5dd2d5e475086f73c1cdc355de
+    m_Address: Assets/Sprites/Character/Cerica/Sad_card.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ec33bb4d13f74085a5250ae98049934
+    m_Address: Assets/Sprites/Character/Cerica/Smile_card.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3fa2d505ad595416cbbb79d2f1418898
     m_Address: Assets/Sprites/Input/keyboard/leftalt.png
     m_ReadOnly: 0
@@ -135,8 +165,23 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f33df6615abd469fbdb39111589a06b
+    m_Address: Assets/Sprites/Character/Alv/Normal_card.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f4c545564cb84251b3f1abb1a07eae5
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_trust.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 528a1e199af524953a728e6fe5f39c0b
     m_Address: Assets/Sprites/Input/keyboard/six.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55b440ae248814f018980ffa10a83cad
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_joy.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -195,6 +240,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70a873a95f35d446e895673eb29613bd
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_fear.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 72afa3f050a0f4a128a9175b3f02bee4
     m_Address: Assets/Sprites/Input/keyboard/leftshift.png
     m_ReadOnly: 0
@@ -235,6 +285,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 811e67f62fb394d32b0dc894a52edb96
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_sadness.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 811fcd3e19cef4a5ba28df96bce44c08
     m_Address: Assets/Sprites/Input/keyboard/t.png
     m_ReadOnly: 0
@@ -260,6 +315,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8b66d9934a13f45d1b8a027e4baabee7
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_default.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8b74e4e3816da41e985b1eb323426ce5
     m_Address: Assets/Sprites/Input/keyboard/rightarrow.png
     m_ReadOnly: 0
@@ -282,6 +342,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a0653047ddcb5487d907028c6ae82568
     m_Address: Assets/Sprites/Input/gamepad/buttonwest.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a2fc90beaddb746a282dfbb431c991d8
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_anger.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -316,7 +381,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b99907c1ff5694e0db0aa21c848c6aae
-    m_Address: Assets/Sprites/Character/Alv/Mask1.png
+    m_Address: Assets/Sprites/Character/Alv/Mask.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -352,6 +417,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d033fced8edb941aa9ea792f8b667976
     m_Address: Assets/Sprites/Input/keyboard/d.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d346a52ddec5a47c383c30ae4b41ae8b
+    m_Address: Assets/Sprites/Character/Cerica/Normal_card.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -410,8 +480,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5b38a97e74bf4a679e422b9018c6c36
+    m_Address: Assets/Sprites/Character/Protagonist/Protagonist_surprise.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e70032c75499f43bfbfefdbbe11ba42e
     m_Address: Assets/Sprites/Input/keyboard/leftctrl.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e72a4b4a0fef24d3780bb109d9efcc10
+    m_Address: Assets/Sprites/Character/Alv/Sad.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -432,6 +512,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: eb29ce9557bee48edbdb21cba7e89bc4
     m_Address: Assets/Sprites/Input/keyboard/shift.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ecb9e4f24ed1b4835a05daf1575a2c84
+    m_Address: Assets/Sprites/Character/Alv/Smile.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
