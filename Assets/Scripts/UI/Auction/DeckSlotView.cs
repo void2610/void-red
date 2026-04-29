@@ -14,9 +14,11 @@ using Void2610.UnityTemplate;
 public class DeckSlotView : MonoBehaviour, IDropHandler
 {
     [SerializeField] private int slotIndex;
+    [SerializeField] private Sprite normalSlotSprite;
+    [SerializeField] private Sprite lockedSlotSprite;
+    [SerializeField] private Image slotImage;
     [SerializeField] private Image highlightImage;
 
-    public int SlotIndex => slotIndex;
     public bool IsOccupied => PlacedCard;
     public Transform CardAnchor => this.transform;
     public DraggableCardView PlacedCard { get; private set; }
@@ -28,6 +30,12 @@ public class DeckSlotView : MonoBehaviour, IDropHandler
 
     private readonly Subject<(DeckSlotView slot, DraggableCardView card)> _onCardDropped = new();
     private MotionHandle _fadeTween;
+
+    public void SetLocked(bool locked)
+    {
+        var sprite = locked ? lockedSlotSprite : normalSlotSprite;
+        slotImage.sprite = sprite;
+    }
 
     /// <summary>
     /// スロットにカードを配置
