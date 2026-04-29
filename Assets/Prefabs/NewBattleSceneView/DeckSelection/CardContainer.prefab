@@ -51,12 +51,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layoutMode: 1
-  spacing: -15
+  spacing: 0
   alignment: 4
   gridConstraintCount: 2
   slideOffset: {x: 0, y: 50}
-  duration: 0.2
-  staggerDelay: 0.05
+  duration: 0.5
+  staggerDelay: 0.15
   moveEase: 8
   enableFade: 1
   fadeEase: 8
@@ -92,7 +92,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: bc4bd8b3c0cc84c4ab5ed32484ced5b6, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
