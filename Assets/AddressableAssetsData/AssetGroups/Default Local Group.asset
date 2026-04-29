@@ -85,11 +85,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2dff48227540a480ca996fd111421e94
-    m_Address: Assets/Sprites/Character/Cerica/Sad.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 319882228aac24a0ca56683db2243fca
     m_Address: Assets/Sprites/Input/mouse/scrollup.png
     m_ReadOnly: 0
@@ -112,16 +107,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3e1f7472ba04945d697976e9ffc49a90
     m_Address: Assets/Sprites/Character/Alv/Mask_card.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3e45fb5dd2d5e475086f73c1cdc355de
-    m_Address: Assets/Sprites/Character/Cerica/Sad_card.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3ec33bb4d13f74085a5250ae98049934
-    m_Address: Assets/Sprites/Character/Cerica/Smile_card.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -172,6 +157,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4f4c545564cb84251b3f1abb1a07eae5
     m_Address: Assets/Sprites/Character/Protagonist/Protagonist_trust.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5220903603b7e4b2e996bb676a066592
+    m_Address: Assets/Sprites/Character/Cerica/Sad.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -340,6 +330,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9dbc0509b019943e881b6e934bc8c3bf
+    m_Address: Assets/Sprites/Character/Cerica/Smile.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a0653047ddcb5487d907028c6ae82568
     m_Address: Assets/Sprites/Input/gamepad/buttonwest.png
     m_ReadOnly: 0
@@ -370,11 +365,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b063bcd88614148daada9555a196f363
-    m_Address: Assets/Sprites/Character/Cerica/Smile.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b92dfd407e702475ea16e832de851460
     m_Address: Assets/Sprites/Input/keyboard/o.png
     m_ReadOnly: 0
@@ -382,6 +372,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b99907c1ff5694e0db0aa21c848c6aae
     m_Address: Assets/Sprites/Character/Alv/Mask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ba2948adc42b34473a8eda483225e3fa
+    m_Address: Assets/Sprites/Character/Cerica/Normal.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -417,11 +412,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d033fced8edb941aa9ea792f8b667976
     m_Address: Assets/Sprites/Input/keyboard/d.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d346a52ddec5a47c383c30ae4b41ae8b
-    m_Address: Assets/Sprites/Character/Cerica/Normal_card.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -537,11 +527,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fa6b5c7a99d5546cea064b3451dfac8e
     m_Address: Assets/Sprites/Input/keyboard/backspace.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fd1631e001c6d4cc994b5fdf5f128ad8
-    m_Address: Assets/Sprites/Character/Cerica/Normal.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
