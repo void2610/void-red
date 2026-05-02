@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using Void2610.SettingsSystem;
@@ -11,6 +12,12 @@ public class SettingsWindowView : BaseWindowView
     [SerializeField] private SettingsView settingsView;
 
     private SettingsPresenter _settingsPresenter;
+
+    /// <summary>
+    /// 表示処理をPresenterに委譲する。Presenterが設定UIを生成してからOnShowRequestedを発火し、
+    /// その購読側で実際のアニメーション付きShowが実行される
+    /// </summary>
+    public override void Show() => _settingsPresenter.RequestShow().Forget();
 
     /// <summary>
     /// 初期化
@@ -34,6 +41,11 @@ public class SettingsWindowView : BaseWindowView
                 .Subscribe(_ => Show())
                 .AddTo(Disposables);
         }
+
+        // Presenterが設定UI生成完了を通知 → 実際のアニメーション付き表示
+        _settingsPresenter.OnShowRequested
+            .Subscribe(_ => base.Show())
+            .AddTo(Disposables);
 
         // 閉じるボタン（SettingsPresenter経由）
         _settingsPresenter.OnHideRequested
