@@ -1,3 +1,4 @@
+using System.IO;
 using LitMotion;
 using UnityEngine;
 using UnityEngine.Video;
@@ -14,6 +15,9 @@ public class TitlePVView : MonoBehaviour
     public bool IsPlaying => _videoPlayer && _videoPlayer.isPlaying;
 
     private const float FADE_DURATION = 0.5f;
+
+    // StreamingAssets配下からの相対パス。VideoClipではなくURL経由でAVFoundationに直接渡す
+    private const string RELATIVE_VIDEO_PATH = "Title/pv.mp4";
 
     private CanvasGroup _canvasGroup;
     private VideoPlayer _videoPlayer;
@@ -38,6 +42,8 @@ public class TitlePVView : MonoBehaviour
         _videoPlayer = GetComponent<VideoPlayer>();
         _canvasGroup = GetComponent<CanvasGroup>();
         _canvasGroup.Hide();
+        _videoPlayer.source = VideoSource.Url;
+        _videoPlayer.url = Path.Combine(Application.streamingAssetsPath, RELATIVE_VIDEO_PATH);
         _videoPlayer.isLooping = true;
         _videoPlayer.Stop();
     }
