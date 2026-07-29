@@ -111,3 +111,12 @@ tools/**/obj/
 .serena/
 /.uloop/outputs
 /.vscode
+
+# NuGetForUnity の復元成果物 (packages.config から復元可能)
+# Discord Social SDK のみ手動配置で復元されないため追跡を維持する
+/Assets/Packages/**
+!/Assets/Packages/**/
+!/Assets/Packages/com.discord.partnersdk/**
+!/Assets/Packages/com.discord.partnersdk.meta
+# System.CodeDom は Editor 除外の手動設定を持つため dll の meta のみ追跡 (Unity 標準 System との CS0433 回避)
+!/Assets/Packages/System.CodeDom.*/**/*.dll.meta

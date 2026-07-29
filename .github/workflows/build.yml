@@ -20,6 +20,7 @@ jobs:
     with:
       unity-version: 6000.3.10f1
       execute-method: CiBuild.BuildWebGL
+      nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
       runner-labels: '["self-hosted","macOS"]'
       build-output-path: CIBuilds/WebGL/build
       deploy-alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}

@@ -25,6 +25,7 @@ jobs:
         uses: void2610/unity-coding-standards/.github/actions/setup-unity-project@main
         with:
           unity-version: ${{ env.UNITY_VERSION }}
+          nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
 
       - name: Compile project
         run: |
