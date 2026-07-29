@@ -118,3 +118,5 @@ tools/**/obj/
 !/Assets/Packages/**/
 !/Assets/Packages/com.discord.partnersdk/**
 !/Assets/Packages/com.discord.partnersdk.meta
+# System.CodeDom は Editor 除外の手動設定を持つため dll の meta のみ追跡 (Unity 標準 System との CS0433 回避)
+!/Assets/Packages/System.CodeDom.*/**/*.dll.meta
