@@ -12,6 +12,8 @@ using VContainer.Unity;
 public class NovelKitLifetimeScope : LifetimeScope
 {
     [SerializeField] private NovelMessageView view;
+    [SerializeField] private NovelKitPortraitView portraitView;
+    [SerializeField] private NovelKitBackgroundView backgroundView;
     [SerializeField] private ScriptableCharacterCatalog catalog;
     [SerializeField] private string scenarioKey = "prologue";
 
@@ -19,6 +21,10 @@ public class NovelKitLifetimeScope : LifetimeScope
     {
         builder.RegisterNovelKit();
         builder.RegisterComponent(view).As<INovelView>().AsSelf();
+        // novel-kit のWarning実装を後勝ちで上書きし、立ち絵と背景を実表示する
+        builder.Register<AddressableImageLoader>(Lifetime.Singleton);
+        builder.RegisterComponent(portraitView).As<IPortraitView>();
+        builder.RegisterComponent(backgroundView).As<IBackgroundView>();
         builder.RegisterInstance<ICharacterCatalog>(catalog);
         builder.RegisterEntryPoint<NovelKitStarter>().WithParameter(scenarioKey);
         builder.RegisterEntryPoint<NovelKitAdvanceInput>();
