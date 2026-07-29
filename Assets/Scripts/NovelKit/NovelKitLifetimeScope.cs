@@ -13,14 +13,14 @@ using VContainer.Unity;
 /// </summary>
 public class NovelKitLifetimeScope : LifetimeScope
 {
-    // Addressablesのアドレスがアセットパスそのものなので、ここまでを前置してシナリオ側のキーを短くする
-    private const string SpriteAddressRoot = "Assets/Sprites/";
-
     [SerializeField] private NovelMessageView view;
     [SerializeField] private PortraitView portraitView;
     [SerializeField] private DialogBackgroundView backgroundView;
     [SerializeField] private ScriptableCharacterCatalog catalog;
     [SerializeField] private string scenarioKey = "prologue";
+
+    // Addressablesのアドレスがアセットパスそのものなので、ここまでを前置してシナリオ側のキーを短くする
+    private const string SpriteAddressRoot = "Assets/Sprites/";
 
     protected override void Configure(IContainerBuilder builder)
     {
