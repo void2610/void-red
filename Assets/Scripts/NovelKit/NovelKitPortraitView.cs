@@ -30,6 +30,7 @@ public class NovelKitPortraitView : IPortraitView
 
     public async UniTask ShowAsync(int slotIndex, string character, string portraitKey, CancellationToken ct)
     {
+        // 範囲外ならロード自体が無駄なので先に弾く (PortraitStage 側も public API として自衛する)
         if (slotIndex < 0 || slotIndex >= _stage.SlotCount)
         {
             Debug.LogWarning($"[NovelKitPortraitView] slot 範囲外: {slotIndex} ({character})");

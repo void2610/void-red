@@ -19,9 +19,9 @@ public class PortraitStage : MonoBehaviour
 
     public int SlotCount => slots.Length;
 
-    public UniTask SetSpriteAsync(int slotIndex, Sprite sprite) => slots[slotIndex].SetCharacterImageAsync(sprite);
-    public UniTask FadeInAsync(int slotIndex) => slots[slotIndex].FadeIn();
-    public UniTask FadeOutAsync(int slotIndex) => slots[slotIndex].FadeOut();
+    public UniTask SetSpriteAsync(int slotIndex, Sprite sprite) => IsValidSlot(slotIndex) ? slots[slotIndex].SetCharacterImageAsync(sprite) : UniTask.CompletedTask;
+    public UniTask FadeInAsync(int slotIndex) => IsValidSlot(slotIndex) ? slots[slotIndex].FadeIn() : UniTask.CompletedTask;
+    public UniTask FadeOutAsync(int slotIndex) => IsValidSlot(slotIndex) ? slots[slotIndex].FadeOut() : UniTask.CompletedTask;
 
     /// <summary>
     /// レイアウトIDに対応するスロット座標を適用する
@@ -36,5 +36,13 @@ public class PortraitStage : MonoBehaviour
             return;
         }
         Debug.LogWarning($"[PortraitStage] 未定義のレイアウト: {layoutId}");
+    }
+
+    private bool IsValidSlot(int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < slots.Length) return true;
+
+        Debug.LogWarning($"[PortraitStage] slot 範囲外: {slotIndex} (SlotCount={slots.Length})");
+        return false;
     }
 }
