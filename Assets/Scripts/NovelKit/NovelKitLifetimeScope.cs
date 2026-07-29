@@ -17,7 +17,7 @@ public class NovelKitLifetimeScope : LifetimeScope
     private const string SpriteAddressRoot = "Assets/Sprites/";
 
     [SerializeField] private NovelMessageView view;
-    [SerializeField] private PortraitStage portraitStage;
+    [SerializeField] private PortraitView portraitView;
     [SerializeField] private DialogBackgroundView backgroundView;
     [SerializeField] private ScriptableCharacterCatalog catalog;
     [SerializeField] private string scenarioKey = "prologue";
@@ -26,13 +26,13 @@ public class NovelKitLifetimeScope : LifetimeScope
     {
         builder.RegisterNovelKit();
         builder.RegisterComponent(view).As<INovelView>().AsSelf();
-        builder.RegisterComponent(portraitStage);
+        builder.RegisterComponent(portraitView);
         builder.RegisterComponent(backgroundView);
 
         // novel-kit の警告用no-op実装を後勝ちで上書きし、立ち絵と背景を実表示する
         builder.RegisterInstance<ISpriteLoader>(new AddressablesSpriteLoader(SpriteAddressRoot));
-        builder.Register<IPortraitView, NovelKitPortraitView>(Lifetime.Singleton);
-        builder.Register<IBackgroundView, NovelKitBackgroundView>(Lifetime.Singleton);
+        builder.Register<IPortraitView, NovelKitPortraitAdapter>(Lifetime.Singleton);
+        builder.Register<IBackgroundView, NovelKitBackgroundAdapter>(Lifetime.Singleton);
 
         builder.RegisterInstance<ICharacterCatalog>(catalog);
         builder.RegisterEntryPoint<NovelKitStarter>().WithParameter(scenarioKey);

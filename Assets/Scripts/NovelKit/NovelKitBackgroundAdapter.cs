@@ -5,15 +5,14 @@ using Novel.Runtime;
 using UnityEngine;
 
 /// <summary>
-/// novel-kit のIBackgroundView実装
-/// キーからスプライトを解決し、描画はDialogBackgroundView (黒経由フェード) へ委譲する
+/// novel-kit の IBackgroundView を満たし、既存の DialogBackgroundView (黒経由フェード) へ委譲するアダプタ
 /// </summary>
-public class NovelKitBackgroundView : IBackgroundView
+public class NovelKitBackgroundAdapter : IBackgroundView
 {
     private readonly DialogBackgroundView _view;
     private readonly ISpriteLoader _spriteLoader;
 
-    public NovelKitBackgroundView(DialogBackgroundView view, ISpriteLoader spriteLoader)
+    public NovelKitBackgroundAdapter(DialogBackgroundView view, ISpriteLoader spriteLoader)
     {
         _view = view;
         _spriteLoader = spriteLoader;
@@ -27,7 +26,7 @@ public class NovelKitBackgroundView : IBackgroundView
         var sprite = await _spriteLoader.LoadAsync(backgroundKey, ct);
         if (!sprite)
         {
-            Debug.LogWarning($"[NovelKitBackgroundView] 背景が見つからない: {backgroundKey}");
+            Debug.LogWarning($"[NovelKitBackgroundAdapter] 背景が見つからない: {backgroundKey}");
             return;
         }
         await _view.SetBackground(sprite).AttachExternalCancellation(ct);

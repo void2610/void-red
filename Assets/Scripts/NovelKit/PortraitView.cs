@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 立ち絵スロットの配置と表示を担当するView
 /// </summary>
-public class PortraitStage : MonoBehaviour
+public class PortraitView : MonoBehaviour
 {
     [Serializable]
     private struct LayoutEntry
@@ -35,14 +35,14 @@ public class PortraitStage : MonoBehaviour
                 ((RectTransform)slots[i].transform).anchoredPosition = entry.slotPositions[i];
             return;
         }
-        Debug.LogWarning($"[PortraitStage] 未定義のレイアウト: {layoutId}");
+        Debug.LogWarning($"[PortraitView] 未定義のレイアウト: {layoutId}");
     }
 
     private bool IsValidSlot(int slotIndex)
     {
         if (slotIndex >= 0 && slotIndex < slots.Length) return true;
 
-        Debug.LogWarning($"[PortraitStage] slot 範囲外: {slotIndex} (SlotCount={slots.Length})");
+        Debug.LogWarning($"[PortraitView] slot 範囲外: {slotIndex} (SlotCount={slots.Length})");
         return false;
     }
 }
