@@ -1,0 +1,4 @@
+{
+  "test": "true",
+  "format": "bash unity-coding-standards/scripts/run-format.sh --verify-no-changes"
+}

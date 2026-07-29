@@ -25,12 +25,12 @@ public class TitleIdlePVPresenter : IStartable, ITickable, IDisposable
 
     public void Tick()
     {
-        if (!_settings.EnableTitleIdlePV) return;
+        if (!_settings.EnableTitleIdlePv) return;
 
         if (!_isPVPlaying)
         {
             // アイドル時間が閾値を超えたらPV再生
-            if (_idleDetector.IdleSeconds >= _settings.TitleIdleToPVSeconds)
+            if (_idleDetector.IdleSeconds >= _settings.TitleIdleToPvSeconds)
             {
                 _titlePVView.Play();
                 _isPVPlaying = true;
