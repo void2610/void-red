@@ -28,17 +28,18 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
     [Inject]
     public void Construct(AddressableImageLoader imageLoader) => _imageLoader = imageLoader;
 
-    public async UniTask SwitchLayoutAsync(PortraitLayout layout, CancellationToken ct)
+    // 座標を書き換えるだけなので待機は発生しない
+    public UniTask SwitchLayoutAsync(PortraitLayout layout, CancellationToken ct)
     {
         foreach (var entry in layouts)
         {
             if (entry.layoutId != layout.Id) continue;
             for (var i = 0; i < slots.Length && i < entry.slotPositions.Length; i++)
                 ((RectTransform)slots[i].transform).anchoredPosition = entry.slotPositions[i];
-            return;
+            return UniTask.CompletedTask;
         }
         Debug.LogWarning($"[NovelKitPortraitView] 未定義のレイアウト: {layout.Id}");
-        await UniTask.CompletedTask;
+        return UniTask.CompletedTask;
     }
 
     public async UniTask ShowAsync(int slotIndex, string character, string portraitKey, CancellationToken ct)
@@ -49,8 +50,7 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
             return;
         }
 
-        var sprite = await _imageLoader.LoadCharacterImageAsync(portraitKey);
-        ct.ThrowIfCancellationRequested();
+        var sprite = await _imageLoader.LoadCharacterImageAsync(portraitKey).AttachExternalCancellation(ct);
         if (!sprite)
         {
             Debug.LogWarning($"[NovelKitPortraitView] 立ち絵が見つからない: {portraitKey}");
@@ -62,7 +62,7 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
         if (!_visible.GetValueOrDefault(slotIndex))
         {
             _visible[slotIndex] = true;
-            await slot.FadeIn();
+            await slot.FadeIn().AttachExternalCancellation(ct);
         }
     }
 
@@ -72,6 +72,6 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
         if (!_visible.GetValueOrDefault(slotIndex)) return;
 
         _visible[slotIndex] = false;
-        await slots[slotIndex].FadeOut();
+        await slots[slotIndex].FadeOut().AttachExternalCancellation(ct);
     }
 }

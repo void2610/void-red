@@ -22,13 +22,12 @@ public class NovelKitBackgroundView : MonoBehaviour, IBackgroundView
 
     public async UniTask ShowAsync(string backgroundKey, CancellationToken ct)
     {
-        var sprite = await _imageLoader.LoadBackgroundImageAsync(backgroundKey);
-        ct.ThrowIfCancellationRequested();
+        var sprite = await _imageLoader.LoadBackgroundImageAsync(backgroundKey).AttachExternalCancellation(ct);
         if (!sprite)
         {
             Debug.LogWarning($"[NovelKitBackgroundView] 背景が見つからない: {backgroundKey}");
             return;
         }
-        await backgroundView.SetBackground(sprite);
+        await backgroundView.SetBackground(sprite).AttachExternalCancellation(ct);
     }
 }
