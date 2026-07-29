@@ -113,9 +113,8 @@ tools/**/obj/
 /.vscode
 
 # NuGetForUnity の復元成果物 (packages.config から復元可能)
-# .meta は Unity の import 設定 (Editor 除外・RoslynAnalyzer ラベル・GUID) を保持するため追跡し続ける
+# Discord Social SDK のみ手動配置で復元されないため追跡を維持する
 /Assets/Packages/**
 !/Assets/Packages/**/
-!/Assets/Packages/**/*.meta
-# Discord Social SDK は手動配置で NuGet では復元されないため全体を追跡する
 !/Assets/Packages/com.discord.partnersdk/**
+!/Assets/Packages/com.discord.partnersdk.meta
