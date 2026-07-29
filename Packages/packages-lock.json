@@ -449,6 +449,15 @@
       "dependencies": {},
       "hash": "c4dea57e1c27567bac512e090a356b08abf83d0b"
     },
+    "com.void2610.novel-kit": {
+      "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#1220905a2bbd7b170a87cf506d52d5255f770e4f",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "2.0.0"
+      },
+      "hash": "1220905a2bbd7b170a87cf506d52d5255f770e4f"
+    },
     "com.void2610.unity-template": {
       "version": "https://github.com/void2610/my-unity-template.git",
       "depth": 0,
@@ -476,12 +485,26 @@
       },
       "hash": "ac5c3e34848ede292ff463ddf2dba0f795d779f5"
     },
+    "jp.hadashikick.mrubycs-compiler": {
+      "version": "https://github.com/hadashiA/ChibiRuby.git?path=src/MRubyCS.Unity/Assets/MRubyCS.Compiler.Unity#0.19.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "68c7737155d7a4beab0c22eb849807ba82f104db"
+    },
     "jp.hadashikick.vcontainer": {
       "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer",
       "depth": 0,
       "source": "git",
       "dependencies": {},
       "hash": "e477ae0a2a9326cc72764ff507ebb4ddd00fa928"
+    },
+    "jp.hadashikick.vitalrouter.unity": {
+      "version": "https://github.com/hadashiA/VitalRouter.git?path=src/VitalRouter.Unity/Assets/VitalRouter",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "4e5f993150b73d62b35e8c5a0d787ce7f687c252"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

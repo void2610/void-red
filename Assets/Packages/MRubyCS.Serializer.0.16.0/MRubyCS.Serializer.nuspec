@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MRubyCS.Serializer</id>
+    <version>0.16.0</version>
+    <authors>hadashiA</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/hadashiA/MRubyCS</projectUrl>
+    <description>A new mruby virtual machine implemented in C#.</description>
+    <repository type="git" url="https://github.com/hadashiA/MRubyCS" commit="8625db40ec12afd72c8b4356f3f36b244799962d" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="MRubyCS" version="0.16.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="MRubyCS" version="0.16.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="MRubyCS" version="0.16.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
