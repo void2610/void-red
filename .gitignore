@@ -111,3 +111,6 @@ tools/**/obj/
 .serena/
 /.uloop/outputs
 /.vscode
+
+# NuGetForUnity の復元成果物 (packages.config から復元可能)
+/Assets/Packages/

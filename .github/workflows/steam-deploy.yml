@@ -15,6 +15,7 @@ jobs:
     with:
       unity-version: 6000.3.10f1
       runner-labels: '["self-hosted","macOS"]'
+      nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
       windows-execute-method: CiBuild.BuildWindows
       mac-execute-method: CiBuild.BuildMac
       release-branch: test
