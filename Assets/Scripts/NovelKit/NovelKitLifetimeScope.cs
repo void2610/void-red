@@ -20,7 +20,7 @@ public class NovelKitLifetimeScope : LifetimeScope
     [SerializeField] private string scenarioKey = "prologue";
 
     // Addressablesのアドレスがアセットパスそのものなので、ここまでを前置してシナリオ側のキーを短くする
-    private const string SpriteAddressRoot = "Assets/Sprites/";
+    private const string SPRITE_ADDRESS_ROOT = "Assets/Sprites/";
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -30,7 +30,7 @@ public class NovelKitLifetimeScope : LifetimeScope
         builder.RegisterComponent(backgroundView);
 
         // novel-kit の警告用no-op実装を後勝ちで上書きし、立ち絵と背景を実表示する
-        builder.RegisterInstance<ISpriteLoader>(new AddressablesSpriteLoader(SpriteAddressRoot));
+        builder.RegisterInstance<ISpriteLoader>(new AddressablesSpriteLoader(SPRITE_ADDRESS_ROOT));
         builder.Register<IPortraitView, NovelKitPortraitAdapter>(Lifetime.Singleton);
         builder.Register<IBackgroundView, NovelKitBackgroundAdapter>(Lifetime.Singleton);
 
