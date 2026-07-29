@@ -18,7 +18,7 @@ MonoBehaviour:
     defaultPortraitKey:
   - speakerId: cerica
     displayName: "\u30BB\u30EA\u30AB"
-    defaultPortraitKey: Cerica/Normal
+    defaultPortraitKey: Character/Cerica/Normal.png
   - speakerId: alv
     displayName: "\u30A2\u30EB\u30F4"
-    defaultPortraitKey: Alv/Normal
+    defaultPortraitKey: Character/Alv/Normal.png

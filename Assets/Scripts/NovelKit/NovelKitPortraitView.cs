@@ -1,77 +1,55 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Novel.Assets;
 using Novel.Runtime;
 using UnityEngine;
-using VContainer;
 
 /// <summary>
 /// novel-kit のIPortraitView実装
-/// レイアウト別のスロット座標へDialogCharacterViewを配置し、スプライト差し替えを行う
+/// キーからスプライトを解決し、描画はPortraitStageへ委譲する
 /// </summary>
-public class NovelKitPortraitView : MonoBehaviour, IPortraitView
+public class NovelKitPortraitView : IPortraitView
 {
-    [Serializable]
-    private struct LayoutEntry
+    private readonly PortraitStage _stage;
+    private readonly ISpriteLoader _spriteLoader;
+    private readonly HashSet<int> _visibleSlots = new();
+
+    public NovelKitPortraitView(PortraitStage stage, ISpriteLoader spriteLoader)
     {
-        public string layoutId;
-        public Vector2[] slotPositions;
+        _stage = stage;
+        _spriteLoader = spriteLoader;
     }
-
-    [SerializeField] private DialogCharacterView[] slots;
-    [SerializeField] private LayoutEntry[] layouts;
-
-    private readonly Dictionary<int, bool> _visible = new();
-    private AddressableImageLoader _imageLoader;
-
-    [Inject]
-    public void Construct(AddressableImageLoader imageLoader) => _imageLoader = imageLoader;
 
     // 座標を書き換えるだけなので待機は発生しない
     public UniTask SwitchLayoutAsync(PortraitLayout layout, CancellationToken ct)
     {
-        foreach (var entry in layouts)
-        {
-            if (entry.layoutId != layout.Id) continue;
-            for (var i = 0; i < slots.Length && i < entry.slotPositions.Length; i++)
-                ((RectTransform)slots[i].transform).anchoredPosition = entry.slotPositions[i];
-            return UniTask.CompletedTask;
-        }
-        Debug.LogWarning($"[NovelKitPortraitView] 未定義のレイアウト: {layout.Id}");
+        _stage.ApplyLayout(layout.Id);
         return UniTask.CompletedTask;
     }
 
     public async UniTask ShowAsync(int slotIndex, string character, string portraitKey, CancellationToken ct)
     {
-        if (slotIndex < 0 || slotIndex >= slots.Length)
+        if (slotIndex < 0 || slotIndex >= _stage.SlotCount)
         {
             Debug.LogWarning($"[NovelKitPortraitView] slot 範囲外: {slotIndex} ({character})");
             return;
         }
 
-        var sprite = await _imageLoader.LoadCharacterImageAsync(portraitKey).AttachExternalCancellation(ct);
+        var sprite = await _spriteLoader.LoadAsync(portraitKey, ct);
         if (!sprite)
         {
             Debug.LogWarning($"[NovelKitPortraitView] 立ち絵が見つからない: {portraitKey}");
             return;
         }
 
-        var slot = slots[slotIndex];
-        slot.SetCharacterImage(sprite);
-        if (!_visible.GetValueOrDefault(slotIndex))
-        {
-            _visible[slotIndex] = true;
-            await slot.FadeIn().AttachExternalCancellation(ct);
-        }
+        await _stage.SetSpriteAsync(slotIndex, sprite).AttachExternalCancellation(ct);
+        if (_visibleSlots.Add(slotIndex)) await _stage.FadeInAsync(slotIndex).AttachExternalCancellation(ct);
     }
 
     public async UniTask HideAsync(int slotIndex, CancellationToken ct)
     {
-        if (slotIndex < 0 || slotIndex >= slots.Length) return;
-        if (!_visible.GetValueOrDefault(slotIndex)) return;
-
-        _visible[slotIndex] = false;
-        await slots[slotIndex].FadeOut().AttachExternalCancellation(ct);
+        if (!_visibleSlots.Remove(slotIndex)) return;
+        await _stage.FadeOutAsync(slotIndex).AttachExternalCancellation(ct);
     }
 }

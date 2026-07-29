@@ -1,33 +1,35 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Novel.Assets;
 using Novel.Runtime;
 using UnityEngine;
-using VContainer;
 
 /// <summary>
 /// novel-kit のIBackgroundView実装
-/// 既存のDialogBackgroundView (黒経由フェード) に背景差し替えを委譲する
+/// キーからスプライトを解決し、描画はDialogBackgroundView (黒経由フェード) へ委譲する
 /// </summary>
-public class NovelKitBackgroundView : MonoBehaviour, IBackgroundView
+public class NovelKitBackgroundView : IBackgroundView
 {
-    [SerializeField] private DialogBackgroundView backgroundView;
+    private readonly DialogBackgroundView _view;
+    private readonly ISpriteLoader _spriteLoader;
 
-    private AddressableImageLoader _imageLoader;
-
-    [Inject]
-    public void Construct(AddressableImageLoader imageLoader) => _imageLoader = imageLoader;
+    public NovelKitBackgroundView(DialogBackgroundView view, ISpriteLoader spriteLoader)
+    {
+        _view = view;
+        _spriteLoader = spriteLoader;
+    }
 
     // イベントCGも背景と同じ全画面レイヤーで表示する (専用素材が増えたら分離する)
     public UniTask ShowStillAsync(string stillKey, CancellationToken ct) => ShowAsync(stillKey, ct);
 
     public async UniTask ShowAsync(string backgroundKey, CancellationToken ct)
     {
-        var sprite = await _imageLoader.LoadBackgroundImageAsync(backgroundKey).AttachExternalCancellation(ct);
+        var sprite = await _spriteLoader.LoadAsync(backgroundKey, ct);
         if (!sprite)
         {
             Debug.LogWarning($"[NovelKitBackgroundView] 背景が見つからない: {backgroundKey}");
             return;
         }
-        await backgroundView.SetBackground(sprite).AttachExternalCancellation(ct);
+        await _view.SetBackground(sprite).AttachExternalCancellation(ct);
     }
 }

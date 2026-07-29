@@ -1,19 +1,19 @@
 chara :player
 
-bg 'Lobby'
+bg 'Background/Lobby.jpg'
 
 narration '……暗闇の中で、意識が浮かび上がる。'
 
 stage :pair, [:cerica, :alv]
-portrait :cerica, 'Cerica/Normal'
-portrait :alv, 'Alv/Normal'
+portrait :cerica, 'Character/Cerica/Normal.png'
+portrait :alv, 'Character/Alv/Normal.png'
 
-say :cerica, 'ここは……どこだ？', 'Cerica/Sad'
+say :cerica, 'ここは……どこだ？', 'Character/Cerica/Sad.png'
 say :alv, '応える声は、ない。'
-say :cerica, '<w=0.5>とにかく、進むしかないか。', 'Cerica/Smile'
+say :cerica, '<w=0.5>とにかく、進むしかないか。', 'Character/Cerica/Smile.png'
 
 exit_chara :alv
-bg 'LobbyDark'
+bg 'Background/LobbyDark.jpg'
 
 say :cerica, '……ひとりになってしまった。'
 clear_stage

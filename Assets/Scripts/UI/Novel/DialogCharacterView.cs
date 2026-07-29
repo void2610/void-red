@@ -32,6 +32,21 @@ public class DialogCharacterView : MonoBehaviour
     }
 
     /// <summary>
+    /// キャラクター画像を設定し、クロスフェード完了まで待機する
+    /// </summary>
+    public UniTask SetCharacterImageAsync(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            characterImage.sprite = null;
+            characterImageBack.sprite = null;
+            return UniTask.CompletedTask;
+        }
+
+        return PlaySpriteChangeAnimation(sprite);
+    }
+
+    /// <summary>
     /// 2枚の画像を使った真のクロスフェードアニメーション
     /// </summary>
     private async UniTask PlaySpriteChangeAnimation(Sprite newSprite)
