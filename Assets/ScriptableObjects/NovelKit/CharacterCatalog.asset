@@ -15,4 +15,10 @@ MonoBehaviour:
   entries:
   - speakerId: player
     displayName: "\u4E3B\u4EBA\u516C"
-    defaultPortraitKey: 
+    defaultPortraitKey:
+  - speakerId: cerica
+    displayName: "\u30BB\u30EA\u30AB"
+    defaultPortraitKey: Character/Cerica/Normal.png
+  - speakerId: alv
+    displayName: "\u30A2\u30EB\u30F4"
+    defaultPortraitKey: Character/Alv/Normal.png
