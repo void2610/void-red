@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Novel.Runtime;
+using UnityEngine;
 using VContainer.Unity;
 
 /// <summary>
@@ -21,7 +22,7 @@ public class NovelKitStarter : IStartable, IDisposable
         _scenarioKey = scenarioKey;
     }
 
-    private async UniTaskVoid PlayAsync(CancellationToken ct)
+    private async UniTask PlayAsync(CancellationToken ct)
     {
         // 分岐リプレイを決定的にするため、再生前にフラグを復元しておく
         if (NovelSaveSerializer.TryDeserialize(_gameProgressService.GetNovelKitState(), out var snapshot))
@@ -33,7 +34,7 @@ public class NovelKitStarter : IStartable, IDisposable
 
     public void Start()
     {
-        PlayAsync(_cts.Token).Forget();
+        PlayAsync(_cts.Token).Forget(Debug.LogException);
     }
 
     public void Dispose()
