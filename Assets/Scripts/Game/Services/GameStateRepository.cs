@@ -92,6 +92,7 @@ public class GameStateRepository
 
         // ノベル進行データのロード
         NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
+        NovelProgress.NovelKitState = loadedData.NovelKitState;
 
         // 獲得テーマデータのロード
         MemoryProgress.Reset();
@@ -132,6 +133,7 @@ public class GameStateRepository
         {
             saveData.AddNovelChoiceResult(choiceResult);
         }
+        saveData.NovelKitState = NovelProgress.NovelKitState;
 
         // 獲得テーマをセーブデータに追加
         var savedThemes = MemoryProgress.AcquiredThemes.Select(theme => theme.ToSavedData());

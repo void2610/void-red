@@ -454,6 +454,7 @@ MonoBehaviour:
   view: {fileID: 42359165}
   portraitView: {fileID: 7979043816502831967}
   backgroundView: {fileID: 7979043816502831966}
+  audioChannel: {fileID: 7979043816502831968}
   catalog: {fileID: 11400000, guid: 41ead546b054c402881676586cb601df, type: 2}
   scenarioKey: prologue
 --- !u!4 &1929583714
@@ -590,6 +591,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2a8fdaf2da64990b851261dae407786, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitPortraitView
+--- !u!114 &7979043816502831968 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6304849522132463678, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09b24bd844c34050badec050a89104b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NovelKitAudioChannel
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

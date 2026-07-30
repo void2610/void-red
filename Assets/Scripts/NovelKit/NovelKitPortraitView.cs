@@ -40,17 +40,19 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
         return UniTask.CompletedTask;
     }
 
-    public async UniTask ShowAsync(int slotIndex, string character, Sprite sprite, CancellationToken ct)
+    public async UniTask ShowAsync(int slotIndex, string character, ResolvedSprite portrait, CancellationToken ct)
     {
         if (!IsValidSlot(slotIndex)) return;
-        if (!sprite)
+        if (!portrait.IsLoaded)
         {
-            Debug.LogWarning($"[NovelKitPortraitView] 立ち絵の解決に失敗: {character}");
+            // 消去指示 (空キー) は退場として扱い、ロード失敗だけ警告する
+            if (portrait.IsCleared) await HideAsync(slotIndex, ct);
+            else Debug.LogWarning($"[NovelKitPortraitView] 立ち絵の解決に失敗: {character} ({portrait.Key})");
             return;
         }
 
         var slot = slots[slotIndex];
-        await slot.image.CrossfadeAsync(sprite, ct);
+        await slot.image.CrossfadeAsync(portrait.Sprite, ct);
         if (_visibleSlots.Add(slotIndex))
             await slot.group.FadeIn(fadeDuration).ToUniTask(cancellationToken: ct);
     }

@@ -52,10 +52,23 @@ public class GameProgressService
     public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
 
     /// <summary>
+    /// novel-kit のフラグ / 既読スナップショットを取得
+    /// </summary>
+    public string GetNovelKitState() => _repository.NovelProgress.NovelKitState;
+
+    /// <summary>
     /// 獲得済みテーマリストを取得
     /// </summary>
-    /// <returns>獲得済みテーマのリスト</returns>
     public IReadOnlyList<AcquiredTheme> GetAcquiredThemes() => _repository.MemoryProgress.AcquiredThemes;
+
+    /// <summary>
+    /// novel-kit のフラグ / 既読スナップショットを記録してセーブ
+    /// </summary>
+    public void SaveNovelKitState(string state)
+    {
+        _repository.NovelProgress.NovelKitState = state;
+        _repository.SaveAll();
+    }
 
     /// <summary>
     /// 全データを初期状態にリセット（デバッグ用）

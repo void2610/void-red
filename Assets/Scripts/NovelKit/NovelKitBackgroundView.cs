@@ -12,16 +12,17 @@ public class NovelKitBackgroundView : MonoBehaviour, IBackgroundView
     [SerializeField] private DialogBackgroundView backgroundView;
 
     // イベントCGも背景と同じ全画面レイヤーで表示する (専用素材が増えたら分離する)
-    public UniTask ShowStillAsync(Sprite sprite, CancellationToken ct) => ShowAsync(sprite, ct);
+    public UniTask ShowStillAsync(ResolvedSprite still, CancellationToken ct) => ShowAsync(still, ct);
 
-    public async UniTask ShowAsync(Sprite sprite, CancellationToken ct)
+    public async UniTask ShowAsync(ResolvedSprite background, CancellationToken ct)
     {
-        if (!sprite)
+        if (!background.IsLoaded)
         {
-            Debug.LogWarning("[NovelKitBackgroundView] 背景の解決に失敗");
+            // 消去指示 (空キー) は黒背景のまま据え置き、ロード失敗だけ警告する
+            if (!background.IsCleared) Debug.LogWarning($"[NovelKitBackgroundView] 背景の解決に失敗: {background.Key}");
             return;
         }
 
-        await backgroundView.SetBackground(sprite).AttachExternalCancellation(ct);
+        await backgroundView.SetBackground(background.Sprite).AttachExternalCancellation(ct);
     }
 }
