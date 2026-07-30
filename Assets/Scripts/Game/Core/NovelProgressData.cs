@@ -7,6 +7,11 @@ using System.Collections.Generic;
 public class NovelProgressData
 {
     /// <summary>
+    /// novel-kit のフラグ / 既読スナップショット (NovelSaveSerializer 形式のJSON)
+    /// </summary>
+    public string NovelKitState { get; set; } = "";
+
+    /// <summary>
     /// ノベル選択結果のリスト
     /// </summary>
     private readonly List<NovelChoiceResult> _choiceResults;
@@ -45,5 +50,6 @@ public class NovelProgressData
     public void Reset()
     {
         _choiceResults.Clear();
+        NovelKitState = "";
     }
 }

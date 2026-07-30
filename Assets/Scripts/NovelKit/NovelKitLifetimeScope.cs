@@ -16,6 +16,7 @@ public class NovelKitLifetimeScope : LifetimeScope
     [SerializeField] private NovelMessageView view;
     [SerializeField] private NovelKitPortraitView portraitView;
     [SerializeField] private NovelKitBackgroundView backgroundView;
+    [SerializeField] private NovelKitAudioChannel audioChannel;
     [SerializeField] private ScriptableCharacterCatalog catalog;
     [SerializeField] private string scenarioKey = "prologue";
 
@@ -31,6 +32,7 @@ public class NovelKitLifetimeScope : LifetimeScope
         builder.RegisterInstance<ISpriteLoader>(new AddressablesSpriteLoader(SPRITE_ADDRESS_ROOT));
         builder.RegisterComponent(portraitView).As<IPortraitView>();
         builder.RegisterComponent(backgroundView).As<IBackgroundView>();
+        builder.RegisterComponent(audioChannel).As<IAudioChannel>();
 
         builder.RegisterInstance<ICharacterCatalog>(catalog);
         builder.RegisterEntryPoint<NovelKitStarter>().WithParameter(scenarioKey);

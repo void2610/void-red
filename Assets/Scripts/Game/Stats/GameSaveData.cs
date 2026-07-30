@@ -22,10 +22,22 @@ public class GameSaveData
     [Header("獲得記憶テーマ")]
     [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
 
+    [Header("novel-kit のフラグ / 既読")]
+    [SerializeField] private string novelKitState = "";
+
     // プロパティ
     public int CurrentStep => currentStep;
     public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
+
+    /// <summary>
+    /// novel-kit の状態スナップショット (NovelSaveSerializer 形式のJSON)
+    /// </summary>
+    public string NovelKitState
+    {
+        get => novelKitState;
+        set => novelKitState = value;
+    }
 
     /// <summary>
     /// カードが閲覧済みかチェック
