@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using Novel.Assets;
 using UnityEngine;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// novel-kit のIPortraitView実装
@@ -12,14 +14,22 @@ using UnityEngine;
 public class NovelKitPortraitView : MonoBehaviour, IPortraitView
 {
     [Serializable]
+    private struct Slot
+    {
+        public CanvasGroup group;
+        public CrossfadeImage image;
+    }
+
+    [Serializable]
     private struct LayoutEntry
     {
         public string layoutId;
         public Vector2[] slotPositions;
     }
 
-    [SerializeField] private DialogCharacterView[] slots;
+    [SerializeField] private Slot[] slots;
     [SerializeField] private LayoutEntry[] layouts;
+    [SerializeField] private float fadeDuration = 0.5f;
 
     private readonly HashSet<int> _visibleSlots = new();
 
@@ -39,15 +49,17 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
             return;
         }
 
-        await slots[slotIndex].SetCharacterImageAsync(sprite).AttachExternalCancellation(ct);
-        if (_visibleSlots.Add(slotIndex)) await slots[slotIndex].FadeIn().AttachExternalCancellation(ct);
+        var slot = slots[slotIndex];
+        await slot.image.CrossfadeAsync(sprite, ct);
+        if (_visibleSlots.Add(slotIndex))
+            await slot.group.FadeIn(fadeDuration).ToUniTask(cancellationToken: ct);
     }
 
     public async UniTask HideAsync(int slotIndex, CancellationToken ct)
     {
         if (!_visibleSlots.Remove(slotIndex)) return;
 
-        await slots[slotIndex].FadeOut().AttachExternalCancellation(ct);
+        await slots[slotIndex].group.FadeOut(fadeDuration).ToUniTask(cancellationToken: ct);
     }
 
     private void ApplyLayout(string layoutId)
@@ -56,7 +68,7 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
         {
             if (entry.layoutId != layoutId) continue;
             for (var i = 0; i < slots.Length && i < entry.slotPositions.Length; i++)
-                ((RectTransform)slots[i].transform).anchoredPosition = entry.slotPositions[i];
+                ((RectTransform)slots[i].group.transform).anchoredPosition = entry.slotPositions[i];
             return;
         }
         Debug.LogWarning($"[NovelKitPortraitView] 未定義のレイアウト: {layoutId}");

@@ -614,8 +614,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitPortraitView
   slots:
-  - {fileID: 9100034}
-  - {fileID: 9100054}
+  - group: {fileID: 9100033}
+    image: {fileID: 9100034}
+  - group: {fileID: 9100053}
+    image: {fileID: 9100054}
   layouts:
   - layoutId: single
     slotPositions:
@@ -624,6 +626,7 @@ MonoBehaviour:
     slotPositions:
     - {x: -450, y: 0}
     - {x: 450, y: 0}
+  fadeDuration: 0.5
 --- !u!1 &9100030
 GameObject:
   m_ObjectHideFlags: 0
@@ -684,11 +687,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 9100030}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ba68df6ffc448f0bf6082f23ed7aed4, type: 3}
+  m_Script: {fileID: 11500000, guid: c15cf4cea630e499f98094eb4d12fb79, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DialogCharacterView
-  characterImage: {fileID: 9100047}
-  characterImageBack: {fileID: 9100043}
+  m_EditorClassIdentifier: Void2610.UnityTemplate::Void2610.UnityTemplate.CrossfadeImage
+  imageA: {fileID: 9100043}
+  imageB: {fileID: 9100047}
+  duration: 0.25
 --- !u!1 &9100040
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,11 +903,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 9100050}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ba68df6ffc448f0bf6082f23ed7aed4, type: 3}
+  m_Script: {fileID: 11500000, guid: c15cf4cea630e499f98094eb4d12fb79, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DialogCharacterView
-  characterImage: {fileID: 9100067}
-  characterImageBack: {fileID: 9100063}
+  m_EditorClassIdentifier: Void2610.UnityTemplate::Void2610.UnityTemplate.CrossfadeImage
+  imageA: {fileID: 9100063}
+  imageB: {fileID: 9100067}
+  duration: 0.25
 --- !u!1 &9100060
 GameObject:
   m_ObjectHideFlags: 0
