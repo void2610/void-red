@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
+using LitMotion.Extensions;
 using Novel.Runtime;
 using R3;
 using TMPro;
@@ -18,6 +20,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     [SerializeField] private GameObject window;
     [SerializeField] private TextMeshProUGUI nameLabel;
     [SerializeField] private TextMeshProUGUI messageLabel;
+    [SerializeField] private GameObject nextIndicator;
     [SerializeField] private RectTransform choiceContainer;
     [SerializeField] private Button choiceButtonPrefab;
     [SerializeField] private Button autoButton;
@@ -39,6 +42,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     private readonly TextProgressController _progress = new();
     private readonly Subject<Unit> _onSkipRequested = new();
 
+    private MotionHandle _indicatorMotion;
     private bool _isAutoMode;
     private bool _isSkipMode;
 
@@ -74,6 +78,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     {
         window.SetActive(true);
         nameLabel.text = line.DisplayName ?? "";
+        HideNextIndicator();
 
         var message = NovelDisplayText.Build(NovelTagLexer.Parse(line.Text));
 
@@ -103,7 +108,9 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         // SEループもここで停止する
         _progress.CompleteTyping();
 
+        ShowNextIndicator();
         await WaitForAdvanceAsync();
+        HideNextIndicator();
     }
 
     public async UniTask<int> ShowChoicesAsync(IReadOnlyList<string> options, CancellationToken ct)
@@ -151,6 +158,56 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         }
 
         await _progress.WaitForNext();
+    }
+
+    private void ShowNextIndicator()
+    {
+        nextIndicator.SetActive(true);
+        PositionIndicatorAtLastCharacter();
+
+        _indicatorMotion.TryCancel();
+
+        var rt = (RectTransform)nextIndicator.transform;
+        var originalPos = rt.anchoredPosition;
+        _indicatorMotion = LMotion.Create(0f, 1f, 1f)
+            .WithLoops(-1, LoopType.Yoyo)
+            .WithEase(Ease.InOutSine)
+            .Bind(t =>
+            {
+                var pos = originalPos;
+                pos.y += Mathf.Sin(t * Mathf.PI) * 5f;
+                rt.anchoredPosition = pos;
+            })
+            .AddTo(this);
+    }
+
+    private void HideNextIndicator()
+    {
+        _indicatorMotion.TryCancel();
+        nextIndicator.SetActive(false);
+    }
+
+    // 最後の可視文字の右下に付ける。行数や文量で位置が変わるため毎回測り直す
+    private void PositionIndicatorAtLastCharacter()
+    {
+        messageLabel.ForceMeshUpdate();
+        var textInfo = messageLabel.textInfo;
+        if (textInfo.characterCount == 0) return;
+
+        var lastIndex = textInfo.characterCount - 1;
+        while (lastIndex >= 0)
+        {
+            var info = textInfo.characterInfo[lastIndex];
+            if (info.isVisible && !char.IsWhiteSpace(info.character)) break;
+            lastIndex--;
+        }
+        if (lastIndex < 0) return;
+
+        var lastChar = textInfo.characterInfo[lastIndex];
+        var worldPos = messageLabel.rectTransform.TransformPoint(new Vector3(lastChar.topRight.x, lastChar.bottomRight.y, 0f));
+        var rt = (RectTransform)nextIndicator.transform;
+        var localPos = ((RectTransform)rt.parent).InverseTransformPoint(worldPos);
+        rt.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
     }
 
     private void SetAutoMode(bool on)
