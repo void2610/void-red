@@ -4,7 +4,7 @@ stage :single, [:alv]
 portrait :alv, 'Character/Alv/Mask.png'
 
 say :alv, 'お疲れ様でした。模擬オークションは如何でしたか？'
-say :player, '……まだ、よくわからない。 でも……少しだけ、自分のことが見えてきた気がする。'
+say :player, '……まだ、よくわからない。 でも……少しだけ、自分のことが見えてきた気がする。', display_as: '■■■'
 say :alv, 'それは何よりです。'
 say :alv, 'この階には、いつでも戻ってこられます。'
 say :alv, '迷ったとき、休みたいとき'
