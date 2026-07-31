@@ -45,7 +45,7 @@ public class NovelKitStarter : IStartable, IDisposable
             return;
         }
 
-        // .rb が無いと novel-kit は何も再生せず Completed を返すため、空振りで進行だけ進むのを防ぐ
+        // .rb が無いと novel-kit は何も再生せず Completed を返すため、空振りで進行だけ進むのを防ぐ (SayNumber は再生ごとに 0 起点)
         if (_runner.CurrentSayNumber == 0)
         {
             Debug.LogError($"[NovelKitStarter] シナリオが再生されなかった: {scenarioKey} (.rb が存在するか確認)");
