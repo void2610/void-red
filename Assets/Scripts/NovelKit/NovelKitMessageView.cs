@@ -20,6 +20,11 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     [SerializeField] private TextMeshProUGUI messageLabel;
     [SerializeField] private RectTransform choiceContainer;
     [SerializeField] private Button choiceButtonPrefab;
+    [SerializeField] private Button autoButton;
+    [SerializeField] private TextMeshProUGUI autoButtonText;
+    [SerializeField] private Button skipButton;
+    [SerializeField] private Color autoButtonNormalColor = Color.white;
+    [SerializeField] private Color autoButtonActiveColor = Color.yellow;
     [SerializeField] private float charSpeed = 0.03f;
     [SerializeField] private float autoNextDelay = 3f;
     [SerializeField] private string typingSeName = "Dialog2";
@@ -153,9 +158,17 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         if (_isAutoMode == on) return;
 
         _isAutoMode = on;
+        autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
 
         // 待機中の切り替えは進行中のタイムアウトを取り消して待ち方を組み直す
         if (_progress.IsWaitingForNext) _progress.CancelWait();
+    }
+
+    private void Awake()
+    {
+        autoButton.onClick.AddListener(ToggleAutoMode);
+        skipButton.onClick.AddListener(RequestSkip);
+        autoButtonText.color = autoButtonNormalColor;
     }
 
     private void OnDestroy()

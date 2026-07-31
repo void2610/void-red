@@ -24,6 +24,12 @@ public class TextProgressController
     private bool _isWaitingForNext;
 
     /// <summary>
+    /// 待機だけを打ち切る（進行はさせない）
+    /// オート解除時に自動進行のタイムアウトを取り消し、手動待ちへ落とすために使う
+    /// </summary>
+    public void CancelWait() => _waitCancellationTokenSource?.Cancel();
+
+    /// <summary>
     /// タイピングを開始し、キャンセルトークンを返す
     /// </summary>
     public CancellationToken BeginTyping()
@@ -129,12 +135,6 @@ public class TextProgressController
         // 次へ進む
         _isWaitingForNext = false;
     }
-
-    /// <summary>
-    /// 待機だけを打ち切る（進行はさせない）
-    /// オート解除時に自動進行のタイムアウトを取り消し、手動待ちへ落とすために使う
-    /// </summary>
-    public void CancelWait() => _waitCancellationTokenSource?.Cancel();
 
     /// <summary>
     /// 文字送りも待機も打ち切って完了扱いにする（スキップ用）
