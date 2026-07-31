@@ -12,6 +12,11 @@ public class TextProgressController
     /// </summary>
     public CancellationToken DialogSeToken => _dialogSeCancellationTokenSource?.Token ?? CancellationToken.None;
 
+    /// <summary>
+    /// 送り待ち中かどうか
+    /// </summary>
+    public bool IsWaitingForNext => _isWaitingForNext;
+
     private CancellationTokenSource _typingCancellationTokenSource;
     private CancellationTokenSource _dialogSeCancellationTokenSource;
     private CancellationTokenSource _waitCancellationTokenSource;
@@ -122,6 +127,23 @@ public class TextProgressController
         _waitCancellationTokenSource?.Cancel();
 
         // 次へ進む
+        _isWaitingForNext = false;
+    }
+
+    /// <summary>
+    /// 待機だけを打ち切る（進行はさせない）
+    /// オート解除時に自動進行のタイムアウトを取り消し、手動待ちへ落とすために使う
+    /// </summary>
+    public void CancelWait() => _waitCancellationTokenSource?.Cancel();
+
+    /// <summary>
+    /// 文字送りも待機も打ち切って完了扱いにする（スキップ用）
+    /// </summary>
+    public void ForceComplete()
+    {
+        SkipTyping();
+
+        _waitCancellationTokenSource?.Cancel();
         _isWaitingForNext = false;
     }
 
