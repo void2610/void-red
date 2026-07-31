@@ -119,17 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &42359165 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5428266411713009942, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
-  m_PrefabInstance: {fileID: 7979043816502831965}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5e892d2738544a77a56608892a39d82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Novel.View::Novel.View.NovelMessageView
 --- !u!224 &42359166 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7376430804190998633, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
@@ -451,7 +440,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  view: {fileID: 42359165}
+  view: {fileID: 7979043816502831974}
   portraitView: {fileID: 7979043816502831967}
   backgroundView: {fileID: 7979043816502831966}
   audioChannel: {fileID: 7979043816502831968}
@@ -564,10 +553,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5428266411713009942, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7207363111601382205, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7979043816502831974}
   m_SourcePrefab: {fileID: 100100000, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
 --- !u!114 &7979043816502831966 stripped
 MonoBehaviour:
@@ -596,12 +589,68 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6304849522132463678, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
   m_PrefabInstance: {fileID: 7979043816502831965}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 7979043816502831973}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09b24bd844c34050badec050a89104b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitAudioChannel
+--- !u!224 &7979043816502831969 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4554064236941310087, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7979043816502831970 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2868043861240887093, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &7979043816502831971 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7172017768859041692, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &7979043816502831972 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 349495271076974098, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7979043816502831973 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7207363111601382205, guid: ef8970a3ec7604638bb27a6c06e9f674, type: 3}
+  m_PrefabInstance: {fileID: 7979043816502831965}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7979043816502831974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7979043816502831973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b33c23aa16e477f812dda1afa3d2f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NovelKitMessageView
+  window: {fileID: 7979043816502831972}
+  nameLabel: {fileID: 7979043816502831971}
+  messageLabel: {fileID: 7979043816502831970}
+  choiceContainer: {fileID: 7979043816502831969}
+  choiceButtonPrefab: {fileID: 5645178109978945894, guid: 24fba00ae0842054b8ba929624c57e8e, type: 3}
+  charsPerSecond: 40
+  typingSeName: Dialog2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
