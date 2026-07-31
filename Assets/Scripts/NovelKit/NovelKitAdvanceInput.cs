@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 using VContainer.Unity;
 using Void2610.SettingsSystem;
 using Void2610.UnityTemplate;
@@ -15,6 +16,8 @@ public class NovelKitAdvanceInput : IStartable, IDisposable
     private readonly IConfirmationDialog _confirmationDialog;
     private readonly CompositeDisposable _disposables = new();
 
+    private bool _isConfirming;
+
     public NovelKitAdvanceInput(NovelKitMessageView view, InputActionsProvider inputActionsProvider,
         IConfirmationDialog confirmationDialog)
     {
@@ -23,12 +26,21 @@ public class NovelKitAdvanceInput : IStartable, IDisposable
         _confirmationDialog = confirmationDialog;
     }
 
-    private async UniTaskVoid ConfirmAndSkip()
+    // ボタンとキーの両方から要求が来るため、確認中の再要求は捨てる
+    private async UniTask ConfirmAndSkip()
     {
-        var confirmed = await _confirmationDialog.ShowDialog("現在のシナリオをスキップしますか？", "スキップ", "キャンセル");
-        if (!confirmed) return;
+        if (_isConfirming) return;
 
-        _view.BeginSkip();
+        _isConfirming = true;
+        try
+        {
+            var confirmed = await _confirmationDialog.ShowDialog("現在のシナリオをスキップしますか？", "スキップ", "キャンセル");
+            if (confirmed) _view.BeginSkip();
+        }
+        finally
+        {
+            _isConfirming = false;
+        }
     }
 
     public void Start()
@@ -49,7 +61,7 @@ public class NovelKitAdvanceInput : IStartable, IDisposable
             .AddTo(_disposables);
 
         _view.OnSkipRequested
-            .Subscribe(_ => ConfirmAndSkip().Forget())
+            .Subscribe(_ => ConfirmAndSkip().Forget(Debug.LogException))
             .AddTo(_disposables);
     }
 
