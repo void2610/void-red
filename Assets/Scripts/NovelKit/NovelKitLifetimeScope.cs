@@ -13,7 +13,7 @@ using VContainer.Unity;
 /// </summary>
 public class NovelKitLifetimeScope : LifetimeScope
 {
-    [SerializeField] private NovelMessageView view;
+    [SerializeField] private NovelKitMessageView view;
     [SerializeField] private NovelKitPortraitView portraitView;
     [SerializeField] private NovelKitBackgroundView backgroundView;
     [SerializeField] private NovelKitAudioChannel audioChannel;

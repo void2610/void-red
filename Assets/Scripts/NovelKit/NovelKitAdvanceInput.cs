@@ -1,18 +1,17 @@
 using System;
-using Novel.View;
 using R3;
 using VContainer.Unity;
 
 /// <summary>
-/// 送り入力をNovelMessageViewに橋渡しする
+/// 送り入力をNovelKitMessageViewに橋渡しする
 /// </summary>
 public class NovelKitAdvanceInput : IStartable, IDisposable
 {
-    private readonly NovelMessageView _view;
+    private readonly NovelKitMessageView _view;
     private readonly InputActionsProvider _inputActionsProvider;
     private readonly CompositeDisposable _disposables = new();
 
-    public NovelKitAdvanceInput(NovelMessageView view, InputActionsProvider inputActionsProvider)
+    public NovelKitAdvanceInput(NovelKitMessageView view, InputActionsProvider inputActionsProvider)
     {
         _view = view;
         _inputActionsProvider = inputActionsProvider;
