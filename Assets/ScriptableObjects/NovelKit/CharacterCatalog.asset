@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Novel.View::Novel.View.ScriptableCharacterCatalog
   entries:
   - speakerId: player
-    displayName: "\u4E3B\u4EBA\u516C"
+    displayName: "\u25A0\u25A0\u25A0"
     defaultPortraitKey:
   - speakerId: cerica
     displayName: "\u30BB\u30EA\u30AB"

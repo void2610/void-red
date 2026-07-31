@@ -1,7 +1,7 @@
 bg 'Background/LobbyDark.jpg'
 
 narration '（空間が変わる。私とセリカの前に、三枚の札が浮かび上がる）'
-say :player, '「これが……商品？」', display_as: '■■■'
+say :player, '「これが……商品？」'
 
 stage :single, [:cerica]
 portrait :cerica, 'Character/Cerica/Normal.png'
@@ -13,18 +13,18 @@ narration '信じた罰：何もかも信じていた自分が、一番の愚か
 narration '触れてしまった温度：壊したかったはずの存在が、気づけば温もりとして胸に残っていた。'
 narration '（それぞれの札が、機械のような声で説明されていく）'
 narration '（……どれも、哀愁が漂う悲しい記憶。 でも、このなかのどれかが私の記憶なのかな）'
-say :player, '「……ねえ、セリカ。これって、ほんとに私の記憶なのかな」', display_as: '■■■'
+say :player, '「……ねえ、セリカ。これって、ほんとに私の記憶なのかな」'
 
 portrait :cerica, 'Character/Cerica/Sad.png'
 say :cerica, '「……。 そんなことを考えていたら、あなたはいつまで経っても記憶を取り戻せないわ」'
-say :player, '「え……どういう意味？」', display_as: '■■■'
+say :player, '「え……どういう意味？」'
 say :cerica, "「自分の“本当の記憶”なんて、私たちに判別する方法は最初から存在しないの。 \nでもね、ここで落札した記憶は、すべて“自分の記憶”になる。 」"
 say :cerica, '「本来の持ち主が誰だろうと、関係ないわ」'
 
-say :player, '「……それって……」', display_as: '■■■'
+say :player, '「……それって……」'
 narration '（頭が真っ白になる。心臓が跳ねる）'
-say :player, "「じゃあ私は……何のためにこのオークションに参加したの？ \n私は、自分を取り戻したいのに……\nそれがもう出来ないなんて、聞いてない……！」", display_as: '■■■'
-say :player, '「私に……もう参加する理由なんて……！」', display_as: '■■■'
+say :player, "「じゃあ私は……何のためにこのオークションに参加したの？ \n私は、自分を取り戻したいのに……\nそれがもう出来ないなんて、聞いてない……！」"
+say :player, '「私に……もう参加する理由なんて……！」'
 narration '（怒りが込み上げる。悔しさと、恐怖と、混乱が混ざって、涙が出そうになる）'
 say :cerica, '「ヒカリ……」'
 
@@ -37,4 +37,4 @@ say :cerica, '「ここでは、苦しみながらもがく者だけが、すべ
 
 narration "（震える手で、札を見つめる。 \nこれは、誰かの記憶。でも、私のものになるかもしれない。）"
 narration '（だったら私は……）'
-say :player, "「……分かった。やってみる。 \n私の感情で、私の記憶を落札してみせる」", display_as: '■■■'
+say :player, "「……分かった。やってみる。 \n私の感情で、私の記憶を落札してみせる」"
