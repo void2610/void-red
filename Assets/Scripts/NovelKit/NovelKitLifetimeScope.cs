@@ -8,8 +8,8 @@ using VContainer;
 using VContainer.Unity;
 
 /// <summary>
-/// novel-kit を最小構成で配線するLifetimeScope
-/// セリフ送り・立ち絵・背景を担当し、フラグの永続化は未対応
+/// novel-kit を配線するLifetimeScope
+/// 再生するシナリオは通常ストーリー進行から決まり、scenarioKeyOverride を入れた時だけ単体再生になる
 /// </summary>
 public class NovelKitLifetimeScope : LifetimeScope
 {
@@ -18,7 +18,9 @@ public class NovelKitLifetimeScope : LifetimeScope
     [SerializeField] private NovelKitBackgroundView backgroundView;
     [SerializeField] private NovelKitAudioChannel audioChannel;
     [SerializeField] private ScriptableCharacterCatalog catalog;
-    [SerializeField] private string scenarioKey = "prologue";
+
+    [Tooltip("空ならストーリー進行に従う。入れるとそのシナリオを単体再生し、進行もシーン遷移も行わない")]
+    [SerializeField] private string scenarioKeyOverride = "";
 
     // Addressablesのアドレスがアセットパスそのものなので、ここまでを前置してシナリオ側のキーを短くする
     private const string SPRITE_ADDRESS_ROOT = "Assets/Sprites/";
@@ -35,7 +37,7 @@ public class NovelKitLifetimeScope : LifetimeScope
         builder.RegisterComponent(audioChannel).As<IAudioChannel>();
 
         builder.RegisterInstance<ICharacterCatalog>(catalog);
-        builder.RegisterEntryPoint<NovelKitStarter>().WithParameter(scenarioKey);
+        builder.RegisterEntryPoint<NovelKitStarter>().WithParameter(scenarioKeyOverride);
         builder.RegisterEntryPoint<NovelKitAdvanceInput>();
     }
 }

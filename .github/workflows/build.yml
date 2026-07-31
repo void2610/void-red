@@ -23,6 +23,8 @@ jobs:
       nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
       runner-labels: '["self-hosted","macOS"]'
       build-output-path: CIBuilds/WebGL/build
+      # NovelKitScene がビルド対象に入り MRuby インタプリタ一式が IL2CPP に含まれるようになったため、既定の 45 分では足りない
+      build-timeout-minutes: 90
       deploy-alias: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
       deploy-message: "${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || format('Deploy {0}', github.sha) }}"
       pr-number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}

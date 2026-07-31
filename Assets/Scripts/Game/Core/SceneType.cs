@@ -34,7 +34,7 @@ public static class SceneTypeExtensions
         { SceneType.Title, "TitleScene" },
         { SceneType.Home, "HomeScene" },
         { SceneType.Battle, "BattleScene" },
-        { SceneType.Novel, "NovelScene" },
+        { SceneType.Novel, "NovelKitScene" },
         { SceneType.Thanks, "ThanksScene" }
     };
 

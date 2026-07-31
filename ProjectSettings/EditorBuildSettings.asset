@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/BattleScene.unity
     guid: cdb2360a157f446beac80f25b32eb9d5
   - enabled: 1
+    path: Assets/Scenes/NovelKitScene.unity
+    guid: 14b2a8983cf864d70b376b2e9d2cc511
+  - enabled: 0
     path: Assets/Scenes/NovelScene.unity
     guid: a22579887ff36419db3559626f1d1845
   - enabled: 1

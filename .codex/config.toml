@@ -1,7 +1,6 @@
 [mcp_servers.uLoopMCP]
 command = "node"
 args = ['Library/uLoopMCP/server.bundle.js']
-env = { "UNITY_TCP_PORT" = "8700" }
-
+env = { "UNITY_TCP_PORT" = "8701" }
 [mcp_servers.uLoopMCP.tools.compile]
 approval_mode = "approve"

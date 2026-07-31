@@ -456,7 +456,7 @@ MonoBehaviour:
   backgroundView: {fileID: 7979043816502831966}
   audioChannel: {fileID: 7979043816502831968}
   catalog: {fileID: 11400000, guid: 41ead546b054c402881676586cb601df, type: 2}
-  scenarioKey: prologue
+  scenarioKeyOverride: 
 --- !u!4 &1929583714
 Transform:
   m_ObjectHideFlags: 0
