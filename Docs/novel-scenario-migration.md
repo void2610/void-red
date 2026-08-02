@@ -22,10 +22,12 @@
 | `CharacterImageName` | `portrait` | 値 `Alv/Mask` → `Character/Alv/Mask.png` |
 | `BackgroundImageName` | `bg` | 値 `LobbyDark` → `Background/LobbyDark.jpg`。拡張子は資産ごとに png / jpg が混在する |
 | `SEClipName` | `se` | |
-| `CustomCharSpeed` | 未対応 | |
-| `AutoAdvance` | 未対応 | |
-| `GetItem` | 未対応 | prologue1 に 1 箇所。TODO コメントで位置のみ保持 |
-| `CardChoice` | 未対応 | prologue2 に 1 箇所。札画像なしの素の `choose` で代替 |
+| `CustomCharSpeed` | `<speed=N>` | どちらも速度の倍率。`<speed=0.25>` で 4 倍遅くなることを実測で確認 |
+| `AutoAdvance` | `<w=秒>` | オート専用の待ち時間は無い。行末に置けば手動・オートどちらでも同じだけ待つ |
+| `GetItem` | なし | prologue1 に 1 箇所。TODO コメントで位置のみ保持 |
+| `CardChoice` | なし | prologue2 に 1 箇所。札画像なしの素の `choose` で代替 |
+
+`CustomCharSpeed` / `AutoAdvance` は移行対象の 5 本では 1 件も使われておらず (旧 `test` シートのみ)、置き換え先が既存タグで足りるため新しいコマンドは足していない。
 
 `CharacterImageName` は「話者」ではなく「画面に出ている立ち絵」を指す。主人公のセリフ行にも相手の立ち絵が指定されるため、`say` の第 3 引数ではなく `portrait` で切り替える。
 
