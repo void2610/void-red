@@ -30,6 +30,9 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     [SerializeField] private Color autoButtonActiveColor = Color.yellow;
     [SerializeField] private float charSpeed = 0.03f;
     [SerializeField] private float autoNextDelay = 3f;
+    [SerializeField] private float indicatorBounceDuration = 1f;
+    [SerializeField] private float indicatorBounceAmplitude = 5f;
+    [SerializeField] private Vector2 indicatorOffset = new(30f, 5f);
     [SerializeField] private string typingSeName = "Dialog2";
 
     /// <summary>
@@ -151,13 +154,12 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     // オート中は一定時間で自動送り。待機中に解除されたら手動待ちへ落とす
     private async UniTask WaitForAdvanceAsync()
     {
-        while (_isAutoMode)
+        // オート切替は待機をキャンセルして戻ってくるだけなので、進行が確定するまで待ち方を選び直す
+        while (_progress.IsWaitingForNext)
         {
-            await _progress.WaitForNextWithTimeout(autoNextDelay);
-            if (!_progress.IsWaitingForNext) return;
+            if (_isAutoMode) await _progress.WaitForNextWithTimeout(autoNextDelay);
+            else await _progress.WaitForNext();
         }
-
-        await _progress.WaitForNext();
     }
 
     private void ShowNextIndicator()
@@ -169,13 +171,13 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
 
         var rt = (RectTransform)nextIndicator.transform;
         var originalPos = rt.anchoredPosition;
-        _indicatorMotion = LMotion.Create(0f, 1f, 1f)
+        _indicatorMotion = LMotion.Create(0f, 1f, indicatorBounceDuration)
             .WithLoops(-1, LoopType.Yoyo)
             .WithEase(Ease.InOutSine)
             .Bind(t =>
             {
                 var pos = originalPos;
-                pos.y += Mathf.Sin(t * Mathf.PI) * 5f;
+                pos.y += Mathf.Sin(t * Mathf.PI) * indicatorBounceAmplitude;
                 rt.anchoredPosition = pos;
             })
             .AddTo(this);
@@ -207,7 +209,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         var worldPos = messageLabel.rectTransform.TransformPoint(new Vector3(lastChar.topRight.x, lastChar.bottomRight.y, 0f));
         var rt = (RectTransform)nextIndicator.transform;
         var localPos = ((RectTransform)rt.parent).InverseTransformPoint(worldPos);
-        rt.anchoredPosition = new Vector2(localPos.x + 30f, localPos.y + 5f);
+        rt.anchoredPosition = new Vector2(localPos.x, localPos.y) + indicatorOffset;
     }
 
     private void SetAutoMode(bool on)
