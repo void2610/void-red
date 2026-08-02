@@ -1062,7 +1062,6 @@ RectTransform:
   - {fileID: 9100021}
   - {fileID: 617654765780270993}
   - {fileID: 4554064236941310087}
-  - {fileID: 9149412424436397180}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1082,7 +1081,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09b24bd844c34050badec050a89104b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitAudioChannel
-  seManager: {fileID: 599100507661183887}
+  seManager: {fileID: 0}
 --- !u!114 &6903809405870213346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1106,8 +1105,15 @@ MonoBehaviour:
   skipButton: {fileID: 8106790999200380143}
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  charSpeed: 0.03
-  autoNextDelay: 3
+  charsPerSecond: 33
+  autoAdvanceDelay: 3
+  skipUnread: 1
+  shakeAmplitude: 3
+  waveAmplitude: 4
+  waveSpeed: 6
+  indicatorBounceDuration: 1
+  indicatorBounceAmplitude: 5
+  indicatorOffset: {x: 30, y: 5}
   typingSeName: Dialog2
 --- !u!1 &9150722108618635631
 GameObject:
@@ -1427,77 +1433,4 @@ MonoBehaviour:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1548068314681488621, guid: 0c2403e33def945da82bf5ecf94a5001, type: 3}
   m_PrefabInstance: {fileID: 6292843370565394360}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &8512021992826896100
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 7376430804190998633}
-    m_Modifications:
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4832695855774412043, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-      propertyPath: m_Name
-      value: NovelSeManager
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
---- !u!114 &599100507661183887 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9110967157870876011, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-  m_PrefabInstance: {fileID: 8512021992826896100}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0089e532b114d4f817f50b04aa9c354, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &9149412424436397180 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 637814569318861464, guid: 80f1b94bb9bba4e2bb4926cf101b2891, type: 3}
-  m_PrefabInstance: {fileID: 8512021992826896100}
   m_PrefabAsset: {fileID: 0}

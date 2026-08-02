@@ -208,4 +208,19 @@ MonoBehaviour:
   - name: SE_MEMORY_CARD_OPEN
     audioClip: {fileID: 8300000, guid: 33f6e0e7b697e48918cfdac3f0b3d09b, type: 3}
     volume: 1
+  - name: DoorArrival
+    audioClip: {fileID: 8300000, guid: c93930eed5f38433d927959acaa8eaec, type: 3}
+    volume: 1
+  - name: DoorArrivalBell
+    audioClip: {fileID: 8300000, guid: 4f9b3aca294014c29b23ca59266ba334, type: 3}
+    volume: 1
+  - name: Footstep
+    audioClip: {fileID: 8300000, guid: 6fca10ddade3146e59837bcf39a2b7c9, type: 3}
+    volume: 1
+  - name: ItemGet
+    audioClip: {fileID: 8300000, guid: e99e940c75bc441ad9e865c216eae354, type: 3}
+    volume: 1
+  - name: Item2
+    audioClip: {fileID: 8300000, guid: 33f6e0e7b697e48918cfdac3f0b3d09b, type: 3}
+    volume: 1
   maxChannels: 20
