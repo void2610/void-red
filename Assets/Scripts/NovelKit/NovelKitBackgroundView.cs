@@ -4,7 +4,7 @@ using Novel.Assets;
 using UnityEngine;
 
 /// <summary>
-/// novel-kit のIBackgroundView実装
+/// novel-kit のIBackgroundChannel / IStillChannel実装
 /// 既存のDialogBackgroundView (黒経由フェード) へ委譲する。イベントCGも同じ全画面レイヤーで出す
 /// </summary>
 public class NovelKitBackgroundView : MonoBehaviour, IBackgroundChannel, IStillChannel

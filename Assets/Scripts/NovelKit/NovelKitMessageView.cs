@@ -54,6 +54,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
 
     private TextRevealEngine _engine;
     private MotionHandle _indicatorMotion;
+    private bool _isWaitingForAdvance;
 
     public void ToggleAutoMode() => SetAutoMode(!_engine.Auto);
 
@@ -63,8 +64,8 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
 
     public void Advance()
     {
-        // オート中の送り入力はオートを解除する（意図しない自動進行を止める）
-        if (_engine.Auto)
+        // 送り待ち中のオート解除だけを横取りする。文字送り中は全文表示の要求として通す
+        if (_engine.Auto && _isWaitingForAdvance)
         {
             SetAutoMode(false);
             return;
@@ -114,9 +115,19 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
             animCts.Cancel();
         }
 
+        await anim;   // 演出側の例外をここで回収する
+
         ShowNextIndicator();
-        await _engine.WaitForAdvanceAsync(line.IsAlreadyRead, ct);
-        HideNextIndicator();
+        _isWaitingForAdvance = true;
+        try
+        {
+            await _engine.WaitForAdvanceAsync(line.IsAlreadyRead, ct);
+        }
+        finally
+        {
+            _isWaitingForAdvance = false;
+            HideNextIndicator();
+        }
     }
 
     public async UniTask<int> ShowChoicesAsync(IReadOnlyList<string> options, CancellationToken ct)
@@ -171,7 +182,9 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
             ApplyOffset(info, wave, visible, isWave: true);
 
             for (var m = 0; m < info.meshInfo.Length; m++)
+            {
                 messageLabel.UpdateGeometry(info.meshInfo[m].mesh, m);
+            }
 
             await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, ct);
         }
