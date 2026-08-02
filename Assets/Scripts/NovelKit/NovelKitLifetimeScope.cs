@@ -32,8 +32,8 @@ public class NovelKitLifetimeScope : LifetimeScope
 
         // novel-kit の既定 (Resourcesロード + 警告用no-op表示) を後勝ちで上書きする
         builder.RegisterInstance<ISpriteLoader>(new AddressablesSpriteLoader(SPRITE_ADDRESS_ROOT));
-        builder.RegisterComponent(portraitView).As<IPortraitView>();
-        builder.RegisterComponent(backgroundView).As<IBackgroundView>();
+        builder.RegisterComponent(portraitView).As<IPortraitChannel>();
+        builder.RegisterComponent(backgroundView).As<IBackgroundChannel>().As<IStillChannel>();
         builder.RegisterComponent(audioChannel).As<IAudioChannel>();
 
         builder.RegisterInstance<ICharacterCatalog>(catalog);

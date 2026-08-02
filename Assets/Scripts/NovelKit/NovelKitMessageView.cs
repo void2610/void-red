@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LitMotion;
-using LitMotion.Extensions;
 using Novel.Runtime;
+using Novel.View;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -13,9 +13,9 @@ using Void2610.UnityTemplate;
 
 /// <summary>
 /// novel-kit のINovelView実装
-/// 参考実装のNovelMessageViewは文字送りと送り待ちを1つのawaitに畳んでおり、文字送り音を打ち終わりで止められないため自前で持つ
+/// 文字送りの進行はnovel-kitのTextRevealEngineに委譲し、TMPへの反映と打鍵音・インジケーターだけを持つ
 /// </summary>
-public class NovelKitMessageView : MonoBehaviour, INovelView
+public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSettings
 {
     [SerializeField] private GameObject window;
     [SerializeField] private TextMeshProUGUI nameLabel;
@@ -28,8 +28,12 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     [SerializeField] private Button skipButton;
     [SerializeField] private Color autoButtonNormalColor = Color.white;
     [SerializeField] private Color autoButtonActiveColor = Color.yellow;
-    [SerializeField] private float charSpeed = 0.03f;
-    [SerializeField] private float autoNextDelay = 3f;
+    [SerializeField] private float charsPerSecond = 33f;
+    [SerializeField] private float autoAdvanceDelay = 3f;
+    [SerializeField] private bool skipUnread = true;
+    [SerializeField] private float shakeAmplitude = 3f;
+    [SerializeField] private float waveAmplitude = 4f;
+    [SerializeField] private float waveSpeed = 6f;
     [SerializeField] private float indicatorBounceDuration = 1f;
     [SerializeField] private float indicatorBounceAmplitude = 5f;
     [SerializeField] private Vector2 indicatorOffset = new(30f, 5f);
@@ -40,16 +44,19 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     /// </summary>
     public Observable<Unit> OnSkipRequested => _onSkipRequested;
 
-    public bool IsAutoMode => _isAutoMode;
+    public bool IsAutoMode => _engine.Auto;
 
-    private readonly TextProgressController _progress = new();
+    public float CharsPerSecond => charsPerSecond;
+    public float AutoAdvanceDelay => autoAdvanceDelay;
+    public bool SkipUnread => skipUnread;
+
     private readonly Subject<Unit> _onSkipRequested = new();
 
+    private TextRevealEngine _engine;
     private MotionHandle _indicatorMotion;
-    private bool _isAutoMode;
-    private bool _isSkipMode;
+    private bool _isWaitingForAdvance;
 
-    public void ToggleAutoMode() => SetAutoMode(!_isAutoMode);
+    public void ToggleAutoMode() => SetAutoMode(!_engine.Auto);
 
     public void RequestSkip() => _onSkipRequested.OnNext(Unit.Default);
 
@@ -57,14 +64,14 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
 
     public void Advance()
     {
-        // オート中の送り入力はオートを解除する（意図しない自動進行を止める）
-        if (_isAutoMode && _progress.IsWaitingForNext)
+        // 送り待ち中のオート解除だけを横取りする。文字送り中は全文表示の要求として通す
+        if (_engine.Auto && _isWaitingForAdvance)
         {
             SetAutoMode(false);
             return;
         }
 
-        _progress.AdvanceToNext();
+        _engine.RequestAdvance();
     }
 
     /// <summary>
@@ -72,9 +79,8 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
     /// </summary>
     public void BeginSkip()
     {
-        _isSkipMode = true;
         SetAutoMode(false);
-        _progress.ForceComplete();
+        _engine.Skip = true;
     }
 
     public async UniTask ShowMessageAsync(NovelLine line, CancellationToken ct)
@@ -83,43 +89,51 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         nameLabel.text = line.DisplayName ?? "";
         HideNextIndicator();
 
-        var message = NovelDisplayText.Build(NovelTagLexer.Parse(line.Text));
+        var tokens = NovelTagLexer.Parse(line.Text);
+        _engine.Build(tokens);
 
-        if (_isSkipMode)
-        {
-            // 全文を即座に出し、待たずに次へ（1フレームだけ送って表示を反映させる）
-            messageLabel.text = message;
-            messageLabel.maxVisibleCharacters = int.MaxValue;
-            await UniTask.NextFrame(ct);
-            return;
-        }
+        messageLabel.text = NovelDisplayText.Build(tokens);
+        messageLabel.ForceMeshUpdate();
+        var tmpTotal = messageLabel.textInfo.characterCount;
+        messageLabel.maxVisibleCharacters = 0;
 
-        var typingToken = _progress.BeginTyping();
-
-        SeManager.Instance.PlaySeLoop(typingSeName, cancellationToken: _progress.DialogSeToken).Forget();
+        using var animCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var anim = AnimateEffectsAsync(animCts.Token).SuppressCancellationThrow();
+        var seCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        SeManager.Instance.PlaySeLoop(typingSeName, cancellationToken: seCts.Token).Forget();
 
         try
         {
-            await messageLabel.RichTextTypewriterAnimation(message, charSpeed, typingToken);
+            await _engine.RevealOnlyAsync(line.IsAlreadyRead,
+                v => messageLabel.maxVisibleCharacters = Mathf.Min(v, tmpTotal), ct);
         }
-        catch (OperationCanceledException)
+        finally
         {
-            // 文字送り中の送り入力でキャンセルされた場合は全文を即座に表示
-            messageLabel.maxVisibleCharacters = int.MaxValue;
+            // 打鍵音は送り待ちに入る前に止める
+            seCts.Cancel();
+            seCts.Dispose();
+            animCts.Cancel();
         }
 
-        // SEループもここで停止する
-        _progress.CompleteTyping();
+        await anim;   // 演出側の例外をここで回収する
 
         ShowNextIndicator();
-        await WaitForAdvanceAsync();
-        HideNextIndicator();
+        _isWaitingForAdvance = true;
+        try
+        {
+            await _engine.WaitForAdvanceAsync(line.IsAlreadyRead, ct);
+        }
+        finally
+        {
+            _isWaitingForAdvance = false;
+            HideNextIndicator();
+        }
     }
 
     public async UniTask<int> ShowChoicesAsync(IReadOnlyList<string> options, CancellationToken ct)
     {
         // 選択肢はプレイヤーの判断が要るのでスキップを打ち切る
-        _isSkipMode = false;
+        _engine.Skip = false;
 
         var tcs = new UniTaskCompletionSource<int>();
         var spawned = new List<GameObject>(options.Count);
@@ -151,14 +165,49 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
         messageLabel.text = "";
     }
 
-    // オート中は一定時間で自動送り。待機中に解除されたら手動待ちへ落とす
-    private async UniTask WaitForAdvanceAsync()
+    // shake/wave の頂点アニメ。区間はエンジンが可視index単位で算出済み
+    private async UniTask AnimateEffectsAsync(CancellationToken ct)
     {
-        // オート切替は待機をキャンセルして戻ってくるだけなので、進行が確定するまで待ち方を選び直す
-        while (_progress.IsWaitingForNext)
+        var shake = _engine.ShakeSpans;
+        var wave = _engine.WaveSpans;
+        if (shake.Count == 0 && wave.Count == 0) return;
+
+        while (!ct.IsCancellationRequested)
         {
-            if (_isAutoMode) await _progress.WaitForNextWithTimeout(autoNextDelay);
-            else await _progress.WaitForNext();
+            messageLabel.ForceMeshUpdate();
+            var info = messageLabel.textInfo;
+            var visible = messageLabel.maxVisibleCharacters;
+
+            ApplyOffset(info, shake, visible, isWave: false);
+            ApplyOffset(info, wave, visible, isWave: true);
+
+            for (var m = 0; m < info.meshInfo.Length; m++)
+            {
+                messageLabel.UpdateGeometry(info.meshInfo[m].mesh, m);
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, ct);
+        }
+    }
+
+    private void ApplyOffset(TMP_TextInfo info, IReadOnlyList<(int start, int end)> ranges, int visible, bool isWave)
+    {
+        foreach (var (start, end) in ranges)
+        {
+            for (var i = start; i < end && i < visible && i < info.characterCount; i++)
+            {
+                var ch = info.characterInfo[i];
+                if (!ch.isVisible) continue;
+
+                var offset = isWave
+                    ? new Vector3(0f, Mathf.Sin(Time.time * waveSpeed + i * 0.5f) * waveAmplitude, 0f)
+                    : new Vector3(UnityEngine.Random.Range(-shakeAmplitude, shakeAmplitude),
+                        UnityEngine.Random.Range(-shakeAmplitude, shakeAmplitude), 0f);
+
+                var verts = info.meshInfo[ch.materialReferenceIndex].vertices;
+                var vi = ch.vertexIndex;
+                for (var k = 0; k < 4; k++) verts[vi + k] += offset;
+            }
         }
     }
 
@@ -214,17 +263,13 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
 
     private void SetAutoMode(bool on)
     {
-        if (_isAutoMode == on) return;
-
-        _isAutoMode = on;
-        autoButtonText.color = _isAutoMode ? autoButtonActiveColor : autoButtonNormalColor;
-
-        // 待機中の切り替えは進行中のタイムアウトを取り消して待ち方を組み直す
-        if (_progress.IsWaitingForNext) _progress.CancelWait();
+        _engine.Auto = on;
+        autoButtonText.color = on ? autoButtonActiveColor : autoButtonNormalColor;
     }
 
     private void Awake()
     {
+        _engine = new TextRevealEngine(this, new UnityFrameClock());
         autoButton.onClick.AddListener(ToggleAutoMode);
         skipButton.onClick.AddListener(RequestSkip);
         autoButtonText.color = autoButtonNormalColor;
@@ -232,7 +277,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView
 
     private void OnDestroy()
     {
+        _indicatorMotion.TryCancel();
         _onSkipRequested.Dispose();
-        _progress.Dispose();
     }
 }

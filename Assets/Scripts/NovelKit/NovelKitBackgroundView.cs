@@ -4,15 +4,12 @@ using Novel.Assets;
 using UnityEngine;
 
 /// <summary>
-/// novel-kit のIBackgroundView実装
-/// 既存のDialogBackgroundView (黒経由フェード) へ委譲する
+/// novel-kit のIBackgroundChannel / IStillChannel実装
+/// 既存のDialogBackgroundView (黒経由フェード) へ委譲する。イベントCGも同じ全画面レイヤーで出す
 /// </summary>
-public class NovelKitBackgroundView : MonoBehaviour, IBackgroundView
+public class NovelKitBackgroundView : MonoBehaviour, IBackgroundChannel, IStillChannel
 {
     [SerializeField] private DialogBackgroundView backgroundView;
-
-    // イベントCGも背景と同じ全画面レイヤーで表示する (専用素材が増えたら分離する)
-    public UniTask ShowStillAsync(ResolvedSprite still, CancellationToken ct) => ShowAsync(still, ct);
 
     public async UniTask ShowAsync(ResolvedSprite background, CancellationToken ct)
     {

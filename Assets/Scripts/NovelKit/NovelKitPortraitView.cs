@@ -8,10 +8,10 @@ using UnityEngine;
 using Void2610.UnityTemplate;
 
 /// <summary>
-/// novel-kit のIPortraitView実装
+/// novel-kit のIPortraitChannel実装
 /// レイアウト別のスロット座標へ立ち絵を配置し、表示・退場を行う
 /// </summary>
-public class NovelKitPortraitView : MonoBehaviour, IPortraitView
+public class NovelKitPortraitView : MonoBehaviour, IPortraitChannel
 {
     [Serializable]
     private struct Slot
@@ -40,14 +40,14 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitView
         return UniTask.CompletedTask;
     }
 
-    public async UniTask ShowAsync(int slotIndex, string character, ResolvedSprite portrait, CancellationToken ct)
+    public async UniTask ShowAsync(int slotIndex, ResolvedSprite portrait, CancellationToken ct)
     {
         if (!IsValidSlot(slotIndex)) return;
         if (!portrait.IsLoaded)
         {
             // 消去指示 (空キー) は退場として扱い、ロード失敗だけ警告する
             if (portrait.IsCleared) await HideAsync(slotIndex, ct);
-            else Debug.LogWarning($"[NovelKitPortraitView] 立ち絵の解決に失敗: {character} ({portrait.Key})");
+            else Debug.LogWarning($"[NovelKitPortraitView] 立ち絵の解決に失敗: {portrait.Key}");
             return;
         }
 
