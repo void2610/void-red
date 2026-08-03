@@ -1100,6 +1100,7 @@ MonoBehaviour:
   indicatorBounceAmplitude: 5
   indicatorOffset: {x: 30, y: 5}
   typingSeName: Dialog2
+  audioChannel: {fileID: 6304849522132463678}
 --- !u!1 &9150722108618635631
 GameObject:
   m_ObjectHideFlags: 0

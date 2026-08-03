@@ -11,7 +11,12 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
 {
+    /// <summary>
+    /// 直近に鳴らしたSEの残り時間 (秒)。オート進行がSEを鳴らし切ってから進むために使う
+    /// </summary>
+    public float SeRemainingSeconds => Mathf.Max(0f, _seEndTime - Time.time);
     private bool _bgmWarned;
+    private float _seEndTime;
 
     public void StopBgm() => WarnBgmUnsupported();
     public void PlayBgm(string bgmKey) => WarnBgmUnsupported();
@@ -21,19 +26,25 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
     {
         if (ct.IsCancellationRequested) return UniTask.FromCanceled(ct);
 
-        SeManager.Instance.PlaySe(seKey);
+        PlayAndRecordLength(seKey);
         return UniTask.CompletedTask;
     }
 
     public async UniTask PlaySeLoopAsync(string seKey, float interval, int count, CancellationToken ct)
     {
-        var seManager = SeManager.Instance;
         for (var i = 0; i < count; i++)
         {
             ct.ThrowIfCancellationRequested();
-            seManager.PlaySe(seKey);
+            PlayAndRecordLength(seKey);
             if (i < count - 1) await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: ct);
         }
+    }
+
+    private void PlayAndRecordLength(string seKey)
+    {
+        var seManager = SeManager.Instance;
+        seManager.PlaySe(seKey);
+        _seEndTime = Time.time + seManager.GetSeLength(seKey);
     }
 
     // シナリオ側の bgm 呼び出しミスに気付けるよう、無音で捨てず一度だけ警告する
