@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Novel.Runtime;
 using UnityEngine;
 using VContainer.Unity;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// 現在のストーリーノードのシナリオを再生し、完了後に進行を記録して次のシーンへ遷移する
@@ -49,6 +50,10 @@ public class NovelKitStarter : IStartable, IDisposable
         if (_runner.CurrentSayNumber == 0)
         {
             Debug.LogError($"[NovelKitStarter] シナリオが再生されなかった: {scenarioKey} (.rb が存在するか確認)");
+
+            // 単体再生の検証中はシーンに留めて原因を追えるようにする
+            if (string.IsNullOrEmpty(_scenarioKeyOverride))
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
 
@@ -62,6 +67,8 @@ public class NovelKitStarter : IStartable, IDisposable
 
     public void Start()
     {
+        BgmManager.Instance.PlayBGM("Novel");
+        SafeNavigationManager.SelectRootForceSelectable().Forget();
         PlayAsync(_cts.Token).Forget(Debug.LogException);
     }
 
