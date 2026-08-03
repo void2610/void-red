@@ -3,15 +3,14 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Novel.Runtime;
 using UnityEngine;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// novel-kit のIAudioChannel実装
-/// 既存のNovelSeManagerへSE再生を委譲する (BGMはノベル側で扱わないため未対応)
+/// SEはAudioSourceをプールしている共通のSeManagerへ委譲する (BGMはノベル側で扱わないため未対応)
 /// </summary>
 public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
 {
-    [SerializeField] private NovelSeManager seManager;
-
     private bool _bgmWarned;
 
     public void StopBgm() => WarnBgmUnsupported();
@@ -22,12 +21,13 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
     {
         if (ct.IsCancellationRequested) return UniTask.FromCanceled(ct);
 
-        seManager.PlaySe(seKey);
+        SeManager.Instance.PlaySe(seKey);
         return UniTask.CompletedTask;
     }
 
     public async UniTask PlaySeLoopAsync(string seKey, float interval, int count, CancellationToken ct)
     {
+        var seManager = SeManager.Instance;
         for (var i = 0; i < count; i++)
         {
             ct.ThrowIfCancellationRequested();
