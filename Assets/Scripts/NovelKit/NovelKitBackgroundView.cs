@@ -28,11 +28,14 @@ public class NovelKitBackgroundView : MonoBehaviour, IBackgroundChannel, IStillC
 
         if (_backgroundImage.sprite == background.Sprite) return;
 
-        await _backgroundImage.FadeOut(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: ct);
+        // 破棄が先に来てもフェード待ちが残らないよう、再生側のctと破棄トークンを併せて待つ
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct, this.GetCancellationTokenOnDestroy());
+
+        await _backgroundImage.FadeOut(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: cts.Token);
 
         _backgroundImage.sprite = background.Sprite;
 
-        await _backgroundImage.FadeIn(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: ct);
+        await _backgroundImage.FadeIn(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: cts.Token);
     }
 
     private void Awake()
