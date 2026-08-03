@@ -1,15 +1,21 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using Novel.Assets;
 using UnityEngine;
+using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
 /// novel-kit のIBackgroundChannel / IStillChannel実装
-/// 既存のDialogBackgroundView (黒経由フェード) へ委譲する。イベントCGも同じ全画面レイヤーで出す
+/// 切り替えは黒を経由してフェードする。イベントCGも同じ全画面レイヤーで出す
 /// </summary>
+[RequireComponent(typeof(Image))]
 public class NovelKitBackgroundView : MonoBehaviour, IBackgroundChannel, IStillChannel
 {
-    [SerializeField] private DialogBackgroundView backgroundView;
+    [SerializeField] private float fadeDuration = 0.5f;
+
+    private Image _backgroundImage;
 
     public async UniTask ShowAsync(ResolvedSprite background, CancellationToken ct)
     {
@@ -20,6 +26,17 @@ public class NovelKitBackgroundView : MonoBehaviour, IBackgroundChannel, IStillC
             return;
         }
 
-        await backgroundView.SetBackground(background.Sprite).AttachExternalCancellation(ct);
+        if (_backgroundImage.sprite == background.Sprite) return;
+
+        await _backgroundImage.FadeOut(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: ct);
+
+        _backgroundImage.sprite = background.Sprite;
+
+        await _backgroundImage.FadeIn(fadeDuration, Ease.InOutQuad).AddTo(gameObject).ToUniTask(cancellationToken: ct);
+    }
+
+    private void Awake()
+    {
+        _backgroundImage = GetComponent<Image>();
     }
 }
