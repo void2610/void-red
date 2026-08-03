@@ -1090,8 +1090,8 @@ MonoBehaviour:
   skipButton: {fileID: 8106790999200380143}
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  charsPerSecond: 33
-  autoAdvanceDelay: 3
+  charsPerSecond: 20
+  autoAdvanceDelay: 2.5
   skipUnread: 1
   shakeAmplitude: 3
   waveAmplitude: 4
