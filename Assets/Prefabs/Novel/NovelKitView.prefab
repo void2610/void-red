@@ -147,11 +147,11 @@ MonoBehaviour:
   layouts:
   - layoutId: single
     slotPositions:
-    - {x: 0, y: 0}
+    - {x: 0, y: -80}
   - layoutId: pair
     slotPositions:
-    - {x: -450, y: 0}
-    - {x: 450, y: 0}
+    - {x: -450, y: -80}
+    - {x: 450, y: -80}
   fadeDuration: 0.5
 --- !u!1 &9100030
 GameObject:
@@ -190,7 +190,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 1000}
+  m_SizeDelta: {x: 900, y: 1150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &9100033
 CanvasGroup:
@@ -406,7 +406,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 1000}
+  m_SizeDelta: {x: 900, y: 1150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &9100053
 CanvasGroup:
