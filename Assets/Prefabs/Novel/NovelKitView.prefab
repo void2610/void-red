@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9100011}
   - component: {fileID: 9100012}
   - component: {fileID: 9100013}
-  - component: {fileID: 9100014}
   - component: {fileID: 9100015}
   m_Layer: 0
   m_Name: Background
@@ -77,19 +76,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &9100014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9100010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c681bd4d010db43f081d50212ba062c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DialogBackgroundView
-  fadeDuration: 0.5
 --- !u!114 &9100015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,7 +88,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43bab4d7681343019348c68c4986e2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitBackgroundView
-  backgroundView: {fileID: 9100014}
+  fadeDuration: 0.5
 --- !u!1 &9100020
 GameObject:
   m_ObjectHideFlags: 0
@@ -1081,7 +1067,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09b24bd844c34050badec050a89104b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitAudioChannel
-  seManager: {fileID: 0}
 --- !u!114 &6903809405870213346
 MonoBehaviour:
   m_ObjectHideFlags: 0
