@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Novel.Assets;
 using Novel.Runtime;
 using UnityEngine;
 using VContainer.Unity;
@@ -11,19 +14,39 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class NovelKitStarter : IStartable, IDisposable
 {
+    // シナリオ本文からスプライトキーを拾う。拡張子付きの文字列リテラルだけを対象にする
+    private static readonly Regex SPRITE_KEY_PATTERN = new(@"'([^']+\.(?:png|jpg|jpeg))'", RegexOptions.Compiled);
+
     private readonly INovelScenarioRunner _runner;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
+    private readonly ISpriteLoader _spriteLoader;
     private readonly string _scenarioKeyOverride;
     private readonly CancellationTokenSource _cts = new();
 
     public NovelKitStarter(INovelScenarioRunner runner, GameProgressService gameProgressService,
-        SceneTransitionManager sceneTransitionManager, string scenarioKeyOverride)
+        SceneTransitionManager sceneTransitionManager, ISpriteLoader spriteLoader, string scenarioKeyOverride)
     {
         _runner = runner;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
+        _spriteLoader = spriteLoader;
         _scenarioKeyOverride = scenarioKeyOverride;
+    }
+
+    // 表示時にロードすると初出のたびに待たされるため、再生前にまとめて温めておく
+    private async UniTask PreloadSpritesAsync(string scenarioKey, CancellationToken ct)
+    {
+        var text = Resources.Load<TextAsset>($"Scenarios/{scenarioKey}");
+        if (text == null) return;
+
+        var keys = new HashSet<string>();
+        foreach (Match m in SPRITE_KEY_PATTERN.Matches(text.text)) keys.Add(m.Groups[1].Value);
+        if (keys.Count == 0) return;
+
+        var tasks = new List<UniTask>(keys.Count);
+        foreach (var key in keys) tasks.Add(_spriteLoader.LoadAsync(key, ct).AsUniTask());
+        await UniTask.WhenAll(tasks);
     }
 
     private async UniTask PlayAsync(CancellationToken ct)
@@ -35,6 +58,8 @@ public class NovelKitStarter : IStartable, IDisposable
         // 進行を記録すると次ノードへ進んでしまうため、遷移先の判定に使うノードは先に確保する
         var node = _gameProgressService.GetCurrentNode();
         var scenarioKey = string.IsNullOrEmpty(_scenarioKeyOverride) ? node.NodeId : _scenarioKeyOverride;
+
+        await PreloadSpritesAsync(scenarioKey, ct);
 
         var result = await _runner.PlayAsync(scenarioKey, ct);
         _gameProgressService.SaveNovelKitState(NovelSaveSerializer.Serialize(_runner.CaptureState()));
