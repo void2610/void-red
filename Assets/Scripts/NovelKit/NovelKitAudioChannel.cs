@@ -27,10 +27,11 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
 
     public async UniTask PlaySeLoopAsync(string seKey, float interval, int count, CancellationToken ct)
     {
+        var seManager = SeManager.Instance;
         for (var i = 0; i < count; i++)
         {
             ct.ThrowIfCancellationRequested();
-            SeManager.Instance.PlaySe(seKey);
+            seManager.PlaySe(seKey);
             if (i < count - 1) await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: ct);
         }
     }
