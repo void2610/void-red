@@ -15,6 +15,10 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
     /// 直近に鳴らしたSEの残り時間 (秒)。オート進行がSEを鳴らし切ってから進むために使う
     /// </summary>
     public float SeRemainingSeconds => Mathf.Max(0f, _seEndTime - Time.time);
+    // SeManager が pitch 未指定時に使うランダム幅と同じ
+    private const float SE_PITCH_MIN = 0.8f;
+    private const float SE_PITCH_MAX = 1.2f;
+
     private bool _bgmWarned;
     private float _seEndTime;
 
@@ -43,8 +47,11 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
     private void PlayAndRecordLength(string seKey)
     {
         var seManager = SeManager.Instance;
-        seManager.PlaySe(seKey);
-        _seEndTime = Time.time + seManager.GetSeLength(seKey);
+
+        // SeManager 任せだとピッチが分からず実際の長さを誤るため、こちらで決めて渡す (既定のランダム幅に合わせる)
+        var pitch = UnityEngine.Random.Range(SE_PITCH_MIN, SE_PITCH_MAX);
+        seManager.PlaySe(seKey, pitch: pitch);
+        _seEndTime = Time.time + seManager.GetSeLength(seKey) / pitch;
     }
 
     // シナリオ側の bgm 呼び出しミスに気付けるよう、無音で捨てず一度だけ警告する
