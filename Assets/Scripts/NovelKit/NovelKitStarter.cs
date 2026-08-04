@@ -46,7 +46,20 @@ public class NovelKitStarter : IStartable, IDisposable
 
         var tasks = new List<UniTask>(keys.Count);
         foreach (var key in keys) tasks.Add(_spriteLoader.LoadAsync(key, ct).AsUniTask());
-        await UniTask.WhenAll(tasks);
+
+        try
+        {
+            await UniTask.WhenAll(tasks);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            // 温めているだけなので、キーの誤りで再生自体を止めない (表示時に改めてロードされる)
+            Debug.LogWarning($"[NovelKitStarter] スプライトの事前ロードに失敗した: {e.Message}");
+        }
     }
 
     private async UniTask PlayAsync(CancellationToken ct)
