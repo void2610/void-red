@@ -34,7 +34,7 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitChannel, IStageLayou
 
     private readonly HashSet<int> _visibleSlots = new();
 
-    public IEnumerable<StageLayoutInfo> EnumerateLayouts() => layouts.Select(e => new StageLayoutInfo(e.layoutId, e.slotPositions.Length));
+    public IEnumerable<StageLayoutInfo> EnumerateLayouts() => layouts.Select(e => new StageLayoutInfo(e.layoutId, e.slotPositions?.Length ?? 0));
 
     public IReadOnlyList<Vector2> GetLayoutPositions(string layoutId) => layouts.FirstOrDefault(e => e.layoutId == layoutId).slotPositions ?? Array.Empty<Vector2>();
 
