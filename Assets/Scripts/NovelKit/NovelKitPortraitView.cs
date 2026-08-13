@@ -86,13 +86,18 @@ public class NovelKitPortraitView : MonoBehaviour, IPortraitChannel, IStageLayou
 
     public async UniTask HideAsync(int slotIndex, CancellationToken ct)
     {
-        if (!_visibleSlots.Remove(slotIndex)) return;
+        if (!IsValidSlot(slotIndex)) return;
 
         if (!Application.isPlaying)
         {
+            // プレビューの片付け。参照を残すとプレハブがその立ち絵を抱え込むのでスプライトごと外す
+            _visibleSlots.Remove(slotIndex);
+            slots[slotIndex].image.Clear();
             slots[slotIndex].group.alpha = 0f;
             return;
         }
+
+        if (!_visibleSlots.Remove(slotIndex)) return;
 
         await slots[slotIndex].group.FadeOut(fadeDuration).ToUniTask(cancellationToken: ct);
     }
