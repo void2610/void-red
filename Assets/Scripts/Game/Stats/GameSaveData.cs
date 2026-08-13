@@ -16,9 +16,6 @@ public class GameSaveData
     [Header("カード閲覧履歴")]
     [SerializeField] private List<string> viewedCardIds = new();
 
-    [Header("ノベル選択結果")]
-    [SerializeField] private List<NovelChoiceResult> novelChoiceResults = new();
-
     [Header("獲得記憶テーマ")]
     [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
 
@@ -27,7 +24,6 @@ public class GameSaveData
 
     // プロパティ
     public int CurrentStep => currentStep;
-    public List<NovelChoiceResult> NovelChoiceResults => novelChoiceResults;
     public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
 
     /// <summary>
@@ -53,25 +49,6 @@ public class GameSaveData
     public HashSet<string> GetViewedCardIds() => new HashSet<string>(viewedCardIds);
 
     /// <summary>
-    /// ノベル選択結果を追加
-    /// </summary>
-    /// <param name="choiceResult">追加する選択結果</param>
-    public void AddNovelChoiceResult(NovelChoiceResult choiceResult) => novelChoiceResults.Add(choiceResult);
-
-    /// <summary>
-    /// 特定のシナリオIDの選択結果を取得
-    /// </summary>
-    /// <param name="scenarioId">シナリオID</param>
-    /// <returns>該当する選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => novelChoiceResults.FindAll(result => result.ScenarioId == scenarioId);
-
-    /// <summary>
-    /// 全ての選択結果を取得
-    /// </summary>
-    /// <returns>全選択結果のリスト</returns>
-    public List<NovelChoiceResult> GetAllChoiceResults() => new List<NovelChoiceResult>(novelChoiceResults);
-
-    /// <summary>
     /// 獲得テーマを追加
     /// </summary>
     /// <param name="theme">追加する獲得テーマ</param>
@@ -80,7 +57,7 @@ public class GameSaveData
     /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
-    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Choices: {novelChoiceResults.Count}, Themes: {acquiredThemes.Count}";
+    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Themes: {acquiredThemes.Count}";
 
     /// <summary>
     /// ゲーム進行情報を更新
