@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Novel.Runtime;
@@ -24,6 +26,9 @@ public class NovelKitAudioChannel : MonoBehaviour, IAudioChannel
 
     public void StopBgm() => WarnBgmUnsupported();
     public void PlayBgm(string bgmKey) => WarnBgmUnsupported();
+
+    // BGMは未対応なのでSEだけを目録に出す。クリップも渡してエディタから試聴できるようにする
+    public IEnumerable<AudioKeyInfo> EnumerateKeys() => SeManager.Instance.EnumerateSeEntries().Select(e => new AudioKeyInfo(e.name, AudioKeyKind.Se, asset: e.clip));
 
     // 再生完了まで待つとセリフ送りが止まるため、鳴らし始めたら即座に次へ進める
     public UniTask PlaySeAsync(string seKey, CancellationToken ct)
