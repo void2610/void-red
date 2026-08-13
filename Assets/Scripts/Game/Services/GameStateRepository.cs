@@ -91,7 +91,6 @@ public class GameStateRepository
         }
 
         // ノベル進行データのロード
-        NovelProgress.LoadFrom(loadedData.GetAllChoiceResults());
         NovelProgress.NovelKitState = loadedData.NovelKitState;
 
         // 獲得テーマデータのロード
@@ -128,11 +127,6 @@ public class GameStateRepository
             saveData.RecordCardView(cardId);
         }
 
-        // ノベル選択結果をセーブデータに追加
-        foreach (var choiceResult in NovelProgress.GetAllChoiceResults())
-        {
-            saveData.AddNovelChoiceResult(choiceResult);
-        }
         saveData.NovelKitState = NovelProgress.NovelKitState;
 
         // 獲得テーマをセーブデータに追加

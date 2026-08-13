@@ -47,11 +47,6 @@ public class GameProgressService
     public HashSet<string> GetViewedCardIds() => new HashSet<string>(_repository.PlayerProgress.ViewedCardIds);
 
     /// <summary>
-    /// 特定のシナリオの選択結果を取得
-    /// </summary>
-    public List<NovelChoiceResult> GetChoiceResultsByScenario(string scenarioId) => _repository.NovelProgress.GetChoiceResultsByScenario(scenarioId);
-
-    /// <summary>
     /// novel-kit のフラグ / 既読スナップショットを取得
     /// </summary>
     public string GetNovelKitState() => _repository.NovelProgress.NovelKitState;
@@ -143,15 +138,6 @@ public class GameProgressService
         _repository.StoryProgress.AdvanceStep();
         _repository.StoryProgress.CurrentNode = GetNextNode();
         _repository.SaveAll();
-    }
-
-    /// <summary>
-    /// ノベル選択結果を記録してセーブ
-    /// </summary>
-    public void RecordNovelChoice(NovelChoiceResult choiceResult)
-    {
-        _repository.NovelProgress.RecordChoice(choiceResult);
-        Debug.Log($"[GameProgressService] 選択結果を記録: {choiceResult.ScenarioId} - Choice{choiceResult.ChoiceIndex}: {choiceResult.SelectedOptionIndex}");
     }
 
     /// <summary>
