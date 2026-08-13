@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9100011}
   - component: {fileID: 9100012}
   - component: {fileID: 9100013}
-  - component: {fileID: 9100014}
   - component: {fileID: 9100015}
   m_Layer: 0
   m_Name: Background
@@ -77,19 +76,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &9100014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9100010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c681bd4d010db43f081d50212ba062c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DialogBackgroundView
-  fadeDuration: 0.5
 --- !u!114 &9100015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,7 +88,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43bab4d7681343019348c68c4986e2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitBackgroundView
-  backgroundView: {fileID: 9100014}
+  fadeDuration: 0.5
 --- !u!1 &9100020
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,11 +147,11 @@ MonoBehaviour:
   layouts:
   - layoutId: single
     slotPositions:
-    - {x: 0, y: 0}
+    - {x: 0, y: -80}
   - layoutId: pair
     slotPositions:
-    - {x: -450, y: 0}
-    - {x: 450, y: 0}
+    - {x: -450, y: -80}
+    - {x: 450, y: -80}
   fadeDuration: 0.5
 --- !u!1 &9100030
 GameObject:
@@ -204,7 +190,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 1000}
+  m_SizeDelta: {x: 900, y: 1150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &9100033
 CanvasGroup:
@@ -420,7 +406,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 1000}
+  m_SizeDelta: {x: 900, y: 1150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!225 &9100053
 CanvasGroup:
@@ -1081,7 +1067,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09b24bd844c34050badec050a89104b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NovelKitAudioChannel
-  seManager: {fileID: 0}
 --- !u!114 &6903809405870213346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,8 +1090,8 @@ MonoBehaviour:
   skipButton: {fileID: 8106790999200380143}
   autoButtonNormalColor: {r: 1, g: 1, b: 1, a: 1}
   autoButtonActiveColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  charsPerSecond: 33
-  autoAdvanceDelay: 3
+  charsPerSecond: 20
+  autoAdvanceDelay: 2.5
   skipUnread: 1
   shakeAmplitude: 3
   waveAmplitude: 4
@@ -1115,6 +1100,7 @@ MonoBehaviour:
   indicatorBounceAmplitude: 5
   indicatorOffset: {x: 30, y: 5}
   typingSeName: Dialog2
+  audioChannel: {fileID: 6304849522132463678}
 --- !u!1 &9150722108618635631
 GameObject:
   m_ObjectHideFlags: 0

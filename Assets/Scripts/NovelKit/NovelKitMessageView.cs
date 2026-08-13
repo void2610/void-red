@@ -38,6 +38,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
     [SerializeField] private float indicatorBounceAmplitude = 5f;
     [SerializeField] private Vector2 indicatorOffset = new(30f, 5f);
     [SerializeField] private string typingSeName = "Dialog2";
+    [SerializeField] private NovelKitAudioChannel audioChannel;
 
     /// <summary>
     /// スキップが要求された（確認ダイアログは購読側が担当する）
@@ -47,13 +48,15 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
     public bool IsAutoMode => _engine.Auto;
 
     public float CharsPerSecond => charsPerSecond;
-    public float AutoAdvanceDelay => autoAdvanceDelay;
+    // 打ち終わり時点のSE残量を足して、オートでもSEを鳴らし切ってから進むようにする
+    public float AutoAdvanceDelay => autoAdvanceDelay + _pendingSeSeconds;
     public bool SkipUnread => skipUnread;
 
     private readonly Subject<Unit> _onSkipRequested = new();
 
     private TextRevealEngine _engine;
     private MotionHandle _indicatorMotion;
+    private float _pendingSeSeconds;
     private bool _isWaitingForAdvance;
 
     public void ToggleAutoMode() => SetAutoMode(!_engine.Auto);
@@ -119,12 +122,14 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
 
         ShowNextIndicator();
         _isWaitingForAdvance = true;
+        _pendingSeSeconds = audioChannel.SeRemainingSeconds;
         try
         {
             await _engine.WaitForAdvanceAsync(line.IsAlreadyRead, ct);
         }
         finally
         {
+            _pendingSeSeconds = 0f;
             _isWaitingForAdvance = false;
             HideNextIndicator();
         }
