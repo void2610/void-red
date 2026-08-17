@@ -449,6 +449,13 @@
       "dependencies": {},
       "hash": "c4dea57e1c27567bac512e090a356b08abf83d0b"
     },
+    "com.void2610.liminal-palette": {
+      "version": "https://github.com/void2610/liminal-palette.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f679a4c5907c665f42b1310046da01d1e9be1f96"
+    },
     "com.void2610.novel-kit": {
       "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#e638e2fbe126393373f4b29a78f472aa0be50841",
       "depth": 0,
