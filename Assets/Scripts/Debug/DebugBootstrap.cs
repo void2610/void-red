@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD || LIMINAL_PALETTE_FORCE_ENABLE
 using UnityEngine;
 using Void2610.LiminalPalette.Integration.VContainer;
 
@@ -22,4 +21,3 @@ internal static class DebugBootstrap
         SceneLifetimeScopeBootstrap.Register<DebugLifetimeScope>();
     }
 }
-#endif

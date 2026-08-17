@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD || LIMINAL_PALETTE_FORCE_ENABLE
 using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using Void2610.LiminalPalette;
@@ -25,4 +24,3 @@ public sealed class SceneDebugCommands
         return SceneManager.GetActiveScene().name;
     }
 }
-#endif

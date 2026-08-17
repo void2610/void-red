@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD || LIMINAL_PALETTE_FORCE_ENABLE
 using System.Linq;
 using Void2610.LiminalPalette;
 
@@ -47,4 +46,3 @@ public sealed class GameProgressDebugCommands
         return _gameProgressService.GetCurrentNode().NodeId;
     }
 }
-#endif
