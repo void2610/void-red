@@ -88,7 +88,8 @@ builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 ## LiminalPalette (ランタイムデバッグ / 検証)
 
 - `[LiminalCommand]` 付きのデバッグコマンドは `Assets/Scripts/Debug/*DebugCommands.cs` に置き、`DebugLifetimeScope` に登録する (`DebugBootstrap` が各シーンへ自動生成し、Root を親に構築される)
-- このプロジェクトは asmdef を持たないため、Debug 系ファイルは全体を `#if UNITY_EDITOR || DEVELOPMENT_BUILD || LIMINAL_PALETTE_FORCE_ENABLE` で囲んで本番ビルドから除外する
+- asmdef 構成: `VoidRed` (Assets/Scripts 全体) / `VoidRed.Editor` (Assets/Scripts/Editor) / `VoidRed.Debug` (Assets/Scripts/Debug、`defineConstraints` で本番ビルドから除外)。Debug 系コードは `VoidRed.Debug` に置く
+- 生成される `InputSystem_Actions.cs` は `Assets/Scripts/Game/Core/` に出力する (VoidRed asmdef から参照するため)
 - ランタイムの動作確認・状態観測は `.claude/skills/liminal-*` (HTTP API 経由) を第一選択にする。運用方針は `unity-standards:liminal-palette-guide` を参照
 - パレットは Editor / Play Mode とも `Cmd/Ctrl + K` で開閉。LP 組み込みコマンド (`Scene/Current`, `Scene/Load` 等) と同じパスを自前で定義しない
 
