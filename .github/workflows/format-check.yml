@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
     paths:
       - 'Assets/Scripts/**/*.cs'
+      - 'Assets/Tests/**/*.cs'
       - '.editorconfig'
       - 'Directory.Build.props'
       - 'FormatCheck.csproj'
@@ -15,6 +16,7 @@ on:
   pull_request:
     paths:
       - 'Assets/Scripts/**/*.cs'
+      - 'Assets/Tests/**/*.cs'
       - '.editorconfig'
       - 'Directory.Build.props'
       - 'FormatCheck.csproj'
