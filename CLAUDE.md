@@ -9,8 +9,8 @@ void-red は Unity 6000.3 で開発しているカードゲーム + ノベル AD
 ## 開発ワークフロー
 
 1. コードを変更する
-2. `uloop-compile` (ForceRecompile=true) でコンパイル
-3. `uloop-get-logs` (LogType=Error) でコンパイルエラーがないことを確認
+2. `uloop-compile` (`uloop compile --force-recompile true`) でコンパイル
+3. `uloop-get-logs` (`uloop get-logs --log-type Error`) でコンパイルエラーがないことを確認
 4. ロジック変更があれば `uloop-run-tests` (PlayMode) か `liminal run "<prefix>/*"` で該当シナリオを回す
 5. コードを編集した場合は、必ず `./unity-coding-standards/scripts/run-format.sh` を実行し、push 前に `--verify-no-changes` (CI と同じ判定) を通す
 6. **フォーマッタ / アナライザ / コンパイル / テストの出力は、末尾サマリ (`tail` や "Formatted N of M" 行) だけで判断せず必ず全文を確認する。**
