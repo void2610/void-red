@@ -4,24 +4,18 @@ using Void2610.UnityTemplate.Steam;
 
 /// <summary>
 /// デバッグ機能をまとめて管理するコンポーネント
+/// セーブデータ等の状態観測は LiminalPalette のコマンド (Save/FileExists 等) を使う
 /// </summary>
 public class DebugController : MonoBehaviour
 {
-    [Header("セーブデータ")]
-    [SerializeField] private bool showSaveInfo = false;
-
     [Header("Steam連携")]
     [SerializeField] private bool resetSteamStats = false; // Steamの実績・統計情報をリセットする
 
-    private GameProgressService _gameProgressService;
-    private SaveDataManager _saveDataManager;
     private SteamService _steamService;
 
     [Inject]
-    public void Construct(GameProgressService gameProgressService, SaveDataManager saveDataManager, SteamService steamService)
+    public void Construct(SteamService steamService)
     {
-        _gameProgressService = gameProgressService;
-        _saveDataManager = saveDataManager;
         _steamService = steamService;
         Init();
     }
@@ -42,22 +36,5 @@ public class DebugController : MonoBehaviour
             else Debug.LogWarning("[Debug] Steamの実績・統計情報のリセットに失敗しました");
         }
 #endif
-    }
-
-    private void OnGUI()
-    {
-        if (!Application.isEditor || !showSaveInfo || _gameProgressService == null || _saveDataManager == null) return;
-
-        GUILayout.BeginArea(new Rect(10, 100, 300, 200));
-        GUILayout.BeginVertical("box");
-
-        GUILayout.Label("=== セーブデータ情報 ===");
-
-        // セーブファイル存在確認
-        var saveExists = _saveDataManager.SaveFileExists();
-        GUILayout.Label($"セーブファイル: {(saveExists ? "存在" : "なし")}");
-
-        GUILayout.EndVertical();
-        GUILayout.EndArea();
     }
 }
