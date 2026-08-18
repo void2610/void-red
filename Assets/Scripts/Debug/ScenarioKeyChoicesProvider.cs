@@ -11,8 +11,8 @@ public sealed class ScenarioKeyChoicesProvider : IChoicesProvider
 {
     public const string RESOURCES_ROOT = "Scenarios";
 
-    public static IReadOnlyList<string> ListKeys() => Resources.LoadAll<TextAsset>(RESOURCES_ROOT).Select(t => t.name)// novel-kit が .rb から生成する .mrb サブアセットは再生キーではないので除く
-.Where(n => !n.Contains('.')).OrderBy(n => n, StringComparer.Ordinal).ToArray();
+    // novel-kit が .rb から生成する .mrb サブアセットは再生キーではないので除く
+    public static IReadOnlyList<string> ListKeys() => Resources.LoadAll<TextAsset>(RESOURCES_ROOT).Select(t => t.name).Where(n => !n.Contains('.')).OrderBy(n => n, StringComparer.Ordinal).ToArray();
 
     public IReadOnlyList<ChoiceItem> GetChoices() => ListKeys().Select(k => new ChoiceItem(k)).ToArray();
 }
