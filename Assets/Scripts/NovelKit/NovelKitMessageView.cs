@@ -51,6 +51,11 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
     // 打ち終わり時点のSE残量を足して、オートでもSEを鳴らし切ってから進むようにする
     public float AutoAdvanceDelay => autoAdvanceDelay + _pendingSeSeconds;
     public bool SkipUnread => skipUnread;
+    public bool IsSkipping => _engine.Skip;
+    public bool IsWaitingForAdvance => _isWaitingForAdvance;
+    public string CurrentSpeaker => nameLabel.text;
+    public string CurrentMessage => messageLabel.text;
+    public int ChoiceCount => choiceContainer.childCount;
 
     private readonly Subject<Unit> _onSkipRequested = new();
 
@@ -162,6 +167,18 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
         {
             foreach (var go in spawned) Destroy(go);
         }
+    }
+
+    /// <summary>
+    /// 表示中の選択肢を index で選ぶ (ボタンの onClick を通すので実クリックと同じ経路)
+    /// </summary>
+    public bool SelectChoice(int index)
+    {
+        if (index < 0 || index >= choiceContainer.childCount) return false;
+        var button = choiceContainer.GetChild(index).GetComponent<Button>();
+        if (!button) return false;
+        button.onClick.Invoke();
+        return true;
     }
 
     public void ClearMessage()
