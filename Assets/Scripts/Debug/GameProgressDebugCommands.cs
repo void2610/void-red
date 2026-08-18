@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Void2610.LiminalPalette;
 
@@ -15,29 +16,31 @@ public sealed class GameProgressDebugCommands
         _saveDataManager = saveDataManager;
     }
 
-    [LiminalCommand("Progress/CurrentNode", Description = "現在のストーリーノード ID を返す")]
+    [LiminalCommand("Progress/CurrentNode", Description = "次に発生するストーリーノード ID を返す (進行度が進むまで変わらない)")]
     public string GetCurrentNode() => _gameProgressService.GetCurrentNode().NodeId;
 
-    [LiminalCommand("Progress/NextNode", Description = "次に発生するストーリーノード ID を返す")]
-    public string GetNextNode() => _gameProgressService.GetNextNode().NodeId;
-
     [LiminalCommand("Progress/NextSceneType", Description = "次に遷移するシーン種別を返す")]
-    public string GetNextSceneType() => _gameProgressService.GetNextSceneType().ToString();
+    public SceneType GetNextSceneType() => _gameProgressService.GetNextSceneType();
 
     [LiminalCommand("Progress/HasSaveData", Description = "有効なセーブデータが存在するか (ストーリー進行ベース) を返す")]
-    public string HasSaveData() => _gameProgressService.HasSaveData().ToString();
+    public bool HasSaveData() => _gameProgressService.HasSaveData();
 
     [LiminalCommand("Progress/AcquiredThemes", Description = "獲得済みテーマ ID をカンマ区切りで返す")]
     public string GetAcquiredThemes() => string.Join(",", _gameProgressService.GetAcquiredThemes().Select(t => t.Theme.ThemeId));
 
     [LiminalCommand("Progress/ViewedCardCount", Description = "閲覧済みカード数を返す")]
-    public string GetViewedCardCount() => _gameProgressService.GetViewedCardIds().Count.ToString();
+    public int GetViewedCardCount() => _gameProgressService.GetViewedCardIds().Count;
 
     [LiminalCommand("Save/FileExists", Description = "セーブファイルが存在するかを返す")]
-    public string SaveFileExists() => _saveDataManager.SaveFileExists().ToString();
+    public bool SaveFileExists() => _saveDataManager.SaveFileExists();
 
-    [LiminalCommand("Save/Delete", Description = "セーブファイルを削除する")]
-    public string DeleteSaveFile() => _saveDataManager.DeleteSaveFile().ToString();
+    [LiminalCommand("Save/Delete", Description = "セーブファイルを削除して空データを再生成する。メモリ上の進行度は残るため、完全リセットは Progress/Reset を使う")]
+    public bool DeleteSaveFile()
+    {
+        // 失敗を success + "False" として返さず、コマンドの失敗にする
+        if (!_saveDataManager.DeleteSaveFile()) throw new InvalidOperationException("セーブファイルの削除に失敗した");
+        return true;
+    }
 
     [LiminalCommand("Progress/Reset", Description = "全進行度を初期状態に戻す (デバッグ用)")]
     public string Reset()
