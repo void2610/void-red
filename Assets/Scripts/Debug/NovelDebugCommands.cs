@@ -72,8 +72,8 @@ public sealed class NovelDebugCommands
         if (!view.IsWaitingForAdvance)
         {
             view.Advance();
-            await WaitUntil(() => view.IsWaitingForAdvance || view.ChoiceCount > 0, timeoutSeconds);
-            return view.CurrentSpeaker;
+            await WaitUntil(() => view.IsWaitingForAdvance || view.ChoiceCount > 0 || !IsActive(), timeoutSeconds);
+            return IsActive() ? view.CurrentSpeaker : "(scene ended)";
         }
         var before = view.CurrentMessage;
         view.Advance();
