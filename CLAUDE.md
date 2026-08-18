@@ -87,10 +87,11 @@ builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 
 ## LiminalPalette (ランタイムデバッグ / 検証)
 
-- `[LiminalCommand]` 付きのデバッグコマンドは `Assets/Scripts/Debug/*DebugCommands.cs` に置き、`DebugLifetimeScope` に登録する (`DebugBootstrap` が各シーンへ自動生成し、Root を親に構築される)
-- asmdef 構成: `VoidRed` (Assets/Scripts 全体) / `VoidRed.Editor` (Assets/Scripts/Editor) / `VoidRed.Debug` (Assets/Scripts/Debug、`defineConstraints` で本番ビルドから除外)。Debug 系コードは `VoidRed.Debug` に置く
+- `[LiminalCommand]` 付きのデバッグコマンドは `Assets/Scripts/Debug/*DebugCommands.cs` に置き、`DebugLifetimeScope` に登録する (`DebugBootstrap` が初回シーン読込み時に生成し、DontDestroyOnLoad で常駐、Root を親に構築される)
+- asmdef 構成: `VoidRed` (Assets/Scripts 全体) / `VoidRed.Editor` (Assets/Scripts/Editor) / `VoidRed.Debug` (Assets/Scripts/Debug、`defineConstraints` で本番ビルドから除外)。新規の Debug 系コードは `VoidRed.Debug` に置く。例外: シーン / プレハブから参照される既存のデバッグ MonoBehaviour (`Assets/Scripts/DebugComponents/`) は本番ビルドで missing script になるため `VoidRed` に残し、実行時ガードで無効化する
 - 生成される `InputSystem_Actions.cs` は `Assets/Scripts/Game/Core/` に出力する (VoidRed asmdef から参照するため)
-- ランタイムの動作確認・状態観測は `.claude/skills/liminal-*` (HTTP API 経由) を第一選択にする。運用方針は `unity-standards:liminal-palette-guide` を参照
+- ランタイムの動作確認・状態観測は `.claude/skills/liminal-*` (HTTP API 経由) を第一選択にする。入口は `liminal-overview` スキル
+- `.claude/skills/liminal-*` はパッケージ同梱ドキュメントのコピーのため、LiminalPalette 更新後は `Tools/LiminalPalette/Install AI Skills...` を再実行して同期する
 - パレットは Editor / Play Mode とも `Cmd/Ctrl + K` で開閉。LP 組み込みコマンド (`Scene/Current`, `Scene/Load` 等) と同じパスを自前で定義しない
 
 ## 依存パッケージ

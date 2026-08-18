@@ -9,7 +9,7 @@
 | Standalone Development build | ✅ | 7610 | Editor が走っていないなら 7610 |
 | Standalone Production build | ❌ | (起動しない) | asmdef defineConstraints で **コンパイル除外** |
 
-最大 5 個 (`7610..7615`) まで隣接を試して全部失敗したら listener は立たない。
+最大 6 個 (`7610..7615`) まで隣接を試して全部失敗したら listener は立たない。
 プロジェクト固有のポートを `ProjectSettings/LiminalPalette.json` で固定すると上記既定を上書きできる (後述)。
 
 ## プロジェクトごとの固定ポート (推奨)
@@ -86,9 +86,9 @@ lpr exec Player/Health/Set value=100
 - Domain Reload 直後は listener が一時的に応答しない瞬間がありうる (数百 ms)
 - 再起動を挟んだ場合は `liminal health` でポート再発見が安全
 
-## なぜポートを 5 個までしか試さないか
+## なぜポートを 6 個までしか試さないか
 
-- LP の `IpcSettings.PortRetryCount` の既定が 5
+- LP の `IpcSettings.PortRetryCount` の既定が 5 (初回 + 5 リトライ = 6 ポート)
 - 7615 まで埋まっているのは「他の LP プロジェクトが多数同時起動」「他のサービスがポートを取っている」など異常状態
 - 利用側で `IpcSettings.PortRetryCount = 10` 等に拡張可能
 
