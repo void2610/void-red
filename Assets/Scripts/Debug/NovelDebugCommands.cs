@@ -15,22 +15,32 @@ using Void2610.LiminalPalette;
 public sealed class NovelDebugCommands
 {
     private readonly GameProgressService _gameProgressService;
+    private readonly NovelPlaybackRequest _playbackRequest;
+    private readonly SceneTransitionManager _sceneTransitionManager;
 
-    public NovelDebugCommands(GameProgressService gameProgressService)
+    public NovelDebugCommands(GameProgressService gameProgressService, NovelPlaybackRequest playbackRequest,
+        SceneTransitionManager sceneTransitionManager)
     {
         _gameProgressService = gameProgressService;
+        _playbackRequest = playbackRequest;
+        _sceneTransitionManager = sceneTransitionManager;
     }
+
+    // --- シナリオの直接再生 ---
+
+    [LiminalCommand("Novel/ListScenarios", Description = "再生可能なシナリオキー (Resources/Scenarios 配下) をカンマ区切りで返す")]
+    public string ListScenarios() => string.Join(",", ScenarioKeyChoicesProvider.ListKeys());
 
     // --- 再生中の観測 ---
 
     [LiminalCommand("Novel/IsActive", Description = "ノベルシーンが構築済みか (NovelKitLifetimeScope が存在するか) を返す")]
     public bool IsActive() => LifetimeScope.Find<NovelKitLifetimeScope>() is { Container: not null };
 
-    private static NovelKitMessageView View => FindScope().Container.Resolve<NovelKitMessageView>();
-    private static INovelScenarioRunner Runner => FindScope().Container.Resolve<INovelScenarioRunner>();
-
     [LiminalCommand("Novel/SayNumber", Description = "再生中シナリオの現在の Say 番号 (再生ごとに 0 起点) を返す")]
     public int SayNumber() => Runner.CurrentSayNumber;
+
+    private static NovelKitMessageView View => FindScope().Container.Resolve<NovelKitMessageView>();
+    private static INovelScenarioRunner Runner => FindScope().Container.Resolve<INovelScenarioRunner>();
 
     [LiminalCommand("Novel/Speaker", Description = "表示中の話者名を返す")]
     public string Speaker() => View.CurrentSpeaker;
@@ -54,6 +64,23 @@ public sealed class NovelDebugCommands
 
     [LiminalCommand("Novel/SavedState", Description = "セーブ済みの novel-kit 状態 (フラグ / 既読) の JSON を返す")]
     public string SavedState() => _gameProgressService.GetNovelKitState() ?? "";
+
+    [LiminalCommand("Novel/PlayScenario", Description = "指定シナリオを進行度と独立に頭から再生する (ノベルシーンへ遷移し、完了後は進行を進めずホームへ戻る)。ノベルシーン中なら再読込して差し替える")]
+    public async UniTask<string> PlayScenario(
+        [LiminalParam(Description = "Resources/Scenarios 配下の .rb 名 (拡張子なし)", ChoicesProvider = typeof(ScenarioKeyChoicesProvider))]
+        string scenarioKey,
+        int timeoutSeconds = 30)
+    {
+        if (!ScenarioKeyChoicesProvider.ListKeys().Contains(scenarioKey)) throw new ArgumentException($"シナリオが存在しない: {scenarioKey} (Novel/ListScenarios で確認)");
+        if (_sceneTransitionManager.IsFading) throw new InvalidOperationException("フェード遷移中のため実行できない。Scene/IsFading が false になってから再実行する");
+
+        _playbackRequest.Set(scenarioKey);
+        // 同じシーンでも Single ロードし直すことで NovelKitStarter が作り直され、予約キーで再生が始まる
+        await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
+        // 最初の Say か選択肢に到達するまで待つ (.rb が空振りしたときは Starter がエラーを出してシーンに留まる)
+        await WaitUntil(() => IsActive() && (Runner.CurrentSayNumber > 0 || View.ChoiceCount > 0), timeoutSeconds);
+        return scenarioKey;
+    }
 
     // --- 再生中の操作 (実入力と同じ View 経路) ---
 
