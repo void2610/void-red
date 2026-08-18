@@ -149,7 +149,8 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
     private async UniTask WaitForSceneReady()
     {
         // 現在のシーンのLifetimeScopeからISceneInitializableを取得
-        var currentLifetimeScope = VContainer.Unity.LifetimeScope.Find<VContainer.Unity.LifetimeScope>();
+        // 引数なしのFindはFindAnyObjectByTypeで任意のスコープ（RootやDebugLifetimeScope）を返しうるため、アクティブシーンに限定する
+        var currentLifetimeScope = VContainer.Unity.LifetimeScope.Find<VContainer.Unity.LifetimeScope>(SceneManager.GetActiveScene());
         if (currentLifetimeScope != null)
         {
             if (currentLifetimeScope.Container.TryResolve(typeof(ISceneInitializable), out var obj))

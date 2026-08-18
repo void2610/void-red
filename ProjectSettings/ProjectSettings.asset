@@ -600,8 +600,8 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Standalone: STEAMWORKS_NET;GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN
-    WebGL: GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN
+    Standalone: STEAMWORKS_NET;GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN;LIMINAL_PALETTE_FORCE_ENABLE
+    WebGL: GOOGLE_ENABLE;ULOOPMCP_HAS_ROSLYN;LIMINAL_PALETTE_FORCE_ENABLE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

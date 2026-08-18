@@ -1,0 +1,22 @@
+{
+    "name": "VoidRed.Debug",
+    "rootNamespace": "",
+    "references": [
+        "VoidRed",
+        "Void2610.LiminalPalette",
+        "Void2610.LiminalPalette.Integration.VContainer",
+        "VContainer",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_EDITOR || DEVELOPMENT_BUILD || LIMINAL_PALETTE_FORCE_ENABLE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

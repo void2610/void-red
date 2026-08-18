@@ -449,14 +449,21 @@
       "dependencies": {},
       "hash": "c4dea57e1c27567bac512e090a356b08abf83d0b"
     },
+    "com.void2610.liminal-palette": {
+      "version": "https://github.com/void2610/liminal-palette.git#f679a4c5907c665f42b1310046da01d1e9be1f96",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f679a4c5907c665f42b1310046da01d1e9be1f96"
+    },
     "com.void2610.novel-kit": {
-      "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#bf7e35f1ab48f95fa96870baae85dacac8be8347",
+      "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#54840c7baa24ede85c2f732e5d8c26c71b2efa36",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "2.0.0"
       },
-      "hash": "bf7e35f1ab48f95fa96870baae85dacac8be8347"
+      "hash": "54840c7baa24ede85c2f732e5d8c26c71b2efa36"
     },
     "com.void2610.unity-template": {
       "version": "https://github.com/void2610/my-unity-template.git",
