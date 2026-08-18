@@ -18,6 +18,11 @@ public sealed class DebugLifetimeScope : LifetimeScope
         builder.RegisterEntryPoint<LiminalPaletteEntryPoint>();
         builder.Register<GameProgressDebugCommands>(Lifetime.Singleton);
         builder.Register<SceneDebugCommands>(Lifetime.Singleton);
+        builder.Register<NovelDebugCommands>(Lifetime.Singleton);
+        builder.Register<SettingsDebugCommands>(Lifetime.Singleton);
+        builder.Register<AudioDebugCommands>(Lifetime.Singleton);
+        builder.Register<UiDebugCommands>(Lifetime.Singleton);
+        builder.Register<ExhibitDebugCommands>(Lifetime.Singleton);
     }
 
     protected override void Awake()

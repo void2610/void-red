@@ -6,7 +6,11 @@
         "Void2610.LiminalPalette",
         "Void2610.LiminalPalette.Integration.VContainer",
         "VContainer",
-        "UniTask"
+        "UniTask",
+        "Void2610.UnityTemplate",
+        "Void2610.SettingsSystem",
+        "Novel.Runtime",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
