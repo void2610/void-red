@@ -136,7 +136,8 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
         {
             _pendingSeSeconds = 0f;
             _isWaitingForAdvance = false;
-            HideNextIndicator();
+            // シーン破棄によるキャンセルでは自身も破棄済みなので、UI には触らない
+            if (this) HideNextIndicator();
         }
     }
 
