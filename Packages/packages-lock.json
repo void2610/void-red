@@ -457,13 +457,13 @@
       "hash": "f679a4c5907c665f42b1310046da01d1e9be1f96"
     },
     "com.void2610.novel-kit": {
-      "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#e638e2fbe126393373f4b29a78f472aa0be50841",
+      "version": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#54840c7baa24ede85c2f732e5d8c26c71b2efa36",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "2.0.0"
       },
-      "hash": "e638e2fbe126393373f4b29a78f472aa0be50841"
+      "hash": "54840c7baa24ede85c2f732e5d8c26c71b2efa36"
     },
     "com.void2610.unity-template": {
       "version": "https://github.com/void2610/my-unity-template.git",
