@@ -2,7 +2,7 @@ using UnityEngine;
 using Void2610.LiminalPalette.Integration.VContainer;
 
 /// <summary>
-/// DebugLifetimeScope を各シーン読込み時に自動生成する登録
+/// DebugLifetimeScope を初回シーン読込み時に自動生成する登録 (以後は DontDestroyOnLoad で常駐し再生成されない)
 /// sceneLoaded / playModeStateChanged 購読や EditorOnly タグ付け等は LiminalPalette 側の SceneLifetimeScopeBootstrap に集約されている
 /// </summary>
 internal static class DebugBootstrap
