@@ -21,16 +21,19 @@ public class NovelKitStarter : IStartable, IDisposable
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly ISpriteLoader _spriteLoader;
+    private readonly NovelPlaybackRequest _playbackRequest;
     private readonly string _scenarioKeyOverride;
     private readonly CancellationTokenSource _cts = new();
 
     public NovelKitStarter(INovelScenarioRunner runner, GameProgressService gameProgressService,
-        SceneTransitionManager sceneTransitionManager, ISpriteLoader spriteLoader, string scenarioKeyOverride)
+        SceneTransitionManager sceneTransitionManager, ISpriteLoader spriteLoader,
+        NovelPlaybackRequest playbackRequest, string scenarioKeyOverride)
     {
         _runner = runner;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _spriteLoader = spriteLoader;
+        _playbackRequest = playbackRequest;
         _scenarioKeyOverride = scenarioKeyOverride;
     }
 
@@ -70,7 +73,11 @@ public class NovelKitStarter : IStartable, IDisposable
 
         // 進行を記録すると次ノードへ進んでしまうため、遷移先の判定に使うノードは先に確保する
         var node = _gameProgressService.GetCurrentNode();
-        var scenarioKey = string.IsNullOrEmpty(_scenarioKeyOverride) ? node.NodeId : _scenarioKeyOverride;
+        // 優先順: 検証用シーンの固定キー > 進行度と独立した再生予約 (回想 / デバッグ) > 現在ノード
+        var requestedKey = _playbackRequest.Consume();
+        var isStandalone = !string.IsNullOrEmpty(_scenarioKeyOverride) || requestedKey != null;
+        var scenarioKey = !string.IsNullOrEmpty(_scenarioKeyOverride) ? _scenarioKeyOverride
+            : requestedKey ?? node.NodeId;
 
         await PreloadSpritesAsync(scenarioKey, ct);
 
@@ -90,13 +97,20 @@ public class NovelKitStarter : IStartable, IDisposable
             Debug.LogError($"[NovelKitStarter] シナリオが再生されなかった: {scenarioKey} (.rb が存在するか確認)");
 
             // 単体再生の検証中はシーンに留めて原因を追えるようにする
-            if (string.IsNullOrEmpty(_scenarioKeyOverride))
+            if (!isStandalone)
                 await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
             return;
         }
 
         // シナリオ単体を再生する検証用シーンでは進行を進めない
         if (!string.IsNullOrEmpty(_scenarioKeyOverride)) return;
+
+        // 予約再生 (回想 / デバッグ) は進行を進めずホームへ戻る
+        if (requestedKey != null)
+        {
+            await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Home);
+            return;
+        }
 
         _gameProgressService.RecordNovelResultAndSave();
         var next = node.ReturnToHome ? SceneType.Home : _gameProgressService.GetNextSceneType();
