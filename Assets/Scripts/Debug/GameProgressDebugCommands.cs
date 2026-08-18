@@ -34,12 +34,32 @@ public sealed class GameProgressDebugCommands
     [LiminalCommand("Save/FileExists", Description = "セーブファイルが存在するかを返す")]
     public bool SaveFileExists() => _saveDataManager.SaveFileExists();
 
+    [LiminalCommand("Save/Info", Description = "ディスク上のセーブデータの要約 (Step / 結果 / 閲覧カード / テーマ) を返す")]
+    public string SaveInfo() => _saveDataManager.LoadGameData().GetDebugInfo();
+
+    [LiminalCommand("Save/CurrentStep", Description = "ディスク上のセーブデータのストーリー Step を返す")]
+    public int SaveCurrentStep() => _saveDataManager.LoadGameData().CurrentStep;
+
     [LiminalCommand("Save/Delete", Description = "セーブファイルを削除して空データを再生成する。メモリ上の進行度は残るため、完全リセットは Progress/Reset を使う")]
     public bool DeleteSaveFile()
     {
         // 失敗を success + "False" として返さず、コマンドの失敗にする
         if (!_saveDataManager.DeleteSaveFile()) throw new InvalidOperationException("セーブファイルの削除に失敗した");
         return true;
+    }
+
+    [LiminalCommand("Progress/AdvanceAsNovel", Description = "現在ノードをノベル完了として記録し次ノードへ進める (セーブされる)")]
+    public string AdvanceAsNovel()
+    {
+        _gameProgressService.RecordNovelResultAndSave();
+        return _gameProgressService.GetCurrentNode().NodeId;
+    }
+
+    [LiminalCommand("Progress/AdvanceAsBattle", Description = "現在ノードをバトル結果付きで記録し次ノードへ進める (セーブされる)")]
+    public string AdvanceAsBattle(bool isPlayerWin = true)
+    {
+        _gameProgressService.RecordBattleResultAndSave(isPlayerWin);
+        return _gameProgressService.GetCurrentNode().NodeId;
     }
 
     [LiminalCommand("Progress/Reset", Description = "全進行度を初期状態に戻す (デバッグ用)")]

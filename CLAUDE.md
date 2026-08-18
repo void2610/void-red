@@ -92,6 +92,8 @@ builder.RegisterComponentInHierarchy<HomeUIPresenter>();
 - 生成される `InputSystem_Actions.cs` は `Assets/Scripts/Game/Core/` に出力する (VoidRed asmdef から参照するため)
 - ランタイムの動作確認・状態観測は `.claude/skills/liminal-*` (HTTP API 経由) を第一選択にする。入口は `liminal-overview` スキル
 - `.claude/skills/liminal-*` はパッケージ同梱ドキュメントのコピーのため、LiminalPalette 更新後は `Tools/LiminalPalette/Install AI Skills...` を再実行して同期する
+- シーンローカルな LifetimeScope (NovelKitLifetimeScope 等) の依存はコンストラクタ注入できないため、コマンド呼び出し時に `LifetimeScope.Find<T>()` でスコープを引いて `Container.Resolve` する (`NovelDebugCommands` 参照)
+- ボタン操作は `UI/ClickButton` (onClick 発火) で実経路を通す。Presenter に検証用 API を生やさない
 - パレットは Editor / Play Mode とも `Cmd/Ctrl + K` で開閉。LP 組み込みコマンド (`Scene/Current`, `Scene/Load` 等) と同じパスを自前で定義しない
 
 ## 依存パッケージ

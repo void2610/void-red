@@ -48,6 +48,9 @@ public class RootLifetimeScope : LifetimeScope
         // ゲーム進行管理（全機能統合）
         builder.Register<GameProgressService>(Lifetime.Singleton);
 
+        // 進行度と独立したノベル再生の予約 (回想 / デバッグ)
+        builder.Register<NovelPlaybackRequest>(Lifetime.Singleton);
+
         // InputSystem管理
         builder.Register<InputActionsProvider>(Lifetime.Singleton);
 

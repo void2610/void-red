@@ -51,6 +51,11 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
     // 打ち終わり時点のSE残量を足して、オートでもSEを鳴らし切ってから進むようにする
     public float AutoAdvanceDelay => autoAdvanceDelay + _pendingSeSeconds;
     public bool SkipUnread => skipUnread;
+    public bool IsSkipping => _engine.Skip;
+    public bool IsWaitingForAdvance => _isWaitingForAdvance;
+    public string CurrentSpeaker => nameLabel.text;
+    public string CurrentMessage => messageLabel.text;
+    public int ChoiceCount => choiceContainer.childCount;
 
     private readonly Subject<Unit> _onSkipRequested = new();
 
@@ -147,6 +152,8 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
         {
             var index = i;
             var button = Instantiate(choiceButtonPrefab, choiceContainer);
+            // プレハブ側の active 状態に依存せず、生成した選択肢は必ず表示する
+            button.gameObject.SetActive(true);
             var label = button.GetComponentInChildren<TextMeshProUGUI>();
             if (label) label.text = options[i];
             button.onClick.AddListener(() => tcs.TrySetResult(index));
@@ -162,6 +169,18 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
         {
             foreach (var go in spawned) Destroy(go);
         }
+    }
+
+    /// <summary>
+    /// 表示中の選択肢を index で選ぶ (ボタンの onClick を通すので実クリックと同じ経路)
+    /// </summary>
+    public bool SelectChoice(int index)
+    {
+        if (index < 0 || index >= choiceContainer.childCount) return false;
+        var button = choiceContainer.GetChild(index).GetComponent<Button>();
+        if (!button || !button.interactable || !button.isActiveAndEnabled) return false;
+        button.onClick.Invoke();
+        return true;
     }
 
     public void ClearMessage()
