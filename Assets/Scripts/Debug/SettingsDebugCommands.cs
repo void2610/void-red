@@ -19,8 +19,8 @@ public sealed class SettingsDebugCommands
         _confirmationDialog = confirmationDialog;
     }
 
-    [LiminalCommand("Settings/List", Description = "全設定を category/key=value の改行区切りで返す")]
-    public string List() => string.Join("\n", _settingsManager.Categories.SelectMany(c => c.Settings.Select(s => $"{c.Name}/{s.SettingKey}={s.SerializeValue()}")));
+    [LiminalCommand("Settings/List", Description = "全設定を key=value の改行区切りで返す (key はそのまま Settings/Get / Set に渡せる)")]
+    public string List() => string.Join("\n", _settingsManager.Categories.SelectMany(c => c.Settings).Select(s => $"{s.SettingKey}={s.SerializeValue()}"));
 
     [LiminalCommand("Settings/Get", Description = "設定キーの現在値 (シリアライズ形式) を返す")]
     public string Get(string key) => Find(key).SerializeValue();
