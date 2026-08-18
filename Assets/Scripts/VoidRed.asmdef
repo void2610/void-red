@@ -24,8 +24,7 @@
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.VisualEffectGraph.Runtime",
-        "Coffee.UIEffect",
-        "MackySoft.SerializeReferenceExtensions"
+        "Coffee.UIEffect"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

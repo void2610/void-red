@@ -2,8 +2,7 @@
     "name": "VoidRed.Editor",
     "rootNamespace": "",
     "references": [
-        "VoidRed",
-        "UniTask"
+        "VoidRed"
     ],
     "includePlatforms": [
         "Editor"

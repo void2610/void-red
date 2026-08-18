@@ -6,7 +6,6 @@
         "Void2610.LiminalPalette",
         "Void2610.LiminalPalette.Integration.VContainer",
         "VContainer",
-        "R3.Unity",
         "UniTask"
     ],
     "includePlatforms": [],
