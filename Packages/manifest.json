@@ -23,7 +23,7 @@
     "com.unity.visualscripting": "1.9.9",
     "com.unityroom.client": "https://github.com/naichilab/unityroom-client-library.git?path=Assets/unityroom",
     "com.void2610.liminal-palette": "https://github.com/void2610/liminal-palette.git#f679a4c5907c665f42b1310046da01d1e9be1f96",
-    "com.void2610.novel-kit": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#e638e2fbe126393373f4b29a78f472aa0be50841",
+    "com.void2610.novel-kit": "https://github.com/void2610/novel-kit.git?path=Assets/Novel#54840c7baa24ede85c2f732e5d8c26c71b2efa36",
     "com.void2610.unity-template": "https://github.com/void2610/my-unity-template.git",
     "com.yujiap.unity-toolbar-extension": "https://github.com/void2610/UnityToolbarExtension.git",
     "io.github.hatayama.uloopmcp": "https://github.com/hatayama/uLoopMCP.git?path=/Packages/src",
@@ -64,8 +64,5 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  },
-  "testables": [
-    "com.void2610.liminal-palette"
-  ]
+  }
 }
