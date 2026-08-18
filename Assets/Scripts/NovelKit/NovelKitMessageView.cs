@@ -152,6 +152,8 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
         {
             var index = i;
             var button = Instantiate(choiceButtonPrefab, choiceContainer);
+            // プレハブ側の active 状態に依存せず、生成した選択肢は必ず表示する
+            button.gameObject.SetActive(true);
             var label = button.GetComponentInChildren<TextMeshProUGUI>();
             if (label) label.text = options[i];
             button.onClick.AddListener(() => tcs.TrySetResult(index));
