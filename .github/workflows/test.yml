@@ -16,6 +16,7 @@ on:
       - ".github/workflows/test.yml"
       - ".gitmodules"
       - "unity-coding-standards"
+      - "unity-coding-standards/**"
   pull_request:
     paths:
       - "Assets/Scripts/**/*.cs"
@@ -28,6 +29,7 @@ on:
       - ".github/workflows/test.yml"
       - ".gitmodules"
       - "unity-coding-standards"
+      - "unity-coding-standards/**"
 
 permissions:
   contents: read
