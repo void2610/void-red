@@ -176,7 +176,7 @@ public class NovelKitMessageView : MonoBehaviour, INovelView, INovelPlaybackSett
     {
         if (index < 0 || index >= choiceContainer.childCount) return false;
         var button = choiceContainer.GetChild(index).GetComponent<Button>();
-        if (!button) return false;
+        if (!button || !button.interactable || !button.isActiveAndEnabled) return false;
         button.onClick.Invoke();
         return true;
     }
