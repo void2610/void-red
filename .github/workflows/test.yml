@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - "Assets/Scripts/**/*.cs"
+      - "Assets/Tests/**/*.cs"
+      # LiminalScenario はシーン / プレハブ / シナリオ (.rb) に依存するため、これらの変更でも回帰検知する
+      - "Assets/Scenes/**"
+      - "Assets/Prefabs/**"
+      - "Assets/Resources/Scenarios/**"
+      - "ProjectSettings/EditorBuildSettings.asset"
+      - "Packages/manifest.json"
+      - ".github/workflows/test.yml"
+      - ".gitmodules"
+      - "unity-coding-standards"
+      - "unity-coding-standards/**"
+  pull_request:
+    paths:
+      - "Assets/Scripts/**/*.cs"
+      - "Assets/Tests/**/*.cs"
+      - "Assets/Scenes/**"
+      - "Assets/Prefabs/**"
+      - "Assets/Resources/Scenarios/**"
+      - "ProjectSettings/EditorBuildSettings.asset"
+      - "Packages/manifest.json"
+      - ".github/workflows/test.yml"
+      - ".gitmodules"
+      - "unity-coding-standards"
+      - "unity-coding-standards/**"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  test-playmode:
+    # PlayMode テストは LiminalScenario ベースの E2E。Edit Mode batch ではメインループが回らないため PlayMode で回す
+    # フォーク経由の pull_request では self-hosted runner で任意コードが走らないようスキップ
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    uses: void2610/unity-coding-standards/.github/workflows/unity-test-self-hosted.yml@main
+    with:
+      job-name: PlayMode テスト
+      test-mode: PlayMode
+      unity-version: "6000.3.10f1"
+      runner-labels: '["self-hosted", "macOS"]'
+      artifact-name: test-results-playmode
+      pr-number: ${{ github.event.pull_request.number || 0 }}
+      nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
+      # LiminalPalette の Runtime UI (UI Toolkit) が graphics device を要するため -nographics を外す
+      nographics: false
+      fail-on-test-failures: true
