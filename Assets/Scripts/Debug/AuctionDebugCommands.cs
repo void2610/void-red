@@ -124,11 +124,45 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Progress/PersonaEmotionIsRemembered", Description = "セーブ済みの感情状態が控えたロット属性と一致するか")]
     public bool PersonaEmotionIsRemembered() => _progress.Persona.EmotionState == _rememberedEmotion;
 
+    [LiminalCommand("Auction/CurrentLotIsKey", Description = "今のロットが楽園への鍵か")]
+    public bool CurrentLotIsKey() => Session().CurrentLot.IsKey;
+
+    [LiminalCommand("Auction/MissedKey", Description = "楽園への鍵を取り逃したか")]
+    public bool MissedKey() => Session().MissedKey;
+
+    [LiminalCommand("Auction/GameOverMessageMentionsKey", Description = "ゲームオーバー画面の本文が鍵の取り逃しを伝えているか")]
+    public bool GameOverMessageMentionsKey() => View().GameOver.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).First(t => t.name == "MessageText").text.Contains("鍵");
+
     [LiminalCommand("Auction/ThemeClarified", Description = "記憶テーマが鮮明化したか (出品の過半を落札)")]
     public bool ThemeClarified() => Session().IsThemeClarified;
 
     [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼画面の見出しに鮮明化後のテーマが含まれているか")]
     public bool BaptismHeaderClarified() => View().Baptism.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).First(t => t.name == "HeaderText").text.Contains(Session().Floor.ClarifiedTheme);
+
+    [LiminalCommand("Auction/AutoPlayFloorWinningKey", Description = "5 ロットを自動進行し、鍵のロットだけ (winKey なら) 落札を狙う。他は 0 枚")]
+    public async UniTask<string> AutoPlayFloorWinningKey(bool winKey = true)
+    {
+        var ct = View().destroyCancellationToken;
+        await UniTask.WaitUntil(() => WaitingFor() == "Theme", cancellationToken: ct);
+        ClickNextIfWaiting();
+        for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
+        {
+            await UniTask.WaitUntil(() => WaitingFor() == "LotIntro", cancellationToken: ct);
+            ClickNextIfWaiting();
+            await UniTask.WaitUntil(() => ActivePanel() == "Dialogue", cancellationToken: ct);
+            Click("ToBiddingButton");
+            await UniTask.WaitUntil(() => ActivePanel() == "Bid", cancellationToken: ct);
+            if (CurrentLotIsKey() && winKey) BidAboveTopRival();
+            else if (!CurrentLotIsKey() && !winKey && lot == 0) BidAboveTopRival();
+            Click("ConfirmButton");
+            await UniTask.WaitUntil(RevealReached, cancellationToken: ct);
+            ClickNextIfTie();
+            await UniTask.WaitUntil(() => WaitingFor() == "LotResult", cancellationToken: ct);
+            ClickNextIfWaiting();
+        }
+        await UniTask.WaitUntil(() => ActivePanel() is "Baptism" or "GameOver", cancellationToken: ct);
+        return $"won={WonCount("ノア")} panel={ActivePanel()}";
+    }
 
     [LiminalCommand("Auction/ActivePanel", Description = "表示中のパネル名 (Counter / Dialogue / Bid / Competition / Baptism / GameOver / Next / None) を返す")]
     public string ActivePanel()

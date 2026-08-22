@@ -22,6 +22,9 @@ public class AuctionSession
 
     public bool IsLastLot => CurrentLotIndex >= _lots.Count - 1;
 
+    /// <summary>この階層に楽園への鍵があり、主人公がそれを取り逃したか</summary>
+    public bool MissedKey => _lots.Any(l => l.IsKey) && !Player.WonLots.Any(w => w.Lot.IsKey);
+
     /// <summary>記憶テーマの鮮明化。出品の過半を落札したときだけ鮮明化後のテーマが開示される</summary>
     public bool IsThemeClarified => Player.WonLots.Count * 2 > _lots.Count && !string.IsNullOrEmpty(Floor.ClarifiedTheme);
     public bool IsPlayerGameOver => Phase == AuctionPhase.GameOver;
@@ -207,13 +210,13 @@ public class AuctionSession
     }
 
     /// <summary>
-    /// 全ロット終了後の判定。主人公が無落札ならゲームオーバー、NPC の無落札は人格崩壊
+    /// 全ロット終了後の判定。主人公が無落札、または楽園への鍵を取り逃したらゲームオーバー。NPC の無落札は人格崩壊
     /// </summary>
     public void FinishLots()
     {
         if (Phase != AuctionPhase.LotResult || !IsLastLot) throw new InvalidOperationException("全ロットが終わっていない");
         foreach (var p in Rivals) p.HasCollapsed = p.WonLots.Count == 0;
-        Phase = Player.WonLots.Count == 0 ? AuctionPhase.GameOver : AuctionPhase.Baptism;
+        Phase = Player.WonLots.Count == 0 || MissedKey ? AuctionPhase.GameOver : AuctionPhase.Baptism;
     }
 
     public void Finish()

@@ -190,13 +190,39 @@ public static class AuctionScenarios
         yield return ScenarioStep.AssertCommandReturns("Auction/BaptismHeaderClarified", null, "False");
     }
 
+    [LiminalScenario(
+        "Auction/Scenario/LastFloorRequiresParadiseKey",
+        Scene = "HomeScene",
+        Description = "最終階層は楽園への鍵を落札しないと、他を落札していてもゲームオーバーになる")]
+    public static IEnumerable<ScenarioStep> LastFloorRequiresParadiseKey()
+    {
+        foreach (var step in StartAuction(floor: 4)) yield return step;
+        yield return ScenarioStep.Run("Auction/AutoPlayFloorWinningKey", Args("winKey", false));
+        yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "GameOver", 60f);
+        yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "1", "鍵以外は落札している");
+        yield return ScenarioStep.AssertCommandReturns("Auction/MissedKey", null, "True");
+        yield return ScenarioStep.AssertCommandReturns("Auction/GameOverMessageMentionsKey", null, "True");
+    }
+
+    [LiminalScenario(
+        "Auction/Scenario/LastFloorWithKeyProceedsToBaptism",
+        Scene = "HomeScene",
+        Description = "最終階層で楽園への鍵を落札すれば洗礼へ進める")]
+    public static IEnumerable<ScenarioStep> LastFloorWithKeyProceedsToBaptism()
+    {
+        foreach (var step in StartAuction(floor: 4)) yield return step;
+        yield return ScenarioStep.Run("Auction/AutoPlayFloorWinningKey", Args("winKey", true));
+        yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "Baptism", 60f);
+        yield return ScenarioStep.AssertCommandReturns("Auction/MissedKey", null, "False");
+    }
+
     // ---- 部品 ----
 
-    private static IEnumerable<ScenarioStep> StartAuction(float competitionTimeout = 1.5f, int seed = SEED)
+    private static IEnumerable<ScenarioStep> StartAuction(float competitionTimeout = 1.5f, int seed = SEED, int floor = 0)
     {
         foreach (var step in ResetProgress()) yield return step;
         yield return WaitFadeDone();
-        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = 0, ["seed"] = seed, ["timeout"] = competitionTimeout });
+        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = floor, ["seed"] = seed, ["timeout"] = competitionTimeout });
         foreach (var step in WaitScene("AuctionScene")) yield return step;
         yield return ScenarioStep.AssertCommandEventually("Auction/WaitingFor", null, "Theme", 10f, "テーマ公開待ち");
     }

@@ -235,7 +235,7 @@ public class AuctionPresenter : IStartable, IDisposable
     private async UniTask RunGameOverAsync(CancellationToken ct)
     {
         _view.HideAllPanels();
-        _view.GameOver.Show(_session.Floor.FloorIndex);
+        _view.GameOver.Show(_session.Floor.FloorIndex, _session.MissedKey);
         _view.SetMessage("ゲームオーバー");
         var retry = _view.GameOver.OnRetry.Select(_ => true);
         var lobby = _view.GameOver.OnLobby.Select(_ => false);

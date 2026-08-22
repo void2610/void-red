@@ -21,7 +21,7 @@ public class LotView : MonoBehaviour
         image.sprite = lot.Image;
         image.color = lot.Emotion.GetColor();
         numberText.text = $"ロット {lotNumber}";
-        titleText.text = $"『{lot.Title}』";
+        titleText.text = lot.IsKey ? $"『{lot.Title}』 (楽園への鍵)" : $"『{lot.Title}』";
         flavorText.text = lot.Flavor;
         emotionText.text = lot.Emotion.ToJapaneseName();
         emotionText.color = lot.Emotion.GetColor();

@@ -17,7 +17,7 @@ public static class AuctionDataBuilder
         string Prompt, string A, string B, BidReaction ReactA, BidReaction ReactB,
         string ObserveLine, string ProvokeLine, string EmpathizeLine, string PersuadeLine, string FailLine);
 
-    private record Lot(string Id, string Title, EmotionType Emotion, string Flavor, int Resonance);
+    private record Lot(string Id, string Title, EmotionType Emotion, string Flavor, int Resonance, bool IsKey = false);
 
     [MenuItem("VoidRed/Auction/Build Data")]
     public static void Build()
@@ -128,6 +128,11 @@ public static class AuctionDataBuilder
                 }
                 var e = emotions[placeholderIndex % emotions.Length];
                 placeholderIndex++;
+                if (floor == 4 && n == 5)
+                {
+                    yield return new Lot(id, "楽園への鍵", EmotionType.Anger, "壊したくなかったものの、最後の一片。", 100, true);
+                    continue;
+                }
                 yield return new Lot(id, $"名もなき記憶 {id}", e, "まだ言葉になっていない記憶の断片。", 20 + (placeholderIndex * 13) % 60);
             }
         }
@@ -174,6 +179,7 @@ public static class AuctionDataBuilder
         so.FindProperty("flavor").stringValue = l.Flavor;
         so.FindProperty("emotion").enumValueIndex = (int)l.Emotion;
         so.FindProperty("resonance").intValue = l.Resonance;
+        so.FindProperty("isKey").boolValue = l.IsKey;
         so.ApplyModifiedPropertiesWithoutUndo();
         return asset;
     }

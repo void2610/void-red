@@ -17,9 +17,11 @@ public class GameOverView : MonoBehaviour
 
     public void Hide() => gameObject.SetActive(false);
 
-    public void Show(int floorIndex)
+    public void Show(int floorIndex, bool missedKey)
     {
         gameObject.SetActive(true);
-        messageText.text = $"記憶を 1 つも落札できなかった。\n第 {floorIndex} 階層の洗礼を受ける権利はない。";
+        messageText.text = missedKey
+            ? $"楽園への鍵を取り逃した。\n第 {floorIndex} 階層の洗礼を受ける権利はない。"
+            : $"記憶を 1 つも落札できなかった。\n第 {floorIndex} 階層の洗礼を受ける権利はない。";
     }
 }

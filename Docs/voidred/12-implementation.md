@@ -33,6 +33,9 @@
 | リソース持ち越し + 階層ごとに 8 × 5 補充 | `GameProgressService.PrepareWalletForFloor` (`Refill` は加算) |
 | 記憶テーマの鮮明化 | 出品の過半 (3/5) を落札したとき洗礼の見出しに鮮明化後テーマを出す (`IsThemeClarified`) |
 | ロビー | HomeScene の旧デッキ / 図鑑ボタンを「人格」「記憶コレクション」に転用。進行案内は `HomeView.SetProgressText` |
+| 4 階層の獲得必須の記憶 (楽園への鍵) | `MemoryLotData.IsKey`。鍵のある階層で取り逃すと `MissedKey` でゲームオーバー (同階層やり直し)。初期データでは `4-5『楽園への鍵』` |
+| ヘルプ | `HelpData/Battle/*` の本文をオークションのルールに書き換え (画像は旧バトルのまま) |
+| 入札のマウスホイール操作 | `EmotionBidItemView.OnScroll` で行の上のホイールを +/- に変換 |
 
 ## エディタツール (再生成)
 
@@ -49,7 +52,7 @@
 
 ## 検証
 
-- `[LiminalScenario]`: `Auction/Scenario/*` (9 本) と `Lobby/Scenario/*` (3 本)。`Assets/Scripts/Debug/AuctionScenarios.cs` `LobbyScenarios.cs`
+- `[LiminalScenario]`: `Auction/Scenario/*` (11 本) と `Lobby/Scenario/*` (3 本)。Test Runner (`uloop run-tests --test-mode PlayMode`) でも全件通る。`Assets/Scripts/Debug/AuctionScenarios.cs` `LobbyScenarios.cs`
 - 操作用コマンド: `Auction/Start` (階層 / seed / 競合秒数を指定して起動)、`Auction/ClickPlus` (同名ボタンが 8 個あるため属性で引く)、`Auction/AutoPlayFloor` (5 ロットを実 UI で自動進行)、`UI/Screenshot`
 - seed を固定すると NPC の入札予定・対話の成否・逆対話の発生が決定的になる。`Auction/Scenario/Observe...` は seed 1 に依存している
 
