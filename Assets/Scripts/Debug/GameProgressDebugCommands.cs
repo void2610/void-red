@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Void2610.LiminalPalette;
 
 /// <summary>
@@ -25,16 +24,10 @@ public sealed class GameProgressDebugCommands
     [LiminalCommand("Progress/HasSaveData", Description = "有効なセーブデータが存在するか (ストーリー進行ベース) を返す")]
     public bool HasSaveData() => _gameProgressService.HasSaveData();
 
-    [LiminalCommand("Progress/AcquiredThemes", Description = "獲得済みテーマ ID をカンマ区切りで返す")]
-    public string GetAcquiredThemes() => string.Join(",", _gameProgressService.GetAcquiredThemes().Select(t => t.Theme.ThemeId));
-
-    [LiminalCommand("Progress/ViewedCardCount", Description = "閲覧済みカード数を返す")]
-    public int GetViewedCardCount() => _gameProgressService.GetViewedCardIds().Count;
-
     [LiminalCommand("Save/FileExists", Description = "セーブファイルが存在するかを返す")]
     public bool SaveFileExists() => _saveDataManager.SaveFileExists();
 
-    [LiminalCommand("Save/Info", Description = "ディスク上のセーブデータの要約 (Step / 結果 / 閲覧カード / テーマ) を返す")]
+    [LiminalCommand("Save/Info", Description = "ディスク上のセーブデータの要約 (Step / 結果) を返す")]
     public string SaveInfo() => _saveDataManager.LoadGameData().GetDebugInfo();
 
     [LiminalCommand("Save/CurrentStep", Description = "ディスク上のセーブデータのストーリー Step を返す")]

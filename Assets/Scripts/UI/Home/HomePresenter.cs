@@ -15,7 +15,6 @@ public class HomePresenter : IStartable, IDisposable
     private readonly HomeView _homeView;
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
-    private readonly AllCardData _allCardData;
     private readonly IConfirmationDialog _confirmationDialogService;
 
     private StoryNode _currentNode;
@@ -28,13 +27,11 @@ public class HomePresenter : IStartable, IDisposable
         HomeView homeView,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        AllCardData allCardData,
         IConfirmationDialog confirmationDialogService)
     {
         _homeView = homeView;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
-        _allCardData = allCardData;
         _confirmationDialogService = confirmationDialogService;
     }
 
@@ -67,15 +64,6 @@ public class HomePresenter : IStartable, IDisposable
         }
     }
 
-    /// <summary>
-    /// カード図鑑を表示
-    /// </summary>
-    private void ShowCardLibrary()
-    {
-        var viewedCardIds = _gameProgressService.GetViewedCardIds();
-        _homeView.ShowCardLibrary(_allCardData, viewedCardIds);
-    }
-
     public void Start()
     {
         // Viewを初期化
@@ -87,19 +75,6 @@ public class HomePresenter : IStartable, IDisposable
 
         _homeView.StoryButtonClicked
             .Subscribe(_ => StartCurrentNodeAsync().Forget())
-            .AddTo(_disposables);
-
-        _homeView.LibraryButtonClicked
-            .Subscribe(_ => ShowCardLibrary())
-            .AddTo(_disposables);
-
-        // カードクリックイベントの購読
-        _homeView.DeckCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
-            .AddTo(_disposables);
-
-        _homeView.LibraryCardClicked
-            .Subscribe(cardData => _homeView.ShowCardDetail(cardData))
             .AddTo(_disposables);
 
         // ホームBGMを再生

@@ -13,18 +13,11 @@ public class GameSaveData
     [SerializeField] private List<string> resultKeys = new();
     [SerializeField] private List<bool> resultValues = new();
 
-    [Header("カード閲覧履歴")]
-    [SerializeField] private List<string> viewedCardIds = new();
-
-    [Header("獲得記憶テーマ")]
-    [SerializeField] private List<SavedAcquiredTheme> acquiredThemes = new();
-
     [Header("novel-kit のフラグ / 既読")]
     [SerializeField] private string novelKitState = "";
 
     // プロパティ
     public int CurrentStep => currentStep;
-    public IReadOnlyList<SavedAcquiredTheme> AcquiredThemes => acquiredThemes;
 
     /// <summary>
     /// novel-kit の状態スナップショット (NovelSaveSerializer 形式のJSON)
@@ -36,28 +29,9 @@ public class GameSaveData
     }
 
     /// <summary>
-    /// カードが閲覧済みかチェック
-    /// </summary>
-    /// <param name="cardId">チェックするカードのID</param>
-    /// <returns>閲覧済みの場合true</returns>
-    public bool IsCardViewed(string cardId) => viewedCardIds.Contains(cardId);
-
-    /// <summary>
-    /// 閲覧済みカードIDリストを取得
-    /// </summary>
-    /// <returns>閲覧済みカードIDのHashSet</returns>
-    public HashSet<string> GetViewedCardIds() => new HashSet<string>(viewedCardIds);
-
-    /// <summary>
-    /// 獲得テーマを追加
-    /// </summary>
-    /// <param name="theme">追加する獲得テーマ</param>
-    public void AddAcquiredTheme(SavedAcquiredTheme theme) => acquiredThemes.Add(theme);
-
-    /// <summary>
     /// デバッグ用情報文字列
     /// </summary>
-    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries, ViewedCards: {viewedCardIds.Count}, Themes: {acquiredThemes.Count}";
+    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries";
 
     /// <summary>
     /// ゲーム進行情報を更新
@@ -87,24 +61,5 @@ public class GameSaveData
             results[resultKeys[i]] = resultValues[i];
 
         return results;
-    }
-
-    /// <summary>
-    /// カード閲覧を記録
-    /// </summary>
-    /// <param name="cardId">閲覧したカードのID</param>
-    public void RecordCardView(string cardId)
-    {
-        if (!string.IsNullOrEmpty(cardId) && !viewedCardIds.Contains(cardId)) viewedCardIds.Add(cardId);
-    }
-
-    /// <summary>
-    /// 獲得テーマリストを更新
-    /// </summary>
-    /// <param name="themes">獲得テーマリスト</param>
-    public void UpdateAcquiredThemes(IEnumerable<SavedAcquiredTheme> themes)
-    {
-        acquiredThemes.Clear();
-        acquiredThemes.AddRange(themes);
     }
 }

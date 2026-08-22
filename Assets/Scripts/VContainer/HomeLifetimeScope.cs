@@ -1,4 +1,3 @@
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,13 +7,9 @@ using VContainer.Unity;
 /// </summary>
 public class HomeLifetimeScope : LifetimeScope
 {
-    [SerializeField] private AllCardData allCardData;
-
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterComponentInHierarchy<HomeView>();
-        builder.RegisterInstance(allCardData);
-        builder.Register<CardPoolService>(Lifetime.Singleton);
 
         builder.RegisterSettingsFeature();
         builder.RegisterEntryPoint<HelpPresenter>();
