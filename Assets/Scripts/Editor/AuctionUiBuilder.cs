@@ -260,6 +260,9 @@ public static class AuctionUiBuilder
     private static GameObject BuildEmotionBidItem()
     {
         var root = Rect("EmotionBidItem", null, new Vector2(360, 36));
+        // ホイール操作を行全体で拾うための透明なレイキャスト面
+        var hit = root.AddComponent<Image>();
+        hit.color = new Color(1f, 1f, 1f, 0.02f);
         var layout = root.AddComponent<HorizontalLayoutGroup>();
         layout.spacing = 6;
         layout.childAlignment = TextAnchor.MiddleLeft;

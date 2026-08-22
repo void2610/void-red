@@ -1,12 +1,14 @@
 using R3;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
 /// 感情属性 1 行分の入札操作 (所持枚数 / 入札枚数 / 増減ボタン)
+/// 行の上でマウスホイールを回しても増減できる
 /// </summary>
-public class EmotionBidItemView : MonoBehaviour
+public class EmotionBidItemView : MonoBehaviour, IScrollHandler
 {
     [SerializeField] private Image colorBar;
     [SerializeField] private TextMeshProUGUI emotionNameText;
@@ -44,5 +46,14 @@ public class EmotionBidItemView : MonoBehaviour
         bidCountText.text = "";
         plusButton.interactable = owned > 0;
         minusButton.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// ホイール上で +、下で -。ボタンの onClick を経由して有効判定も共有する
+    /// </summary>
+    public void OnScroll(PointerEventData eventData)
+    {
+        var button = eventData.scrollDelta.y > 0 ? plusButton : minusButton;
+        if (button.interactable && button.gameObject.activeInHierarchy) button.onClick.Invoke();
     }
 }
