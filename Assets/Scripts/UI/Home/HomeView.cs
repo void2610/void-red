@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using R3;
 using TMPro;
@@ -18,9 +17,6 @@ public class HomeView : MonoBehaviour
     [SerializeField] private Button storyButton;
     [SerializeField] private Button personButton;
     [SerializeField] private Button dreamButton;
-    [SerializeField] private DeckView deckView;
-    [SerializeField] private CardLibraryView cardLibraryView;
-    [SerializeField] private CardDetailView cardDetailView;
     [SerializeField] private TextMeshProUGUI speakingText;
 
     // ボタンクリックイベントをObservableとして公開
@@ -28,25 +24,6 @@ public class HomeView : MonoBehaviour
     public Observable<Unit> StoryButtonClicked => storyButton.OnClickAsObservable();
     public Observable<Unit> DeckButtonClicked => deckButton.OnClickAsObservable();
     public Observable<Unit> LibraryButtonClicked => libraryButton.OnClickAsObservable();
-
-    // カードクリックイベント
-    public Observable<CardData> DeckCardClicked => deckView.OnCardClicked;
-    public Observable<CardData> LibraryCardClicked => cardLibraryView.OnCardClicked;
-
-    /// <summary>
-    /// デッキデータを表示
-    /// </summary>
-    public void ShowDeckData(List<CardModel> cardModels) => deckView.Show(cardModels);
-
-    /// <summary>
-    /// カード図鑑を表示
-    /// </summary>
-    public void ShowCardLibrary(AllCardData allCardData, HashSet<string> viewedCardIds) => cardLibraryView.Show(allCardData, viewedCardIds);
-
-    /// <summary>
-    /// カード詳細を表示
-    /// </summary>
-    public void ShowCardDetail(CardData cardData) => cardDetailView.ShowCardDetail(cardData, false);
 
     /// <summary>
     /// Personボタンのinteractable設定
@@ -66,6 +43,8 @@ public class HomeView : MonoBehaviour
         // 未実装のボタンを無効化
         personButton.interactable = false;
         dreamButton.interactable = false;
+        deckButton.interactable = false;
+        libraryButton.interactable = false;
 
         InitSpeaking().Forget();
     }
