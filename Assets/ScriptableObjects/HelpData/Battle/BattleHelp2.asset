@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d16bd16f1c84bc9a59bf920dc8c092, type: 3}
   m_Name: BattleHelp2
   m_EditorClassIdentifier: 
-  title: "\u6B6F\u8ECA\u3092\u56DE\u3057\u3066\u51FA\u3057\u65B9\u3092\u6C7A\u3081\u308D"
+  title: "対話で相手の出方を探る"
   image: {fileID: 21300000, guid: 58776d7b3b82442b8b499636405b05d2, type: 3}
-  description: "\u76F8\u624B\u306E\u6027\u683C\u306B\u5BFE\u3057\u3001\u52DD\u3066\u305D\u3046\u306A\u3082\u306E\u3092\u9078\u629E\n\u5F37\u5F31\u95A2\u4FC2\u306F\u201D\u8FF7\u3044\u201D\uFF1E\u201D\u885D\u52D5\u201D\uFF1E\u201D\u78BA\u4FE1\u201D"
+  description: "観察 (85%) は相手の入札予定枚数が分かるが、逆に問いかけられることがある
+挑発・共感・説得 (25%) は入札額を増減させる。相手の性格で効き方が変わり、失敗してもセリフが返る"

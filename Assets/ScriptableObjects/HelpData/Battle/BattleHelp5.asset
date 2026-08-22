@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d16bd16f1c84bc9a59bf920dc8c092, type: 3}
   m_Name: BattleHelp5
   m_EditorClassIdentifier: 
-  title: "\u7D50\u679C\u3068\u5831\u916C"
+  title: "洗礼と歪み"
   image: {fileID: 21300000, guid: badf8d27ccda84bae9393d7a321c7382, type: 3}
-  description: "3\u30BF\u30FC\u30F3\u3067\u30EA\u30B6\u30EB\u30C8\u753B\u9762\u306B\u79FB\u884C\n\u52DD\u5229\u6570\u3068\u7372\u5F97\u3057\u305F\u8A18\u61B6\u304C\u8868\u793A\u3055\u308C\u308B"
+  description: "記憶の属性と違う属性で入札した枚数が「歪み」になる
+洗礼では落札した記憶から 1 つを人格に統合する。1 つも落札できなければゲームオーバー"

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d16bd16f1c84bc9a59bf920dc8c092, type: 3}
   m_Name: BattleHelp1
   m_EditorClassIdentifier: 
-  title: "\u30C6\u30FC\u30DE\u3084\u30AD\u30FC\u30EF\u30FC\u30C9\u3092\u898B\u3066\u672D\u3092\u9078\u629E"
+  title: "記憶テーマとロットを読む"
   image: {fileID: 21300000, guid: e7ea37fa7e9d74c129f868e736c85696, type: 3}
-  description: "\u30C6\u30FC\u30DE\u304B\u3089\u63A8\u5BDF\u3057\u3001\u89E3\u91C8\u304C\u5408\u3044\u305D\u3046\u306A\u672D\u3092\u9078\u629E\n\u30DC\u30BF\u30F3\u5165\u529B\u3067\u30AD\u30FC\u30EF\u30FC\u30C9\u304C\u753B\u9762\u4E0A\u306B\u6F02\u3046\u70BA\u3001\u5408\u81F4\u6570\u304C\u591A\u3044\u672D\u304C\u304A\u3059\u3059\u3081"
+  description: "各階層には記憶テーマがあり、5 つの記憶が 1 つずつ出品される
+共鳴値は見えない。名前とフレーバーからテーマとの合致を推測する"

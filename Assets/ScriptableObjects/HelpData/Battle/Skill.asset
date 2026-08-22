@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Skill
   m_EditorClassIdentifier: 
   isImageOnly: 1
-  title: "\u611F\u60C5\u5C5E\u6027\u30FB\u30B9\u30AD\u30EB\u4E00\u89A7\u8868"
+  title: "人格崩壊"
   image: {fileID: 21300000, guid: 2f2017fa4647e42759bdf376ff7a022f, type: 3}
-  description: 
+  description: "1 つも落札できなかった参加者は人格崩壊し、ロビーから消える
+リソースが尽きた参加者はそのロットの入札に参加できない"
