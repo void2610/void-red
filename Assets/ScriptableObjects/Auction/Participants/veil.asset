@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c317e195b90114605a8488fde8af409c, type: 3}
+  m_Name: veil
+  m_EditorClassIdentifier: VoidRed::ParticipantData
+  displayName: "\u30F4\u30A7\u30A4\u30EB"
+  emotion: 5
+  portrait: {fileID: 0}
+  isMob: 0
+  profile:
+    baseBid: 3
+    favoriteBid: 5
+    spread: 2
+    provokeReaction: 1
+    empathizeReaction: 0
+    persuadeReaction: 3
+    persuadeBoostsFavorite: 0
+    reactionScale: 120
+    competitionPolicy: 3
+    counterDialogueChance: 15
+    counterDialogue:
+      prompt: "\u2026\u2026\u30A2\u30BF\u30B7\u306B\u4F55\u306E\u7528\u3060\u3057\u3002"
+      choiceA: "\u7D44\u307E\u306A\u3044\uFF1F"
+      choiceB: "\u90AA\u9B54\u3057\u306A\u3044\u3067"
+      reactionA: 3
+      reactionB: 1
+    observeLine: "\u898B\u3066\u3093\u3058\u3083\u306A\u3044\u3057\u3002"
+    provokeLine: "\u30A2\u30BF\u30B7\u3068\u3084\u308D\u3046\u3063\u3066\u306E\uFF1F"
+    empathizeLine: "\u3060\u304B\u3089\u4F55\uFF1F"
+    persuadeLine: "\u5225\u306B\u3002\u305D\u3093\u306A\u306E\u304F\u308C\u3066\u3084\u308B\u308F\u3002"
+    failLine: "\u306F\u3041\uFF1F\u77E5\u3089\u306A\u3044\u3057\u3002"

@@ -2,7 +2,10 @@
     "name": "VoidRed.Editor",
     "rootNamespace": "",
     "references": [
-        "VoidRed"
+        "VoidRed",
+        "Unity.TextMeshPro",
+        "Unity.ugui",
+        "VContainer"
     ],
     "includePlatforms": [
         "Editor"

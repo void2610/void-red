@@ -51,10 +51,6 @@ MonoBehaviour:
   bgmManager: {fileID: 8376210248285478965, guid: 262d095b94f0c4909bb9734d0d23be9e, type: 3}
   seManager: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
   volumeController: {fileID: 5470536369724715556, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
-  allEnemyData: {fileID: 11400000, guid: d06109f2e0651496d82b4c003034f36c, type: 2}
-  allThemeData: {fileID: 11400000, guid: 5679fc83a0723432a91d3c598ccbc458, type: 2}
-  allCardData: {fileID: 11400000, guid: 075876f7cb3fc4a0ba6a5498533fcd46, type: 2}
-  allTutorialData: {fileID: 11400000, guid: e6219db96b3a2488b9fa3cbc9cf2a4ae, type: 2}
   allHelpData: {fileID: 11400000, guid: b6aae48f1f49c4e1792c0d29b14185d1, type: 2}
   confirmationDialogView: {fileID: 8700813855565595698, guid: bfd959397e0354ca7bf5bf755bffe420, type: 3}
   exhibitSettings: {fileID: 11400000, guid: 65520ba61276e43aba6134168a5a23c4, type: 2}

@@ -39,11 +39,11 @@ public class EmotionBid
     }
 
     /// <summary>
-    /// 最も多く入札した属性。同数なら感情の輪の順で先のもの
+    /// 最も多く入札した属性。同数なら preferred (記憶の属性) を優先し、それも無ければ感情の輪の順で先のもの
     /// </summary>
-    public EmotionType DominantEmotion()
+    public EmotionType DominantEmotion(EmotionType preferred)
     {
-        var best = EmotionWallet.ALL_EMOTIONS[0];
+        var best = preferred;
         foreach (var e in EmotionWallet.ALL_EMOTIONS) if (_counts[e] > _counts[best]) best = e;
         return best;
     }

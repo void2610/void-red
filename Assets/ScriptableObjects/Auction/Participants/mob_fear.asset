@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c317e195b90114605a8488fde8af409c, type: 3}
+  m_Name: mob_fear
+  m_EditorClassIdentifier: VoidRed::ParticipantData
+  displayName: "\u602F\u3048\u308B\u53C2\u52A0\u8005"
+  emotion: 2
+  portrait: {fileID: 0}
+  isMob: 1
+  profile:
+    baseBid: 2
+    favoriteBid: 4
+    spread: 1
+    provokeReaction: 1
+    empathizeReaction: 1
+    persuadeReaction: 3
+    persuadeBoostsFavorite: 0
+    reactionScale: 100
+    competitionPolicy: 2
+    counterDialogueChance: 20
+    counterDialogue:
+      prompt: "\u2026\u2026\u3042\u306A\u305F\u3082\u3001\u3084\u308A\u76F4\u3057\u305F\u3044\u306E\uFF1F"
+      choiceA: "\u305D\u3046\u3060"
+      choiceB: "\u9055\u3046"
+      reactionA: 1
+      reactionB: 3
+    observeLine: "\u2026\u2026\u3002"
+    provokeLine: "\u2026\u2026\uFF01"
+    empathizeLine: "\u2026\u2026\u3046\u3093\u3002"
+    persuadeLine: "\u2026\u2026\u305D\u3046\u3060\u306D\u3002"
+    failLine: "\u2026\u2026\u3002"

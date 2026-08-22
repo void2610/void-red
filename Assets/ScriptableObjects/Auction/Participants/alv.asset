@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c317e195b90114605a8488fde8af409c, type: 3}
+  m_Name: alv
+  m_EditorClassIdentifier: VoidRed::ParticipantData
+  displayName: "\u30A2\u30EB\u30F4"
+  emotion: 3
+  portrait: {fileID: 0}
+  isMob: 0
+  profile:
+    baseBid: 2
+    favoriteBid: 3
+    spread: 1
+    provokeReaction: 1
+    empathizeReaction: 0
+    persuadeReaction: 3
+    persuadeBoostsFavorite: 0
+    reactionScale: 100
+    competitionPolicy: 2
+    counterDialogueChance: 40
+    counterDialogue:
+      prompt: "\u3075\u3075\u3001\u30DC\u30AF\u306E\u624B\u306E\u5185\u304C\u6C17\u306B\u306A\u308A\u307E\u3059\u304B\uFF1F"
+      choiceA: "\u6C17\u306B\u306A\u308B"
+      choiceB: "\u8208\u5473\u306A\u3044"
+      reactionA: 2
+      reactionB: 4
+    observeLine: "\u6848\u5185\u4EBA\u3067\u3059\u304B\u3089\u3001\u624B\u306E\u5185\u306F\u96A0\u3057\u307E\u305B\u3093\u3088\u3002"
+    provokeLine: "\u304A\u3084\u3001\u6311\u767A\u3067\u3059\u304B\u3002\u4E57\u3063\u3066\u3042\u3052\u307E\u3057\u3087\u3046\u3002"
+    empathizeLine: "\u5171\u611F\u3001\u3067\u3059\u304B\u3002\u30DC\u30AF\u306B\u306F\u4E0D\u8981\u3067\u3059\u306D\u3002"
+    persuadeLine: "\u306A\u308B\u307B\u3069\u3002\u3067\u306F\u5C11\u3057\u63A7\u3048\u307E\u3057\u3087\u3046\u3002"
+    failLine: "\u2026\u2026\u3075\u3075\u3001\u305D\u308C\u306F\u79D8\u5BC6\u3067\u3059\u3002"

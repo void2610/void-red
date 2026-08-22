@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96304b63a15f74b708b21b11ae93179e, type: 3}
+  m_Name: Floor3
+  m_EditorClassIdentifier: VoidRed::FloorData
+  floorIndex: 3
+  themeTitle: "\u61A7\u308C\u3066\u3044\u305F\u3082\u306E"
+  clarifiedTheme: 
+  rivals:
+  - {fileID: 11400000, guid: 639e7b8d83310461d8ee1e32a8f9ea49, type: 2}
+  - {fileID: 11400000, guid: cd3f1195d834d4a5bb4044fc7d9adab0, type: 2}
+  - {fileID: 11400000, guid: b3679ae23720741b199fcadba8bc8226, type: 2}
+  - {fileID: 11400000, guid: a9b36a46361b74220a852124cd0c4eeb, type: 2}
+  lots:
+  - {fileID: 11400000, guid: 7cbf882690b194a03bde6b9da33024ff, type: 2}
+  - {fileID: 11400000, guid: c6f9019ede03743c9b6f79cfdc50e129, type: 2}
+  - {fileID: 11400000, guid: 5aeac2468c2ef4de284c975837c518b0, type: 2}
+  - {fileID: 11400000, guid: e0f17ce5719974a1ebac2502c1caa011, type: 2}
+  - {fileID: 11400000, guid: 09ad5dce1cb4c4f3592e65b7a034945d, type: 2}

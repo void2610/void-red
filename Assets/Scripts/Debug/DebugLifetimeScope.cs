@@ -23,6 +23,7 @@ public sealed class DebugLifetimeScope : LifetimeScope
         builder.Register<AudioDebugCommands>(Lifetime.Singleton);
         builder.Register<UiDebugCommands>(Lifetime.Singleton);
         builder.Register<ExhibitDebugCommands>(Lifetime.Singleton);
+        builder.Register<AuctionDebugCommands>(Lifetime.Singleton);
     }
 
     protected override void Awake()

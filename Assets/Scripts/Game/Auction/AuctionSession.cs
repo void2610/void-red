@@ -120,7 +120,8 @@ public class AuctionSession
         Player.SubmittedBid = bid.Clone();
         foreach (var p in Rivals) p.SubmittedBid = p.CanBid ? p.PlannedBid.Clone() : null;
 
-        var bidders = _participants.Where(p => p.SubmittedBid != null && (p.IsPlayer ? p.Wallet.Total > 0 : true)).ToList();
+        // 0 枚は入札したことにならない。全員 0 枚なら流札
+        var bidders = _participants.Where(p => p.SubmittedBid != null && p.SubmittedBid.Total > 0).ToList();
         LastReveal = new RevealResult(bidders);
         Phase = LastReveal.IsTie ? AuctionPhase.Competition : AuctionPhase.Reveal;
         if (Phase == AuctionPhase.Competition) Competition = new CompetitionState(CurrentLot, LastReveal.TiedParticipants, 0f, _competitionTimeout);

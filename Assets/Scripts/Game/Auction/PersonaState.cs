@@ -13,13 +13,13 @@ public class PersonaState
 
     /// <summary>
     /// 落札した記憶のうち 1 つを人格に統合する。残りはコレクションに入るだけ
-    /// 感情状態は入札内訳で最も多かった属性になる (歪みが無ければ記憶の属性と一致する)
+    /// 感情状態は入札内訳で最も多かった属性になる (同数なら記憶の属性。歪みが無ければ必ず一致する)
     /// </summary>
     public void Integrate(WonLot chosen, IEnumerable<WonLot> allWon)
     {
         IntegratedLotIds.Add(chosen.Lot.LotId);
         TotalDistortion += chosen.Distortion;
-        EmotionState = chosen.Bid.DominantEmotion();
+        EmotionState = chosen.Bid.DominantEmotion(chosen.Lot.Emotion);
         foreach (var w in allWon) if (!CollectionLotIds.Contains(w.Lot.LotId)) CollectionLotIds.Add(w.Lot.LotId);
     }
 

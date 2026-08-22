@@ -30,6 +30,14 @@ public sealed class UiDebugCommands
         var selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
         return selected != null ? selected.name : "";
     }
+
+    [LiminalCommand("UI/Screenshot", Description = "Game 画面を PNG に保存する (絶対パス)。保存はフレーム末尾に行われる")]
+    public string Screenshot(string path)
+    {
+        ScreenCapture.CaptureScreenshot(path);
+        return path;
+    }
+
     private static Button[] ActiveButtons()
     {
         return UnityEngine.Object.FindObjectsByType<Button>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).Where(b => b.interactable && b.isActiveAndEnabled).ToArray();
