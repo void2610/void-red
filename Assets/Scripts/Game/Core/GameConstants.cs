@@ -1,55 +1,31 @@
 /// <summary>
-/// ゲーム全体で使用される定数を管理するクラス
+/// ゲーム全体で使用される定数。数値バランスは仮値で、実装後に調整する
 /// </summary>
 public static class GameConstants
 {
     /// <summary>
-    /// 感情リソースのデフォルト値（8種類×各5枚 = 合計40枚）
+    /// 階層開始時に各感情属性へ補充する枚数 (8 種類 × 5 枚 = 40 枚)
     /// </summary>
-    public const int DEFAULT_EMOTION_VALUE = 5;
+    public const int EMOTION_REFILL_PER_FLOOR = 5;
 
     /// <summary>
-    /// オークションに並べるカード枚数
+    /// 1 階層で出品されるロット数
     /// </summary>
-    public const int AUCTION_CARD_COUNT = 6;
+    public const int LOTS_PER_FLOOR = 5;
 
     /// <summary>
-    /// カードゲージの最大値
+    /// 最後の上乗せからこの秒数誰も動かなければ競合が確定する
     /// </summary>
-    public const int MAX_GAUGE_VALUE = 10;
+    public const float COMPETITION_TIMEOUT_SECONDS = 10f;
 
     /// <summary>
-    /// 競合フェーズのタイムアウト時間（秒）
+    /// NPC が競合で上乗せを検討する間隔 (秒) の下限 / 上限
     /// </summary>
-    public const float COMPETITION_TIMEOUT_SECONDS = 5f;
+    public const float NPC_RAISE_INTERVAL_MIN = 1.5f;
+    public const float NPC_RAISE_INTERVAL_MAX = 4f;
 
     /// <summary>
-    /// バトルのラウンド数（3本勝負）
+    /// 最終階層の番号 (0〜4 の 5 階層)
     /// </summary>
-    public const int BATTLE_ROUND_COUNT = 3;
-
-    /// <summary>
-    /// バトルの勝利に必要な本数
-    /// </summary>
-    public const int BATTLE_WINS_REQUIRED = 2;
-
-    /// <summary>
-    /// デッキの枚数
-    /// </summary>
-    public const int DECK_SIZE = 3;
-
-    /// <summary>
-    /// 不足カードのデフォルト数字
-    /// </summary>
-    public const int DEFAULT_CARD_NUMBER = 3;
-
-    /// <summary>
-    /// 感情マッチ倍率
-    /// </summary>
-    public const float EMOTION_MATCH_MULTIPLIER = 1.5f;
-
-    /// <summary>
-    /// 自己記憶倍率
-    /// </summary>
-    public const float SELF_MEMORY_MULTIPLIER = 2.0f;
+    public const int LAST_FLOOR_INDEX = 4;
 }

@@ -86,7 +86,7 @@ public class SceneTransitionManager : ISceneTransitionService, IDisposable
             {
                 SceneType.Title => "タイトル画面",
                 SceneType.Home => "ホーム画面",
-                SceneType.Battle => "バトル中",
+                SceneType.Auction => "記憶オークション中",
                 SceneType.Novel => "ストーリー",
                 SceneType.Thanks => "展示モード",
                 _ => "プレイ中"

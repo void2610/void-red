@@ -27,7 +27,7 @@ public sealed class GameProgressDebugCommands
     [LiminalCommand("Save/FileExists", Description = "セーブファイルが存在するかを返す")]
     public bool SaveFileExists() => _saveDataManager.SaveFileExists();
 
-    [LiminalCommand("Save/Info", Description = "ディスク上のセーブデータの要約 (Step / 結果) を返す")]
+    [LiminalCommand("Save/Info", Description = "ディスク上のセーブデータの要約 (Step / リソース / 人格) を返す")]
     public string SaveInfo() => _saveDataManager.LoadGameData().GetDebugInfo();
 
     [LiminalCommand("Save/CurrentStep", Description = "ディスク上のセーブデータのストーリー Step を返す")]
@@ -45,13 +45,6 @@ public sealed class GameProgressDebugCommands
     public string AdvanceAsNovel()
     {
         _gameProgressService.RecordNovelResultAndSave();
-        return _gameProgressService.GetCurrentNode().NodeId;
-    }
-
-    [LiminalCommand("Progress/AdvanceAsBattle", Description = "現在ノードをバトル結果付きで記録し次ノードへ進める (セーブされる)")]
-    public string AdvanceAsBattle(bool isPlayerWin = true)
-    {
-        _gameProgressService.RecordBattleResultAndSave(isPlayerWin);
         return _gameProgressService.GetCurrentNode().NodeId;
     }
 

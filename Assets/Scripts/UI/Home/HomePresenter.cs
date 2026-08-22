@@ -52,10 +52,10 @@ public class HomePresenter : IStartable, IDisposable
 
         switch (_currentNode)
         {
-            case BattleNode battleNode:
-                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Battle);
+            case AuctionNode:
+                await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Auction);
                 break;
-            case NovelNode novelNode:
+            case NovelNode:
                 await _sceneTransitionManager.TransitionToSceneWithFade(SceneType.Novel);
                 break;
             default:

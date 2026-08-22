@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using R3;
 using UnityEngine;
 
@@ -7,10 +8,13 @@ using UnityEngine;
 /// </summary>
 public class GameProgressService
 {
-    /// <summary>
-    /// データセーブ時のイベント
-    /// </summary>
     public Observable<Unit> OnDataSaved => _repository.OnDataSaved;
+
+    /// <summary>主人公が持ち越している感情リソース。階層開始時に補充される</summary>
+    public EmotionWallet PlayerWallet => _repository.PlayerWallet;
+
+    public PersonaState Persona => _repository.Persona;
+    public IReadOnlyCollection<string> CollapsedParticipantIds => _repository.CollapsedParticipantIds;
 
     private readonly GameStateRepository _repository;
 
@@ -22,35 +26,22 @@ public class GameProgressService
         _repository.StoryProgress.CurrentNode = GetNextNode();
     }
 
-    /// <summary>
-    /// 有効なセーブデータが存在するかチェック（ストーリー進行ベース）
-    /// </summary>
     public bool HasSaveData() => _repository.HasSaveData();
 
-    /// <summary>
-    /// 現在のストーリーノードを取得
-    /// </summary>
     public StoryNode GetCurrentNode() => _repository.StoryProgress.CurrentNode;
 
     public SceneType GetNextSceneType() => GetSceneTypeForNode(GetNextNode());
 
-    /// <summary>
-    /// novel-kit のフラグ / 既読スナップショットを取得
-    /// </summary>
     public string GetNovelKitState() => _repository.NovelProgress.NovelKitState;
 
-    /// <summary>
-    /// novel-kit のフラグ / 既読スナップショットを記録してセーブ
-    /// </summary>
+    public bool HasCollapsed(string participantId) => _repository.CollapsedParticipantIds.Contains(participantId);
+
     public void SaveNovelKitState(string state)
     {
         _repository.NovelProgress.NovelKitState = state;
         _repository.SaveAll();
     }
 
-    /// <summary>
-    /// 全データを初期状態にリセット（デバッグ用）
-    /// </summary>
     public void ResetToDefaultData()
     {
         _repository.ResetAll();
@@ -58,64 +49,50 @@ public class GameProgressService
     }
 
     /// <summary>
-    /// 次に発生するストーリーノードを決定（結果辞書による分岐対応）
+    /// 次に発生するストーリーノードを決定
+    /// ノベルとオークションを交互に並べ、0〜4 階層を順に回る
     /// </summary>
     public StoryNode GetNextNode()
     {
-        StoryNode nextNode;
         var currentStep = _repository.StoryProgress.CurrentStep;
-
-        switch (currentStep)
+        return currentStep switch
         {
-            // プロローグ1 - 次のバトルへ直接遷移
-            case 0:
-                nextNode = new NovelNode("prologue1", false);
-                break;
-            // アルヴ - バトル後は次のノベルへ直接遷移
-            case 1:
-                nextNode = new BattleNode("alv", false);
-                break;
-            // プロローグ2 - ノベル後はホームに戻る
-            case 2:
-                nextNode = new NovelNode("prologue2");
-                break;
-            // セリカ1 - セリカと出会う
-            case 3:
-                nextNode = new NovelNode("cerica1", false);
-                break;
-            // セリカ2 - 商品提示
-            case 4:
-                nextNode = new NovelNode("cerica2", false);
-                break;
-            // セリカバトル
-            case 5:
-                nextNode = new DemoEnding();
-                // nextNode = new BattleNode("cerica", false);
-                break;
-            // この先は未定
-            default:
-                nextNode = new DemoEnding();
-                break;
-        }
-
-        return nextNode;
+            0 => new NovelNode("prologue1", false),
+            1 => new AuctionNode(0, false),
+            2 => new NovelNode("prologue2"),
+            3 => new NovelNode("cerica1", false),
+            4 => new NovelNode("cerica2", false),
+            5 => new AuctionNode(1),
+            6 => new AuctionNode(2),
+            7 => new AuctionNode(3),
+            8 => new AuctionNode(4),
+            _ => new DemoEnding(),
+        };
     }
 
     /// <summary>
-    /// 現在のバトル結果を記録
+    /// 階層開始時の主人公の手持ち。持ち越し分に規定枚数を補充した状態を返す (セーブはしない)
     /// </summary>
-    public void RecordBattleResultAndSave(bool isPlayerWin)
+    public EmotionWallet PrepareWalletForFloor()
     {
-        var nodeId = _repository.StoryProgress.CurrentNode.NodeId;
-        _repository.StoryProgress.RecordBattleResult(nodeId, isPlayerWin);
+        var wallet = _repository.PlayerWallet.Clone();
+        wallet.Refill(GameConstants.EMOTION_REFILL_PER_FLOOR);
+        return wallet;
+    }
+
+    /// <summary>
+    /// 洗礼を終えた階層の結果を記録し、次ノードへ進めてセーブする
+    /// </summary>
+    public void RecordAuctionClearAndSave(EmotionWallet remainingWallet, WonLot integrated, IEnumerable<WonLot> allWon, IEnumerable<string> collapsedIds)
+    {
+        _repository.PlayerWallet.LoadCounts(remainingWallet.ToCounts());
+        _repository.Persona.Integrate(integrated, allWon);
+        _repository.CollapsedParticipantIds.UnionWith(collapsedIds);
         _repository.StoryProgress.AdvanceStep();
         _repository.StoryProgress.CurrentNode = GetNextNode();
         _repository.SaveAll();
     }
 
-    /// <summary>
-    /// ノベル完了（複数選択記録 + 進行 + セーブを統合）
-    /// </summary>
     public void RecordNovelResultAndSave()
     {
         _repository.StoryProgress.AdvanceStep();
@@ -123,14 +100,11 @@ public class GameProgressService
         _repository.SaveAll();
     }
 
-    /// <summary>
-    /// StoryNodeから対応するSceneTypeを取得
-    /// </summary>
     private SceneType GetSceneTypeForNode(StoryNode node)
     {
         return node switch
         {
-            BattleNode => SceneType.Battle,
+            AuctionNode => SceneType.Auction,
             NovelNode => SceneType.Novel,
             DemoEnding => SceneType.Thanks,
             _ => SceneType.Home

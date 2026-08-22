@@ -48,7 +48,7 @@ public class InputActionsProvider : IDisposable
         // シーンに応じてアクションマップを有効化
         switch (sceneType)
         {
-            case SceneType.Battle:
+            case SceneType.Auction:
                 _inputActions.Battle.Enable();
                 break;
             case SceneType.Novel:

@@ -10,14 +10,43 @@ public class GameSaveData
 {
     [Header("ゲーム進行データ")]
     [SerializeField] private int currentStep = 0;
-    [SerializeField] private List<string> resultKeys = new();
-    [SerializeField] private List<bool> resultValues = new();
+
+    [Header("感情リソース (EmotionType の順)")]
+    [SerializeField] private List<int> emotionCounts = new();
+
+    [Header("人格")]
+    [Tooltip("-1 で未定。それ以外は EmotionType の値")]
+    [SerializeField] private int emotionState = -1;
+    [SerializeField] private List<string> integratedLotIds = new();
+    [SerializeField] private List<string> collectionLotIds = new();
+    [SerializeField] private int totalDistortion = 0;
+
+    [Header("人格崩壊した参加者")]
+    [SerializeField] private List<string> collapsedParticipantIds = new();
 
     [Header("novel-kit のフラグ / 既読")]
     [SerializeField] private string novelKitState = "";
 
-    // プロパティ
-    public int CurrentStep => currentStep;
+    public int CurrentStep
+    {
+        get => currentStep;
+        set => currentStep = value;
+    }
+
+    public List<int> EmotionCounts => emotionCounts;
+    public int EmotionState
+    {
+        get => emotionState;
+        set => emotionState = value;
+    }
+    public List<string> IntegratedLotIds => integratedLotIds;
+    public List<string> CollectionLotIds => collectionLotIds;
+    public int TotalDistortion
+    {
+        get => totalDistortion;
+        set => totalDistortion = value;
+    }
+    public List<string> CollapsedParticipantIds => collapsedParticipantIds;
 
     /// <summary>
     /// novel-kit の状態スナップショット (NovelSaveSerializer 形式のJSON)
@@ -28,38 +57,5 @@ public class GameSaveData
         set => novelKitState = value;
     }
 
-    /// <summary>
-    /// デバッグ用情報文字列
-    /// </summary>
-    public string GetDebugInfo() => $"Step: {currentStep}, Results: {resultKeys.Count}entries";
-
-    /// <summary>
-    /// ゲーム進行情報を更新
-    /// </summary>
-    public void UpdateGameProgress(int step, Dictionary<string, bool> results)
-    {
-        currentStep = step;
-
-        resultKeys.Clear();
-        resultValues.Clear();
-
-        foreach (var result in results)
-        {
-            resultKeys.Add(result.Key);
-            resultValues.Add(result.Value);
-        }
-    }
-
-    /// <summary>
-    /// 結果辞書を取得
-    /// </summary>
-    public Dictionary<string, bool> GetBattleResults()
-    {
-        var results = new Dictionary<string, bool>();
-
-        for (var i = 0; i < Mathf.Min(resultKeys.Count, resultValues.Count); i++)
-            results[resultKeys[i]] = resultValues[i];
-
-        return results;
-    }
+    public string GetDebugInfo() => $"Step: {currentStep}, Emotions: [{string.Join(",", emotionCounts)}], State: {emotionState}, Integrated: {integratedLotIds.Count}, Collection: {collectionLotIds.Count}, Collapsed: {collapsedParticipantIds.Count}";
 }

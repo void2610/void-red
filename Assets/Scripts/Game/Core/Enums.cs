@@ -1,35 +1,4 @@
 /// <summary>
-/// ゲームの状態を表すEnum
-/// </summary>
-public enum GameState
-{
-    /// <summary> 記憶テーマ公開 </summary>
-    ThemeAnnouncement,
-    /// <summary> カード提示（6枚を場に並べる） </summary>
-    CardReveal,
-    /// <summary> 対話フェーズ（カード選択→ブラフ/ヒント） </summary>
-    DialoguePhase,
-    /// <summary> 感情リソースで入札 </summary>
-    BiddingPhase,
-    /// <summary> 入札結果の開示・落札者決定 </summary>
-    AuctionResult,
-    /// <summary> 競合フェーズ（同数時のリアルタイム上乗せ） </summary>
-    CompetitionPhase,
-    /// <summary> リザルト（獲得カード表示・感情リソース報酬・感情状態判定） </summary>
-    ResultPhase,
-    /// <summary> デッキ選択（バトル用の3枚を選択） </summary>
-    DeckSelection,
-    /// <summary> カードバトル（3本勝負） </summary>
-    CardBattle,
-    /// <summary> バトル結果（勝利→記憶選択、敗北→演出） </summary>
-    BattleResult,
-    /// <summary> 記憶テーマ構成・キャラクター表示 </summary>
-    MemoryGrowth,
-    /// <summary> バトル終了 </summary>
-    BattleEnd,
-}
-
-/// <summary>
 /// 感情リソースの8属性（プルチックの感情の輪に基づく）
 /// </summary>
 public enum EmotionType

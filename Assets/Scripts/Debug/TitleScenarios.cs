@@ -30,7 +30,7 @@ public static class TitleScenarios
     public static IEnumerable<ScenarioStep> StartWithSaveAsksConfirmationAndResets()
     {
         foreach (var step in ResetProgress()) yield return step;
-        yield return ScenarioStep.AssertCommandReturns("Progress/AdvanceAsNovel", null, "alv");
+        yield return ScenarioStep.AssertCommandReturns("Progress/AdvanceAsNovel", null, "auction0");
         yield return WaitFadeDone();
 
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "StartButton"));
@@ -48,12 +48,12 @@ public static class TitleScenarios
     public static IEnumerable<ScenarioStep> ContinueGoesHome()
     {
         foreach (var step in ResetProgress()) yield return step;
-        yield return ScenarioStep.AssertCommandReturns("Progress/AdvanceAsNovel", null, "alv");
+        yield return ScenarioStep.AssertCommandReturns("Progress/AdvanceAsNovel", null, "auction0");
         yield return WaitFadeDone();
 
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "ContinueButton"));
         foreach (var step in WaitScene("HomeScene")) yield return step;
-        yield return ScenarioStep.AssertCommandReturns("Progress/CurrentNode", null, "alv");
+        yield return ScenarioStep.AssertCommandReturns("Progress/CurrentNode", null, "auction0");
         yield return ScenarioStep.AssertCommandReturns("Save/CurrentStep", null, "1");
     }
 }

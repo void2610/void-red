@@ -13,21 +13,16 @@ public abstract class StoryNode
 }
 
 /// <summary>
-/// バトルイベントを表すノード
+/// 記憶オークション 1 階層分を表すノード
 /// </summary>
-public class BattleNode : StoryNode
+public class AuctionNode : StoryNode
 {
-    public string AuctionId { get; }
+    public int FloorIndex { get; }
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="auctionId">オークションID</param>
-    /// <param name="returnToHome">このノード終了後にホームに戻るか（デフォルト: true）</param>
-    public BattleNode(string auctionId, bool returnToHome = true)
+    public AuctionNode(int floorIndex, bool returnToHome = true)
     {
-        NodeId = auctionId;
-        AuctionId = auctionId;
+        NodeId = $"auction{floorIndex}";
+        FloorIndex = floorIndex;
         ReturnToHome = returnToHome;
     }
 }
