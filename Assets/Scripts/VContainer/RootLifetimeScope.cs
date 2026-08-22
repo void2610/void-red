@@ -16,6 +16,7 @@ public class RootLifetimeScope : LifetimeScope
     [SerializeField] private SeManager seManager;
     [SerializeField] private VolumeController volumeController;
     [SerializeField] private AllHelpData allHelpData;
+    [SerializeField] private AllFloorData allFloorData;
     [SerializeField] private ConfirmationDialogView confirmationDialogView;
 
     [Header("展示モード")]
@@ -26,6 +27,7 @@ public class RootLifetimeScope : LifetimeScope
     {
         // データの登録と初期化
         builder.RegisterInstance(allHelpData);
+        builder.RegisterInstance(allFloorData);
         RegisterAllData();
 
         // セーブデータ管理

@@ -10,7 +10,8 @@
         "Void2610.UnityTemplate",
         "Void2610.SettingsSystem",
         "Novel.Runtime",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

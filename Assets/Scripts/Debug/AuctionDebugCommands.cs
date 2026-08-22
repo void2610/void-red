@@ -124,6 +124,12 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Progress/PersonaEmotionIsRemembered", Description = "セーブ済みの感情状態が控えたロット属性と一致するか")]
     public bool PersonaEmotionIsRemembered() => _progress.Persona.EmotionState == _rememberedEmotion;
 
+    [LiminalCommand("Auction/ThemeClarified", Description = "記憶テーマが鮮明化したか (出品の過半を落札)")]
+    public bool ThemeClarified() => Session().IsThemeClarified;
+
+    [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼画面の見出しに鮮明化後のテーマが含まれているか")]
+    public bool BaptismHeaderClarified() => View().Baptism.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).First(t => t.name == "HeaderText").text.Contains(Session().Floor.ClarifiedTheme);
+
     [LiminalCommand("Auction/ActivePanel", Description = "表示中のパネル名 (Counter / Dialogue / Bid / Competition / Baptism / GameOver / Next / None) を返す")]
     public string ActivePanel()
     {
@@ -265,6 +271,49 @@ public sealed class AuctionDebugCommands
         r.Wallet.LoadCounts(new int[EmotionWallet.ALL_EMOTIONS.Length]);
         View().RefreshSlots();
         return r.DisplayName;
+    }
+
+    [LiminalCommand("Auction/BidAboveTopRival", Description = "ライバルの入札予定の最大枚数 + 1 枚を積む (確実に単独最高額にする)")]
+    public int BidAboveTopRival()
+    {
+        var target = MaxPlannedBid() + 1;
+        var placed = 0;
+        foreach (var e in EmotionWallet.ALL_EMOTIONS)
+        {
+            var owned = Session().Player.Wallet.Get(e);
+            for (var i = 0; i < owned && placed < target; i++) { ClickPlus(e); placed++; }
+        }
+        if (placed != target) throw new InvalidOperationException($"手持ち不足: {placed}/{target}");
+        return placed;
+    }
+
+    [LiminalCommand("Auction/AutoPlayFloor", Description = "テーマ公開から 5 ロットを実 UI で自動進行する。最初の winLots ロットは最大予定 + 1 枚で落札を狙い、残りは 0 枚で流す")]
+    public async UniTask<string> AutoPlayFloor(int winLots = 1)
+    {
+        var ct = View().destroyCancellationToken;
+        await UniTask.WaitUntil(() => WaitingFor() == "Theme", cancellationToken: ct);
+        ClickNextIfWaiting();
+        for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
+        {
+            await UniTask.WaitUntil(() => WaitingFor() == "LotIntro", cancellationToken: ct);
+            ClickNextIfWaiting();
+            await UniTask.WaitUntil(() => ActivePanel() == "Dialogue", cancellationToken: ct);
+            Click("ToBiddingButton");
+            await UniTask.WaitUntil(() => ActivePanel() == "Bid", cancellationToken: ct);
+            if (lot < winLots) BidAboveTopRival();
+            Click("ConfirmButton");
+            await UniTask.WaitUntil(RevealReached, cancellationToken: ct);
+            ClickNextIfTie();
+            await UniTask.WaitUntil(() => WaitingFor() == "LotResult", cancellationToken: ct);
+            ClickNextIfWaiting();
+        }
+        await UniTask.WaitUntil(() => ActivePanel() is "Baptism" or "GameOver", cancellationToken: ct);
+        return $"won={WonCount("ノア")} panel={ActivePanel()}";
+    }
+
+    private static void Click(string name)
+    {
+        View().GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == name && b.interactable).onClick.Invoke();
     }
 
     private static AuctionParticipant Participant(string name)

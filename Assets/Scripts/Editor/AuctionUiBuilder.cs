@@ -19,6 +19,8 @@ public static class AuctionUiBuilder
     private const string HOME_SCENE = "Assets/Scenes/HomeScene.unity";
     private const string AUCTION_SCENE = "Assets/Scenes/AuctionScene.unity";
     private const string ALL_FLOOR_DATA = "Assets/ScriptableObjects/Auction/AllFloorData.asset";
+    private const string LOBBY_PREFAB_DIR = "Assets/Prefabs/HomeSceneView";
+    private const string ROOT_SCOPE_PREFAB = "Assets/Prefabs/Root/RootLifetimeScope.prefab";
 
     private static readonly Color PANEL_BG = new(0.08f, 0.05f, 0.08f, 0.85f);
     private static readonly Color OVERLAY_BG = new(0.05f, 0.02f, 0.04f, 0.95f);
@@ -72,9 +74,145 @@ public static class AuctionUiBuilder
         Debug.Log("[AuctionUiBuilder] AuctionScene 生成完了");
     }
 
+    [MenuItem("VoidRed/Auction/Build Lobby")]
+    public static void BuildLobby()
+    {
+        _font = AssetDatabase.LoadAssetAtPath<GameObject>(NORMAL_BUTTON).GetComponentInChildren<TextMeshProUGUI>(true).font;
+
+        // Root の AllFloorData 配線
+        var rootPrefab = PrefabUtility.LoadPrefabContents(ROOT_SCOPE_PREFAB);
+        var rootSo = new SerializedObject(rootPrefab.GetComponent<RootLifetimeScope>());
+        rootSo.FindProperty("allFloorData").objectReferenceValue = AssetDatabase.LoadAssetAtPath<AllFloorData>(ALL_FLOOR_DATA);
+        rootSo.ApplyModifiedPropertiesWithoutUndo();
+        PrefabUtility.SaveAsPrefabAsset(rootPrefab, ROOT_SCOPE_PREFAB);
+        PrefabUtility.UnloadPrefabContents(rootPrefab);
+
+        var entryPrefab = BuildCollectionEntry();
+        var collectionPrefab = BuildCollectionWindow(entryPrefab);
+        var personaPrefab = BuildPersonaWindow();
+
+        var scene = EditorSceneManager.OpenScene(HOME_SCENE, OpenSceneMode.Single);
+        var canvas = scene.GetRootGameObjects().First(g => g.name == "Canvas");
+        foreach (var stale in Children(canvas.transform).Where(c => c.name is "MemoryCollectionView" or "PersonaView" or "ProgressText").ToList()) UnityEngine.Object.DestroyImmediate(stale.gameObject);
+
+        var progress = Text(canvas, "ProgressText", "", 18, TextAlignmentOptions.MidlineLeft);
+        Place(progress.rectTransform, new Vector2(0f, 1f), new Vector2(230, -24), new Vector2(440, 28));
+        var collection = (GameObject)PrefabUtility.InstantiatePrefab(collectionPrefab, canvas.transform);
+        var persona = (GameObject)PrefabUtility.InstantiatePrefab(personaPrefab, canvas.transform);
+        // 設定パネルより手前には出さない
+        var settings = Children(canvas.transform).FirstOrDefault(c => c.name == "SettingsPanel");
+        if (settings != null)
+        {
+            collection.transform.SetSiblingIndex(settings.GetSiblingIndex());
+            persona.transform.SetSiblingIndex(settings.GetSiblingIndex());
+        }
+
+        var homeView = scene.GetRootGameObjects().Select(g => g.GetComponentInChildren<HomeView>(true)).First(v => v != null);
+        Wire(homeView, ("progressText", progress), ("collectionView", collection.GetComponent<MemoryCollectionView>()), ("personaView", persona.GetComponent<PersonaView>()));
+        // 旧デッキ / 図鑑ボタンを人格 / コレクションの入口として復活させる
+        foreach (var button in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Button>(true)).Where(b => b.name is "CardLibButton" or "DeckButton"))
+        {
+            // プレハブインスタンスの上書き値はプロパティ経由では保存されないため SerializedObject で書く
+            var bso = new SerializedObject(button);
+            bso.FindProperty("m_Interactable").boolValue = true;
+            bso.ApplyModifiedPropertiesWithoutUndo();
+            var label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            var lso = new SerializedObject(label);
+            lso.FindProperty("m_text").stringValue = button.name == "DeckButton" ? "人格" : "記憶コレクション";
+            lso.ApplyModifiedPropertiesWithoutUndo();
+        }
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Debug.Log("[AuctionUiBuilder] ロビー UI 生成完了");
+    }
+
     private static void Stretch(Graphic g, float margin = 0)
     {
         Stretch(g.rectTransform, margin);
+    }
+
+    private static GameObject BuildCollectionEntry()
+    {
+        var root = Rect("MemoryCollectionEntry", null, new Vector2(640, 56));
+        var bg = Image(root, "Background", new Color(0.12f, 0.08f, 0.1f, 0.9f));
+        Stretch(bg);
+        var bar = Image(root, "ColorBar", Color.white);
+        Place(bar.rectTransform, new Vector2(0f, 0.5f), new Vector2(10, 0), new Vector2(10, 46));
+        var title = Text(root, "TitleText", "", 17, TextAlignmentOptions.MidlineLeft);
+        Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(290, -14), new Vector2(520, 24));
+        var flavor = Text(root, "FlavorText", "", 13, TextAlignmentOptions.MidlineLeft);
+        Place(flavor.rectTransform, new Vector2(0f, 0f), new Vector2(290, 14), new Vector2(520, 22));
+        var mark = Text(root, "MarkText", "", 16, TextAlignmentOptions.Center);
+        Place(mark.rectTransform, new Vector2(1f, 0.5f), new Vector2(-40, 0), new Vector2(60, 24));
+        var view = root.AddComponent<MemoryCollectionEntryView>();
+        Wire(view, ("colorBar", bar), ("titleText", title), ("flavorText", flavor), ("markText", mark));
+        return SavePrefab(root, "MemoryCollectionEntry", LOBBY_PREFAB_DIR);
+    }
+
+    private static GameObject BuildCollectionWindow(GameObject entryPrefab)
+    {
+        var root = Window("MemoryCollectionView", "記憶コレクション", out var close);
+        var scroll = Rect("Scroll", root, new Vector2(660, 400));
+        Place(scroll.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -10), new Vector2(660, 400));
+        var scrollRect = scroll.AddComponent<ScrollRect>();
+        var mask = scroll.AddComponent<RectMask2D>();
+        var content = Rect("Content", scroll, new Vector2(660, 0));
+        var crt = content.GetComponent<RectTransform>();
+        crt.anchorMin = new Vector2(0, 1);
+        crt.anchorMax = new Vector2(1, 1);
+        crt.pivot = new Vector2(0.5f, 1);
+        crt.anchoredPosition = Vector2.zero;
+        var layout = content.AddComponent<VerticalLayoutGroup>();
+        layout.spacing = 4;
+        layout.childAlignment = TextAnchor.UpperCenter;
+        layout.childControlWidth = false;
+        layout.childControlHeight = false;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = false;
+        var fitter = content.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        scrollRect.content = crt;
+        scrollRect.horizontal = false;
+        scrollRect.viewport = scroll.GetComponent<RectTransform>();
+        var summary = Text(root, "SummaryText", "", 18, TextAlignmentOptions.MidlineLeft);
+        Place(summary.rectTransform, new Vector2(0f, 1f), new Vector2(200, -60), new Vector2(300, 26));
+        var view = root.AddComponent<MemoryCollectionView>();
+        Wire(view, ("closeButton", close), ("entryContainer", content.transform), ("entryPrefab", entryPrefab), ("summaryText", summary));
+        return SavePrefab(root, "MemoryCollectionView", LOBBY_PREFAB_DIR);
+    }
+
+    private static GameObject BuildPersonaWindow()
+    {
+        var root = Window("PersonaView", "人格", out var close);
+        var integrated = Text(root, "IntegratedText", "", 18, TextAlignmentOptions.TopLeft);
+        Place(integrated.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -170), new Vector2(640, 200));
+        var wallet = Text(root, "WalletText", "", 16, TextAlignmentOptions.MidlineLeft);
+        Place(wallet.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 150), new Vector2(640, 40));
+        var collapsed = Text(root, "CollapsedText", "", 16, TextAlignmentOptions.MidlineLeft);
+        Place(collapsed.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 110), new Vector2(640, 30));
+        var view = root.AddComponent<PersonaView>();
+        Wire(view, ("closeButton", close), ("integratedText", integrated), ("walletText", wallet), ("collapsedText", collapsed));
+        return SavePrefab(root, "PersonaView", LOBBY_PREFAB_DIR);
+    }
+
+    /// <summary>
+    /// 全画面の暗幕 + 中央パネル + 閉じるボタンを持つウィンドウ。BaseWindowView の CanvasGroup を付ける
+    /// </summary>
+    private static GameObject Window(string name, string title, out Button close)
+    {
+        var root = Rect(name, null, Vector2.zero);
+        Stretch(root.GetComponent<RectTransform>());
+        root.AddComponent<CanvasGroup>();
+        var dim = Image(root, "Dim", OVERLAY_BG);
+        Stretch(dim);
+        dim.raycastTarget = true;
+        var panel = Panel(root, "Panel", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(720, 520));
+        var header = Text(root, "TitleText", title, 26, TextAlignmentOptions.Center);
+        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -40), new Vector2(400, 36));
+        // CloseButton は設定パネルにもあるため、検証で名前引きできるよう個別名にする
+        close = ButtonPrefab(root, $"{name}CloseButton", "閉じる", new Vector2(140, 38));
+        Place(close.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0, 40), new Vector2(140, 38));
+        return root;
     }
 
     private static void RegisterSceneInBuild()
@@ -306,8 +444,8 @@ public static class AuctionUiBuilder
     {
         var panel = Panel(parent, "BaptismView", new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, OVERLAY_BG);
         Stretch(panel.GetComponent<RectTransform>());
-        var header = Text(panel, "HeaderText", "洗礼", 28, TextAlignmentOptions.Center);
-        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -30), new Vector2(400, 36));
+        var header = Text(panel, "HeaderText", "洗礼", 24, TextAlignmentOptions.Center);
+        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -34), new Vector2(700, 60));
         var container = Rect("EntryContainer", panel, new Vector2(700, 380));
         Place(container.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0, -250), new Vector2(700, 380));
         var layout = container.AddComponent<VerticalLayoutGroup>();
@@ -326,7 +464,7 @@ public static class AuctionUiBuilder
         var finish = ButtonPrefab(panel, "FinishButton", "洗礼を受ける", new Vector2(180, 40));
         Place(finish.GetComponent<RectTransform>(), new Vector2(1f, 0f), new Vector2(-140, 40), new Vector2(180, 40));
         var view = panel.AddComponent<BaptismView>();
-        Wire(view, ("entryContainer", container.transform), ("entryPrefab", entryPrefab), ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected), ("finishButton", finish));
+        Wire(view, ("headerText", header), ("entryContainer", container.transform), ("entryPrefab", entryPrefab), ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected), ("finishButton", finish));
         return view;
     }
 
@@ -428,9 +566,9 @@ public static class AuctionUiBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static GameObject SavePrefab(GameObject go, string name)
+    private static GameObject SavePrefab(GameObject go, string name, string dir = PREFAB_DIR)
     {
-        var path = $"{PREFAB_DIR}/{name}.prefab";
+        var path = $"{dir}/{name}.prefab";
         var prefab = PrefabUtility.SaveAsPrefabAsset(go, path);
         UnityEngine.Object.DestroyImmediate(go);
         return prefab;

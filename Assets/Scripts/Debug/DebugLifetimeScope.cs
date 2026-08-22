@@ -24,6 +24,7 @@ public sealed class DebugLifetimeScope : LifetimeScope
         builder.Register<UiDebugCommands>(Lifetime.Singleton);
         builder.Register<ExhibitDebugCommands>(Lifetime.Singleton);
         builder.Register<AuctionDebugCommands>(Lifetime.Singleton);
+        builder.Register<LobbyDebugCommands>(Lifetime.Singleton);
     }
 
     protected override void Awake()

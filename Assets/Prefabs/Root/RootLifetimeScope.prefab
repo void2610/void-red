@@ -52,6 +52,7 @@ MonoBehaviour:
   seManager: {fileID: 2473017120573771212, guid: 5e34f8ec950704adc804c781f89a3266, type: 3}
   volumeController: {fileID: 5470536369724715556, guid: f5e6fe0c12dd74e2a9d6ef02a485e5f8, type: 3}
   allHelpData: {fileID: 11400000, guid: b6aae48f1f49c4e1792c0d29b14185d1, type: 2}
+  allFloorData: {fileID: 11400000, guid: 350e7c9716bfb43c9811956ac493150e, type: 2}
   confirmationDialogView: {fileID: 8700813855565595698, guid: bfd959397e0354ca7bf5bf755bffe420, type: 3}
   exhibitSettings: {fileID: 11400000, guid: 65520ba61276e43aba6134168a5a23c4, type: 2}
   exhibitOverlayViewPrefab: {fileID: 1760116568138814758, guid: e27a5b7aea0d747b8b7cf4d028716140, type: 3}

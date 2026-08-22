@@ -9,6 +9,7 @@ using UnityEngine.UI;
 /// </summary>
 public class BaptismView : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI headerText;
     [SerializeField] private Transform entryContainer;
     [SerializeField] private GameObject entryPrefab;
     [SerializeField] private TextMeshProUGUI remainingText;
@@ -28,6 +29,9 @@ public class BaptismView : MonoBehaviour
     public void Show(AuctionSession session)
     {
         gameObject.SetActive(true);
+        headerText.text = session.IsThemeClarified
+            ? $"洗礼 — 記憶テーマが鮮明になった\n「{session.Floor.ThemeTitle}」→「{session.Floor.ClarifiedTheme}」"
+            : $"洗礼 — 記憶テーマ「{session.Floor.ThemeTitle}」";
         foreach (var e in _entries) Destroy(e.gameObject);
         _entries.Clear();
         foreach (var won in session.Player.WonLots)

@@ -16,6 +16,7 @@ public class HomePresenter : IStartable, IDisposable
     private readonly GameProgressService _gameProgressService;
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly IConfirmationDialog _confirmationDialogService;
+    private readonly AllFloorData _allFloorData;
 
     private StoryNode _currentNode;
     private readonly CompositeDisposable _disposables = new();
@@ -27,12 +28,24 @@ public class HomePresenter : IStartable, IDisposable
         HomeView homeView,
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
-        IConfirmationDialog confirmationDialogService)
+        IConfirmationDialog confirmationDialogService,
+        AllFloorData allFloorData)
     {
         _homeView = homeView;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
+        _allFloorData = allFloorData;
+    }
+
+    private static string DescribeNextNode(StoryNode node)
+    {
+        return node switch
+        {
+            AuctionNode a => $"次: 第 {a.FloorIndex} 階層の記憶オークション",
+            NovelNode n => $"次: ストーリー ({n.ScenarioId})",
+            _ => "次: 楽園",
+        };
     }
 
     /// <summary>
@@ -76,6 +89,16 @@ public class HomePresenter : IStartable, IDisposable
         _homeView.StoryButtonClicked
             .Subscribe(_ => StartCurrentNodeAsync().Forget())
             .AddTo(_disposables);
+
+        _homeView.CollectionButtonClicked
+            .Subscribe(_ => _homeView.CollectionView.Show(_allFloorData, _gameProgressService.Persona))
+            .AddTo(_disposables);
+
+        _homeView.PersonaButtonClicked
+            .Subscribe(_ => _homeView.PersonaView.Show(_allFloorData, _gameProgressService.Persona, _gameProgressService.PlayerWallet, _gameProgressService.CollapsedParticipantIds))
+            .AddTo(_disposables);
+
+        _homeView.SetProgressText(DescribeNextNode(_gameProgressService.GetNextNode()));
 
         // ホームBGMを再生
         BgmManager.Instance.PlayBGM("Home");

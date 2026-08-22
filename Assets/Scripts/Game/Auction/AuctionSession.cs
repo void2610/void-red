@@ -21,6 +21,9 @@ public class AuctionSession
     public AuctionParticipant LastWinner { get; private set; }
 
     public bool IsLastLot => CurrentLotIndex >= _lots.Count - 1;
+
+    /// <summary>記憶テーマの鮮明化。出品の過半を落札したときだけ鮮明化後のテーマが開示される</summary>
+    public bool IsThemeClarified => Player.WonLots.Count * 2 > _lots.Count && !string.IsNullOrEmpty(Floor.ClarifiedTheme);
     public bool IsPlayerGameOver => Phase == AuctionPhase.GameOver;
 
     private const int OBSERVE_SUCCESS_RATE = 85;
@@ -171,13 +174,13 @@ public class AuctionSession
     }
 
     /// <summary>
-    /// 競合を締めて落札者を決める。全員リソース切れで同数なら流札
+    /// 競合を締めて落札者を決める。時間切れでも同数のままなら、同額の中から抽選で決める (流札にはしない)
     /// </summary>
     public AuctionParticipant ResolveCompetition()
     {
         if (Phase != AuctionPhase.Competition) throw new InvalidOperationException($"競合フェーズではない: {Phase}");
         Competition.End();
-        var winner = Competition.Leader();
+        var winner = Competition.Leader() ?? PickTiedLeader();
         var others = Competition.Competitors.ToDictionary(c => c.DisplayName, c => Competition.TotalOf(c));
         if (winner != null) winner.WonLots.Add(new WonLot(CurrentLot, CurrentLotIndex, Competition.FinalBidOf(winner), true, others));
         LastWinner = winner;
@@ -217,5 +220,12 @@ public class AuctionSession
     {
         if (Phase != AuctionPhase.Baptism) throw new InvalidOperationException($"洗礼フェーズではない: {Phase}");
         Phase = AuctionPhase.Finished;
+    }
+
+    private AuctionParticipant PickTiedLeader()
+    {
+        var max = Competition.Competitors.Max(Competition.TotalOf);
+        var tied = Competition.Competitors.Where(c => Competition.TotalOf(c) == max).ToList();
+        return tied[_rng.Next(tied.Count)];
     }
 }

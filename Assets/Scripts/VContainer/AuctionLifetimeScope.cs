@@ -9,8 +9,6 @@ using VContainer.Unity;
 /// </summary>
 public class AuctionLifetimeScope : LifetimeScope
 {
-    [SerializeField] private AllFloorData allFloorData;
-
     [Tooltip("-1 なら進行度に従う。0 以上ならその階層を単体で回す (デバッグ用)")]
     [SerializeField] private int floorOverride = -1;
 
@@ -20,9 +18,9 @@ public class AuctionLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterComponentInHierarchy<AuctionView>();
-        builder.RegisterInstance(allFloorData);
         builder.Register(resolver =>
         {
+            var allFloorData = resolver.Resolve<AllFloorData>();
             var progress = resolver.Resolve<GameProgressService>();
             var request = resolver.Resolve<AuctionStartRequest>();
             var floorIndex = request.ConsumeFloorOverride() ?? (floorOverride >= 0 ? floorOverride : (progress.GetNextNode() as AuctionNode)?.FloorIndex ?? 0);

@@ -162,6 +162,34 @@ public static class AuctionScenarios
         yield return ScenarioStep.AssertCommandReturns("Auction/LastBidderCount", null, "3", "主人公 0 枚とアルヴを除く 3 人だけが入札に参加した");
     }
 
+    [LiminalScenario(
+        "Auction/Scenario/WinningMajorityClarifiesTheme",
+        Scene = "HomeScene",
+        Description = "5 ロット中 3 つを落札すると記憶テーマが鮮明化し、洗礼の見出しに鮮明化後のテーマが出る")]
+    public static IEnumerable<ScenarioStep> WinningMajorityClarifiesTheme()
+    {
+        foreach (var step in StartAuction()) yield return step;
+        yield return ScenarioStep.Run("Auction/AutoPlayFloor", Args("winLots", 3));
+        yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "Baptism", 60f);
+        yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "3");
+        yield return ScenarioStep.AssertCommandReturns("Auction/ThemeClarified", null, "True");
+        yield return ScenarioStep.AssertCommandReturns("Auction/BaptismHeaderClarified", null, "True", "見出しに鮮明化後のテーマが出る");
+    }
+
+    [LiminalScenario(
+        "Auction/Scenario/WinningMinorityKeepsThemeVague",
+        Scene = "HomeScene",
+        Description = "落札が過半に届かなければ記憶テーマは鮮明化しない")]
+    public static IEnumerable<ScenarioStep> WinningMinorityKeepsThemeVague()
+    {
+        foreach (var step in StartAuction()) yield return step;
+        yield return ScenarioStep.Run("Auction/AutoPlayFloor", Args("winLots", 2));
+        yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "Baptism", 60f);
+        yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "2");
+        yield return ScenarioStep.AssertCommandReturns("Auction/ThemeClarified", null, "False");
+        yield return ScenarioStep.AssertCommandReturns("Auction/BaptismHeaderClarified", null, "False");
+    }
+
     // ---- 部品 ----
 
     private static IEnumerable<ScenarioStep> StartAuction(float competitionTimeout = 1.5f, int seed = SEED)

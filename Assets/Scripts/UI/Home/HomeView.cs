@@ -18,12 +18,19 @@ public class HomeView : MonoBehaviour
     [SerializeField] private Button personButton;
     [SerializeField] private Button dreamButton;
     [SerializeField] private TextMeshProUGUI speakingText;
+    [SerializeField] private TextMeshProUGUI progressText;
+    [SerializeField] private MemoryCollectionView collectionView;
+    [SerializeField] private PersonaView personaView;
 
     // ボタンクリックイベントをObservableとして公開
     public Observable<Unit> TitleButtonClicked => titleButton.OnClickAsObservable();
     public Observable<Unit> StoryButtonClicked => storyButton.OnClickAsObservable();
-    public Observable<Unit> DeckButtonClicked => deckButton.OnClickAsObservable();
-    public Observable<Unit> LibraryButtonClicked => libraryButton.OnClickAsObservable();
+    public Observable<Unit> PersonaButtonClicked => deckButton.OnClickAsObservable();
+    public Observable<Unit> CollectionButtonClicked => libraryButton.OnClickAsObservable();
+    public MemoryCollectionView CollectionView => collectionView;
+    public PersonaView PersonaView => personaView;
+
+    public void SetProgressText(string text) => progressText.text = text;
 
     /// <summary>
     /// Personボタンのinteractable設定
@@ -43,8 +50,6 @@ public class HomeView : MonoBehaviour
         // 未実装のボタンを無効化
         personButton.interactable = false;
         dreamButton.interactable = false;
-        deckButton.interactable = false;
-        libraryButton.interactable = false;
 
         InitSpeaking().Forget();
     }
