@@ -38,18 +38,28 @@ public class AuctionPresenter : IStartable, IDisposable
 
     private async UniTask RunAsync(CancellationToken ct)
     {
-        await _view.WaitNextAsync($"記憶テーマ「{_session.Floor.ThemeTitle}」\n第 {_session.Floor.FloorIndex} 階層の記憶オークションを始める");
-        while (!_session.IsLastLot)
+        try
         {
-            await RunLotAsync(ct);
+            await _view.WaitNextAsync($"記憶テーマ「{_session.Floor.ThemeTitle}」\n第 {_session.Floor.FloorIndex} 階層の記憶オークションを始める");
+            while (!_session.IsLastLot)
+            {
+                await RunLotAsync(ct);
+            }
+            _session.FinishLots();
+            if (_session.IsPlayerGameOver)
+            {
+                await RunGameOverAsync(ct);
+                return;
+            }
+            await RunBaptismAsync(ct);
         }
-        _session.FinishLots();
-        if (_session.IsPlayerGameOver)
+        catch (OperationCanceledException)
         {
-            await RunGameOverAsync(ct);
-            return;
         }
-        await RunBaptismAsync(ct);
+        catch (InvalidOperationException) when (_view == null || ct.IsCancellationRequested)
+        {
+            // シーン破棄でボタンの Observable が完了し FirstAsync が空列挙で失敗する。進行の中断として扱う
+        }
     }
 
     private async UniTask RunLotAsync(CancellationToken ct)
