@@ -4,7 +4,7 @@ Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイ
 
 ## プロジェクト概要
 
-void-red は Unity 6000.3 で開発しているカードゲーム + ノベル ADV。カードバトル (インゲーム) とノベルパート (novel-kit / MRuby シナリオ) をホームから行き来する構成。VContainer (DI)、R3 (リアクティブ)、UniTask (非同期)、LitMotion (アニメーション) を使用。
+void-red は Unity 6000.3 で開発している人格構築・心理戦オークション ADV。記憶オークション (インゲーム) とノベルパート (novel-kit / MRuby シナリオ) をホーム (ロビー) から行き来する構成。ゲーム仕様は `Docs/voidred/` (入口は `README.md`、実装対応は `12-implementation.md`)。VContainer (DI)、R3 (リアクティブ)、UniTask (非同期)、LitMotion (アニメーション) を使用。
 
 ## 開発ワークフロー
 
@@ -81,7 +81,7 @@ Play Mode はエディタが非フォーカスでも進む (`Run In Background` 
 
 ### DI 設計原則
 
-- VContainer を使用する。シーンと LifetimeScope を 1:1 で対応させる (Title / Home / Battle / NovelKit / Thanks)。シーン横断サービスは `RootLifetimeScope` (VContainerSettings の Root プレハブ) に登録する
+- VContainer を使用する。シーンと LifetimeScope を 1:1 で対応させる (Title / Home / Auction / NovelKit / Thanks)。シーン横断サービスは `RootLifetimeScope` (VContainerSettings の Root プレハブ) に登録する
 - View クラスのみ MonoBehaviour を継承し、Presenter / Service はピュア C# クラスでコンストラクタ注入する
 - Presenter は View の Observable (`Button.OnClickAsObservable` 等) を購読して動く。View に業務ロジックを書かない
 
@@ -92,9 +92,13 @@ Play Mode はエディタが非フォーカスでも進む (`Run In Background` 
 
 ### シーン構成と遷移
 
-- TitleScene → HomeScene → BattleScene / NovelKitScene → HomeScene (バトル / ノベル後に戻る)。ThanksScene は展示モード用
+- TitleScene → HomeScene → AuctionScene / NovelKitScene → HomeScene (オークション / ノベル後に戻る)。ThanksScene は展示モード用
 - 遷移は `SceneTransitionManager.TransitionToSceneWithFade` に一本化 (フェード中は no-op になるため、連続遷移は `IsFading` を待つ)
-- ストーリー進行は `GameProgressService` (現在ノード / 次ノード / セーブ) が持つ。ノベル完了・バトル結果の記録で次ノードへ進む
+- ストーリー進行は `GameProgressService` (現在ノード / 次ノード / セーブ / 持ち越しリソース / 人格) が持つ。ノベル完了・洗礼 (`RecordAuctionClearAndSave`) で次ノードへ進む。ゲームオーバーは進行度を動かさない
+
+## オークション UI / データの再生成
+
+プレハブ・シーン・初期データは `Assets/Scripts/Editor/AuctionUiBuilder.cs` / `AuctionDataBuilder.cs` の静的メソッドで生成する。`uloop execute-menu-item` はセキュリティ設定でブロックされるため、`uloop-execute-dynamic-code` で `AuctionUiBuilder.BuildPrefabs(); return "ok";` のように直接呼ぶ。レイアウト調整はビルダー側の数値を直して再実行する。`*LifetimeScope.cs` を新規作成すると VContainer のテンプレートが本文を上書きするので、作成後に中身を確認する。
 
 ## 依存パッケージ
 

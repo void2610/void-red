@@ -30,7 +30,8 @@ public static IEnumerable<ScenarioStep> PlayScenarioChooseAndReturnHome()
 - `Scene = "..."` で開始シーンを Single ロードする。Root スコープ (VContainerSettings) と常駐の `DebugLifetimeScope` は自動で立つ
 - prefix は `<領域>/Scenario/<名前>`。ランナー (`*E2ETests.cs`) は prefix で拾うので、新しい領域を作ったらランナーも 1 ファイル足す
 - 前文は `ScenarioFragments.ResetProgress()` (進行度 + ノベル保存状態の初期化)。テストは実セーブを書き換えるので、決定性のために毎回リセットする
-- 操作は実経路を通す: ボタンは `UI/ClickButton`、選択肢は `Novel/Choose`、送りは `Novel/AdvanceToNextLine`
+- 操作は実経路を通す: ボタンは `UI/ClickButton`、選択肢は `Novel/Choose`、送りは `Novel/AdvanceToNextLine`。同名ボタンが複数ある UI は属性などで引く専用コマンドを足す (`Auction/ClickPlus`)
+- 見た目の確認は `UI/Screenshot path=<絶対パス>` で PNG を書き出して見る
 
 ## 決定性のパターン
 
@@ -57,5 +58,7 @@ Test Runner からは `uloop-run-tests` (PlayMode)。CI は `.github/workflows/t
 | `Progress/Scenario/` | ノベル / バトル完了記録で Step が進みセーブに追従、リセットで戻る |
 | `Novel/Scenario/` | 任意シナリオ再生 → 選択 → 完走でホーム復帰 (進行度不変・フラグ保存)、行送りが台本どおり、スキップの確認ダイアログ |
 | `Title/Scenario/` | はじめから (セーブ無し / 有り + 確認ダイアログ)、つづきから |
+| `Auction/Scenario/` | 記憶オークション: 落札 → 洗礼 → セーブ、無落札のゲームオーバーとやり直し、歪み、対話の回数制限、観察と逆対話、競合、破産、テーマ鮮明化 |
+| `Lobby/Scenario/` | ホームの進行案内、記憶コレクションの伏せ字 / 開示、人格画面 |
 
-バトル (インゲーム) はメインシステムの仕様変更を控えているため未着手。
+オークションは `Auction/Start` で階層・seed・競合の確定秒数を指定して起動する。seed を固定すると NPC の入札予定と対話の成否が決定的になる (`Docs/voidred/12-implementation.md`)。

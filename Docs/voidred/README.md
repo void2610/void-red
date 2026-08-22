@@ -12,8 +12,8 @@
 - スコープ外: ストーリー / ノベルパート / 演出 / エンディング分岐
 - 記憶データ・キャラの入札傾向は **ScriptableObject** で保持し、インスペクタで調整できるようにする
 - **数値バランスは事前に確定させず、仮値で実装してから調整する**
-- 旧ルール (カードバトル + 旧オークション) の実装は、現状コミットに **git タグを打ったうえで全消去**し、
-  新ルールで作り直す
+- 旧ルール (カードバトル + 旧オークション) の実装はタグ `legacy/card-battle` に残して全消去済み。
+  新ルールのプロトタイプは実装済み (対応表は [12-implementation.md](12-implementation.md))
 
 ## 目次
 
@@ -29,6 +29,8 @@
 | [08-floors.md](08-floors.md) | 階層別パラメータ (参加メンバー / 記憶テーマ) | 必須 |
 | [09-worldview.md](09-worldview.md) | 世界観・元ネタ・枢要罪対応 | 参考 |
 | [10-open-questions.md](10-open-questions.md) | 未確定事項 / 要検討 | 必須 |
+| [11-legacy-ui-inventory.md](11-legacy-ui-inventory.md) | 削除した旧 UI 資産の目録と復元手順 | 参考 |
+| [12-implementation.md](12-implementation.md) | 仕様と実装の対応表・再生成手順・検証 | 必須 |
 
 画像は原典に base64 で埋め込まれていたものを `images/` に PNG として書き出し、各ドキュメントから参照している。
 
