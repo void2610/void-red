@@ -61,6 +61,13 @@ public class CompetitionView : BasePhaseView
     /// </summary>
     public void SetInstruction(string text) => instructionText.text = text;
 
+    /// <summary>競合を見守るだけのときは、押せない上乗せ操作を出したままにしない</summary>
+    public void SetRaiseVisible(bool visible)
+    {
+        raiseButton.gameObject.SetActive(visible);
+        emotionResourceDisplayView.gameObject.SetActive(visible);
+    }
+
     /// <summary>競合している 2 人の立ち絵を差し替える (素材が無ければ隠す)</summary>
     public void SetPortraits(Sprite player, Sprite rival)
     {

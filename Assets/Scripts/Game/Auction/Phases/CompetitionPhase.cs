@@ -26,6 +26,7 @@ public class CompetitionPhase : IAuctionPhase
         view.Competition.SetInstruction(playerCompeting ? "競り上げろ" : "競合を見守る");
         var topRival = competition.Competitors.Where(c => !c.IsPlayer).OrderByDescending(competition.TotalOf).FirstOrDefault();
         view.Competition.SetPortraits(view.PlayerPortrait, topRival?.Data ? topRival.Data.Portrait : null);
+        view.Competition.SetRaiseVisible(playerCompeting);
         view.Competition.SetEmotionInteractable(playerCompeting);
         UpdateRaiseInteractable(context, playerCompeting);
 
