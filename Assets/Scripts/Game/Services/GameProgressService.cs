@@ -18,6 +18,10 @@ public class GameProgressService
 
     private readonly GameStateRepository _repository;
 
+    // やり直しで補充が重ならないよう、階層に入ったときの手持ちを控える
+    private EmotionWallet _floorStartWallet;
+    private int _floorStartFloorIndex = -1;
+
     public GameProgressService(SaveDataManager saveDataManager)
     {
         _repository = new GameStateRepository(saveDataManager);
@@ -44,6 +48,8 @@ public class GameProgressService
 
     public void ResetToDefaultData()
     {
+        _floorStartWallet = null;
+        _floorStartFloorIndex = -1;
         _repository.ResetAll();
         _repository.StoryProgress.CurrentNode = GetNextNode();
     }
@@ -72,12 +78,18 @@ public class GameProgressService
 
     /// <summary>
     /// 階層開始時の主人公の手持ち。持ち越し分に規定枚数を補充した状態を返す (セーブはしない)
+    /// 同じ階層をやり直すときは補充をやり直さず、最初に入ったときと同じ状態から始める
     /// </summary>
-    public EmotionWallet PrepareWalletForFloor()
+    public EmotionWallet PrepareWalletForFloor(int floorIndex)
     {
-        var wallet = _repository.PlayerWallet.Clone();
-        wallet.Refill(GameConstants.EMOTION_REFILL_PER_FLOOR);
-        return wallet;
+        if (_floorStartWallet == null || _floorStartFloorIndex != floorIndex)
+        {
+            var refilled = _repository.PlayerWallet.Clone();
+            refilled.Refill(GameConstants.EMOTION_REFILL_PER_FLOOR);
+            _floorStartWallet = refilled;
+            _floorStartFloorIndex = floorIndex;
+        }
+        return _floorStartWallet.Clone();
     }
 
     /// <summary>
@@ -85,6 +97,8 @@ public class GameProgressService
     /// </summary>
     public void RecordAuctionClearAndSave(EmotionWallet remainingWallet, WonLot integrated, IEnumerable<WonLot> allWon, IEnumerable<string> collapsedIds)
     {
+        // 階層を抜けたので、やり直し用に控えていた開始状態は捨てる
+        _floorStartWallet = null;
         _repository.PlayerWallet.LoadCounts(remainingWallet.ToCounts());
         _repository.Persona.Integrate(integrated, allWon);
         _repository.CollapsedParticipantIds.UnionWith(collapsedIds);

@@ -27,7 +27,7 @@ public class AuctionLifetimeScope : LifetimeScope
             var seed = request.ConsumeSeed() ?? seedOverride;
             var rng = seed == 0 ? new System.Random() : new System.Random(seed);
             var timeout = request.ConsumeCompetitionTimeout() ?? GameConstants.COMPETITION_TIMEOUT_SECONDS;
-            return new AuctionSession(allFloorData.GetFloor(floorIndex), progress.PrepareWalletForFloor(), "ノア", rng, timeout);
+            return new AuctionSession(allFloorData.GetFloor(floorIndex), progress.PrepareWalletForFloor(floorIndex), "ノア", rng, timeout);
         }, Lifetime.Scoped);
 
         // オークション画面には設定ボタンを置かないため、バトル用の登録 (SettingButtonView 無し) を使う
