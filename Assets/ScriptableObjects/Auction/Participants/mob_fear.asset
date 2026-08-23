@@ -16,7 +16,7 @@ MonoBehaviour:
   emotion: 2
   portrait: {fileID: 0}
   cutInSprite: {fileID: 0}
-  iconSprite: {fileID: 0}
+  iconSprite: {fileID: 21300000, guid: 5a4e7fa78eca5417c91856b4d03a3f29, type: 3}
   themeColor: {r: 0.2, g: 0.4, b: 0.2, a: 1}
   isMob: 1
   profile:

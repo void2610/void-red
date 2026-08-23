@@ -191,6 +191,8 @@ public static class AuctionDataBuilder
         }
         else
         {
+            // 立ち絵が無いモブは、司る感情のアイコンで見分けられるようにする
+            so.FindProperty("iconSprite").objectReferenceValue = EmotionIcon(r.Emotion);
             so.FindProperty("themeColor").colorValue = r.Emotion.GetColor();
         }
         var p = so.FindProperty("profile");
@@ -249,6 +251,23 @@ public static class AuctionDataBuilder
         for (var i = 0; i < lotIds.Length; i++) l.GetArrayElementAtIndex(i).objectReferenceValue = lots[lotIds[i]];
         so.ApplyModifiedPropertiesWithoutUndo();
         return asset;
+    }
+
+    /// <summary>感情アイコン (入札ウィンドウの車輪と同じ絵柄)</summary>
+    private static Sprite EmotionIcon(EmotionType emotion)
+    {
+        var name = emotion switch
+        {
+            EmotionType.Joy => "icon_joy",
+            EmotionType.Trust => "icon_trust",
+            EmotionType.Fear => "icon_fear",
+            EmotionType.Surprise => "icon_surprise",
+            EmotionType.Sadness => "icon_sorrow",
+            EmotionType.Disgust => "icon_disgust",
+            EmotionType.Anger => "icon_anger",
+            _ => "icon_expectations",
+        };
+        return LoadSprite($"Assets/Sprites/Auction/Bid/EmotionIcons/{name}.png");
     }
 
     private static Sprite LoadSprite(string path)
