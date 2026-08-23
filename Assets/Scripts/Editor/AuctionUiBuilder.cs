@@ -527,10 +527,11 @@ public static class AuctionUiBuilder
         Place(resourceText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 18), new Vector2(128, 24));
         var bidText = Text(root, "BidText", "", 30, TextAlignmentOptions.Center);
         bidText.color = new Color(1f, 0.88f, 0.5f);
-        Place(bidText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -42), new Vector2(128, 40));
+        // アイコンの絵柄に重ねると数字が読めないので、枠の上に浮かせる
+        Place(bidText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 42), new Vector2(128, 40));
         var winner = Text(root, "WinnerMark", "WINNER", 20, TextAlignmentOptions.Center);
         winner.color = new Color(1f, 0.45f, 0.35f);
-        Place(winner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 14), new Vector2(128, 26));
+        Place(winner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 12), new Vector2(128, 26));
         winner.gameObject.SetActive(false);
         var outMark = Text(root, "OutMark", "OUT", 24, TextAlignmentOptions.Center);
         outMark.color = new Color(0.65f, 0.65f, 0.65f);
