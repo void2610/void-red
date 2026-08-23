@@ -236,6 +236,45 @@ public class AuctionSessionTests
         Assert.AreEqual(before - 2, session.Player.Wallet.Total, "競合に入った時点で消費される");
     }
 
+    [Test]
+    public void 逆対話は観察の成否によらず各ロット一度だけ起こる()
+    {
+        // 必ず逆対話を仕掛ける相手を作る
+        var session = AuctionTestFactory.CreateSession(rivalBid: 2, rivalCount: 1);
+        var rival = session.Rivals[0];
+        AuctionTestFactory.SetPrivate(rival.Data.Profile, "counterDialogueChance", 100);
+        session.BeginNextLot();
+
+        var first = session.UseDialogue(rival, DialogueCommand.Observe);
+        Assert.IsNotNull(first.Counter, "観察を仕掛けたら (成否によらず) 逆対話が起こる");
+        Assert.IsNotEmpty(first.Line, "失敗してもセリフは返る");
+        Assert.IsTrue(rival.CounterFiredThisLot, "同じロットでは二度起こらない");
+
+        // 次のロットへ進める
+        session.EnterBidding();
+        session.SubmitPlayerBid(new EmotionBid());
+        session.ResolveReveal();
+        session.BeginNextLot();
+
+        var second = session.UseDialogue(rival, DialogueCommand.Observe);
+        Assert.IsNotNull(second.Counter, "ロットが変われば再び起こる");
+    }
+
+    [Test]
+    public void 逆対話への返答で相手の入札予定が動く()
+    {
+        var session = AuctionTestFactory.CreateSession(rivalBid: 3, rivalCount: 1);
+        var rival = session.Rivals[0];
+        AuctionTestFactory.SetPrivate(rival.Data.Profile, "counterDialogueChance", 100);
+        session.BeginNextLot();
+
+        var outcome = session.UseDialogue(rival, DialogueCommand.Observe);
+        var before = rival.PlannedBid.Total;
+        session.AnswerCounterDialogue(rival, 0);
+
+        Assert.AreNotEqual(before, rival.PlannedBid.Total, "選択肢 A は入札予定を大きく動かす");
+    }
+
     private static EmotionType MismatchedEmotion(EmotionType lotEmotion) =>
         EmotionWallet.ALL_EMOTIONS.First(e => e != lotEmotion);
 

@@ -94,15 +94,16 @@ public class AuctionSession
         var profile = target.Data.Profile;
         var rate = command == DialogueCommand.Observe ? OBSERVE_SUCCESS_RATE : OTHER_SUCCESS_RATE;
         var success = _rng.Next(100) < rate;
-        if (!success) return new DialogueOutcome(command, target, false, profile.FailLine);
 
         if (command == DialogueCommand.Observe)
         {
-            // 逆対話は各ロット各キャラ 1 回まで
-            var counter = !target.CounterFiredThisLot && _rng.Next(100) < profile.CounterDialogueChance ? profile.CounterDialogue : null;
-            if (counter != null) target.CounterFiredThisLot = true;
-            return new DialogueOutcome(command, target, true, profile.ObserveLine, target.PlannedBid.Total, counter);
+            // 観察を仕掛けた事実に相手が反応するので、成否によらず逆対話は起こりうる (各ロット各キャラ 1 回まで)
+            var counter = TryFireCounterDialogue(target);
+            var line = success ? profile.ObserveLine : profile.FailLine;
+            return new DialogueOutcome(command, target, success, line, success ? target.PlannedBid.Total : null, counter);
         }
+
+        if (!success) return new DialogueOutcome(command, target, false, profile.FailLine);
 
         var reaction = profile.ReactionFor(command);
         if (command == DialogueCommand.Persuade && profile.PersuadeBoostsFavorite && CurrentLot.Emotion == target.Data.Emotion) reaction = BidReaction.BigIncrease;
@@ -236,6 +237,18 @@ public class AuctionSession
     {
         if (Phase != AuctionPhase.Baptism) throw new InvalidOperationException($"洗礼フェーズではない: {Phase}");
         Phase = AuctionPhase.Finished;
+    }
+
+    /// <summary>
+    /// 逆対話を仕掛けるか抽選する。仕掛けたらそのロットではもう起こらない
+    /// </summary>
+    private CounterDialogue TryFireCounterDialogue(AuctionParticipant target)
+    {
+        var profile = target.Data.Profile;
+        if (target.CounterFiredThisLot || _rng.Next(100) >= profile.CounterDialogueChance) return null;
+
+        target.CounterFiredThisLot = true;
+        return profile.CounterDialogue;
     }
 
     private AuctionParticipant PickTiedLeader()
