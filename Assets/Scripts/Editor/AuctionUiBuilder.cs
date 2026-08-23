@@ -33,6 +33,8 @@ public static class AuctionUiBuilder
         "CardBattleView", "DeckSelectionView", "RewardPhaseView", "MemoryGrowthView", "SkillButtonView", "TutorialView", "TutorialGizmoHelper",
         // 立ち絵は対話 View に一本化したので、旧バトルの敵立ち絵は使わない
         "EnemyView",
+        // 透明なまま blocksRaycasts が立ちっぱなしで全画面のクリックを奪う。オークションにポーズは無い
+        "BattlePauseView",
     };
 
     // 対話コマンドのボタン (DialogueCommand の順) に振るラベルとアイコン
@@ -544,6 +546,8 @@ public static class AuctionUiBuilder
         var root = Rect("ParticipantIcon", null, new Vector2(128, 128));
         var bg = Image(root, "Background", new Color(0.06f, 0.03f, 0.05f, 0.55f));
         Stretch(bg);
+        // 対話相手を選ぶ当たり判定になるので、この Image だけはクリックを受ける
+        bg.raycastTarget = true;
         // 枠は所属色の下線として使う (塗りつぶすと立ち絵が読めなくなる)
         var frame = Image(root, "Frame", Color.white);
         Place(frame.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 3), new Vector2(128, 4));
