@@ -38,14 +38,8 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/LotEmotion", Description = "現在のロットの感情属性を返す")]
     public string LotEmotion() => Session().CurrentLot.Emotion.ToString();
 
-    [LiminalCommand("Auction/CurrentLotIsKey", Description = "今のロットが楽園への鍵か")]
-    public bool CurrentLotIsKey() => Session().CurrentLot.IsKey;
-
     [LiminalCommand("Auction/MissedKey", Description = "楽園への鍵を取り逃したか")]
     public bool MissedKey() => Session().MissedKey;
-
-    [LiminalCommand("Auction/ThemeClarified", Description = "記憶テーマが鮮明化したか (出品の過半を落札)")]
-    public bool ThemeClarified() => Session().IsThemeClarified;
 
     [LiminalCommand("Auction/PlayerResources", Description = "主人公の所持リソース総数を返す")]
     public int PlayerResources() => Session().Player.Wallet.Total;
@@ -86,26 +80,11 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/WonCount", Description = "指定参加者の落札数を返す (主人公は ノア)")]
     public int WonCount(string name) => Participant(name).WonLots.Count;
 
-    [LiminalCommand("Auction/WonDistortion", Description = "主人公の落札記憶 (0 始まりの順) の歪みを返す")]
-    public int WonDistortion(int index) => Session().Player.WonLots[index].Distortion;
-
     [LiminalCommand("Auction/WonViaCompetition", Description = "主人公の落札記憶 (0 始まりの順) が競合経由かを返す")]
     public bool WonViaCompetition(int index) => Session().Player.WonLots[index].ViaCompetition;
 
-    [LiminalCommand("Auction/IsCollapsed", Description = "指定ライバルが人格崩壊したかを返す")]
-    public bool IsCollapsed(string name) => Rival(name).HasCollapsed;
-
     [LiminalCommand("Auction/CollapseConsistent", Description = "全ライバルについて (崩壊 == 無落札) が成り立つかを返す")]
     public bool CollapseConsistent() => Session().Rivals.All(r => r.HasCollapsed == (r.WonLots.Count == 0));
-
-    [LiminalCommand("Auction/RememberPlanned", Description = "指定ライバルの入札予定枚数を控える (PlannedDelta 用)")]
-    public int RememberPlanned(string name) => _rememberedPlanned = Rival(name).PlannedBid.Total;
-
-    [LiminalCommand("Auction/PlannedDelta", Description = "控えた値からの入札予定の増減を返す")]
-    public int PlannedDelta(string name) => Rival(name).PlannedBid.Total - _rememberedPlanned;
-
-    [LiminalCommand("Auction/RememberLotEmotion", Description = "今のロットの属性を控える (PersonaEmotionIsRemembered 用)")]
-    public string RememberLotEmotion() => (_rememberedEmotion = Session().CurrentLot.Emotion).ToString();
 
     [LiminalCommand("Auction/BidAmounts", Description = "現在積んでいる入札の合計枚数を返す")]
     public int BidAmounts() => Session().Player.SubmittedBid?.Total ?? 0;
@@ -250,15 +229,6 @@ public sealed class AuctionDebugCommands
         return losers.Any(l => l.Wallet.Total == GameConstants.EMOTION_REFILL_PER_FLOOR * EmotionWallet.ALL_EMOTIONS.Length);
     }
 
-    [LiminalCommand("Auction/DrainRival", Description = "指定ライバルの手持ちを 0 にする (破産状態の再現)")]
-    public string DrainRival(string name)
-    {
-        var r = Rival(name);
-        r.Wallet.LoadCounts(new int[EmotionWallet.ALL_EMOTIONS.Length]);
-        View().RefreshParticipants();
-        return r.DisplayName;
-    }
-
     [LiminalCommand("Auction/ClickIntegrate", Description = "洗礼で指定ロット番号 (0 始まり) の札を選ぶ")]
     public string ClickIntegrate(int lotIndex)
     {
@@ -306,13 +276,6 @@ public sealed class AuctionDebugCommands
         return placed;
     }
 
-    [LiminalCommand("Auction/BidAboveTopRivalIfKey", Description = "鍵のロットなら最大予定 + 1 枚を積む。winKey が false のときは最初のロットだけ積む")]
-    public async UniTask<int> BidAboveTopRivalIfKey(bool winKey)
-    {
-        if (winKey ? CurrentLotIsKey() : !CurrentLotIsKey() && LotIndex() == 0) return await BidAboveTopRival();
-        return 0;
-    }
-
     [LiminalCommand("Auction/BidToTieTopRival", Description = "ライバルの入札予定の最大枚数とちょうど同じ枚数を積む (競合を起こす)")]
     public async UniTask<int> BidToTieTopRival()
     {
@@ -328,23 +291,6 @@ public sealed class AuctionDebugCommands
         }
         if (placed != target) throw new InvalidOperationException($"手持ち不足: {placed}/{target}");
         return placed;
-    }
-
-    [LiminalCommand("Auction/BidMatchingAndMismatched", Description = "今のロットと同じ属性を matching 枚、それ以外を 1 属性 perEmotion 枚ずつ合計 mismatched 枚積む")]
-    public async UniTask<string> BidMatchingAndMismatched(int matching, int mismatched, int perEmotion = 4)
-    {
-        var lotEmotion = Session().CurrentLot.Emotion;
-        await BidAmount(lotEmotion, matching);
-        var remaining = mismatched;
-        foreach (var e in EmotionWallet.ALL_EMOTIONS.Where(x => x != lotEmotion))
-        {
-            if (remaining == 0) break;
-            var take = Math.Min(Math.Min(remaining, perEmotion), Session().Player.Wallet.Get(e));
-            if (take == 0) continue;
-            await BidAmount(e, take);
-            remaining -= take;
-        }
-        return $"{lotEmotion}x{matching} + other x{mismatched - remaining}";
     }
 
     [LiminalCommand("Auction/RaiseUntilLeading", Description = "競合中、他の競合者の最大額を margin 枚上回るまで上乗せする")]
