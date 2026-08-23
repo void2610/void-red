@@ -79,7 +79,9 @@
 
 ## 検証
 
-- `[LiminalScenario]`: `Auction/Scenario/*` (11 本) と `Lobby/Scenario/*` (3 本)。Test Runner (`uloop run-tests --test-mode PlayMode`) でも全件通る。`Assets/Scripts/Debug/AuctionScenarios.cs` `LobbyScenarios.cs`
+- **ルールの検証は EditMode テスト** (`Assets/Tests/EditMode/AuctionSessionTests.cs`、13 ケース)。Play Mode を使わないので数秒で終わる
+- `[LiminalScenario]`: `Auction/Scenario/*` は代表 3 本のみ。`Lobby/Scenario/*` は 3 本
+- Play Mode の E2E は 1 本あたり数十秒かかり、まとめて流すと Editor が応答しなくなる。増やす前に EditMode で書けないか検討する`Assets/Scripts/Debug/AuctionScenarios.cs` `LobbyScenarios.cs`
 - 操作用コマンド: `Auction/Start` (階層 / seed / 競合秒数を指定して起動)、`Auction/ClickPlus` (同名ボタンが 8 個あるため属性で引く)、`Auction/AutoPlayFloor` (5 ロットを実 UI で自動進行)、`UI/Screenshot`
 - seed を固定すると NPC の入札予定・対話の成否・逆対話の発生が決定的になる。`Auction/Scenario/Observe...` は seed 1 に依存している
 
