@@ -1,10 +1,21 @@
 # テスト方針 (EditMode / LiminalScenario / CI)
 
-**ルールの判定は EditMode テストで検証し、E2E シナリオは「UI の導線が繋がっているか」の代表ケースだけに絞る。**
+**EditMode テストと E2E シナリオの両方を回す。役割が違うので、どちらも減らさない。**
 
-理由: Play Mode の E2E は演出待ちで 1 本あたり数十秒かかり、本数が増えると Unity を長時間占有して操作できなくなる。
-実際にオークションの全シナリオを流したところ、競合フェーズの待ちループと合わさって Editor が応答しなくなった。
-ドメイン層 (`AuctionSession` / `CompetitionState` / `BidAI` / `PersonaState`) はすべて純 C# なので、EditMode なら数秒で全件回る。
+- **EditMode**: ルールの判定と「進行が止まらないこと」。純 C# なので数秒で全件回る
+- **E2E (LiminalScenario)**: 実 UI を通した導線。ボタンの配線や演出の順序はここでしか壊れが分からない
+
+E2E がフリーズしたら、それは**テストの都合ではなく製品の不具合**として直す。
+実際に競合フェーズが決着しない不具合で Editor が応答しなくなったことがあり、次の 3 点を製品側に入れた。
+
+| 仕組み | 目的 |
+| --- | --- |
+| `CompetitionRunner` + `CompetitionState` の打ち切り | 競合が必ず決着する。時刻を外から渡すので EditMode で総当たり検証できる |
+| `PhaseLoopGuard` | 同じフェーズが同じ状態で回り続けたら例外にする |
+| `AuctionPresenter` の復帰処理 | 進行が壊れてもロビーへ戻し、操作できない状態で放置しない |
+
+UI の押下は Observable の購読タイミングで取りこぼすと**押しても進まない詰み**になる。
+確定 / 洗礼 / ゲームオーバーのボタンは View 側がフラグで受け、Presenter はそれを待つ。
 
 ## 層と置き場所
 
@@ -44,7 +55,7 @@ public static IEnumerable<ScenarioStep> PlayScenarioChooseAndReturnHome()
 - **フェード**: `SceneTransitionManager` はフェード中の遷移要求を無言で捨てる。遷移や再生の前後は `WaitFadeDone()` / `WaitScene(name)` を挟む
 - **同フレーム内の順序依存**: UniTask 継続と LP のステップ実行の順序に依存する箇所 (例: 確認ダイアログを閉じた直後の再要求) だけ `WaitFrames(2, "理由")` を使い、理由をコメントに残す
 - **1 シナリオ 1 確認**: 細かく多く。glob (`"Novel/Scenario/*"`) で束ねて回す
-- **E2E を増やしすぎない**: 判定の網羅は EditMode に寄せる。E2E は導線が切れていないかを見る代表ケースだけにする
+- **判定の網羅は EditMode に寄せる**: 同じ確認を E2E で重複させない。E2E は導線を見る
 
 ## 実行方法
 
@@ -64,7 +75,7 @@ Test Runner からは `uloop-run-tests` (PlayMode)。CI は `.github/workflows/t
 | `Progress/Scenario/` | ノベル / バトル完了記録で Step が進みセーブに追従、リセットで戻る |
 | `Novel/Scenario/` | 任意シナリオ再生 → 選択 → 完走でホーム復帰 (進行度不変・フラグ保存)、行送りが台本どおり、スキップの確認ダイアログ |
 | `Title/Scenario/` | はじめから (セーブ無し / 有り + 確認ダイアログ)、つづきから |
-| `Auction/Scenario/` | 記憶オークション (代表 3 本): 落札 → 洗礼 → セーブ / 無落札のゲームオーバーとやり直し / 同数 → 競合 → 落札。判定の網羅は `Assets/Tests/EditMode/AuctionSessionTests.cs` |
+| `Auction/Scenario/` | 記憶オークション (11 本): 落札 → 洗礼 → セーブ、無落札のゲームオーバーとやり直し、歪み、対話の回数制限、観察と逆対話、競合、破産、テーマ鮮明化、楽園への鍵 |
 | `Lobby/Scenario/` | ホームの進行案内、記憶コレクションの伏せ字 / 開示、人格画面 |
 
 オークションは `Auction/Start` で階層・seed・競合の確定秒数を指定して起動する。seed を固定すると NPC の入札予定と対話の成否が決定的になる (`Docs/voidred/12-implementation.md`)。

@@ -61,8 +61,8 @@ Play Mode はエディタが非フォーカスでも進む (`Run In Background` 
 EditMode / シナリオ / CI の使い分けと決定性パターンは [`Docs/test-strategy.md`](./Docs/test-strategy.md) を参照。要点:
 
 - **ルールの判定は EditMode テスト (`Assets/Tests/EditMode/*Tests.cs`) に書く**。ドメイン層は純 C# なので Play Mode 不要で数秒で回る
-- **Play Mode の E2E は代表ケースだけに絞る**。演出待ちで 1 本数十秒かかり、まとめて流すと Editor が応答しなくなる
 - **UI を通す検証は `[LiminalScenario]` (`Assets/Scripts/Debug/*Scenarios.cs`) として残す**。手で `liminal exec` を連打して終わらせない
+- **E2E がフリーズしたらテストではなく製品を直す**。進行が止まらないことは `CompetitionRunner` / `PhaseLoopGuard` で保証し、EditMode で検証する
 - `Assets/Tests/PlayMode/*E2ETests.cs` は prefix (`Novel/Scenario/` 等) でシナリオを列挙して Test Runner に流す薄いランナー。シナリオを追加すれば自動で乗る
 - CI (`.github/workflows/test.yml`) が PR ごとに PlayMode テストを回す (self-hosted)
 - 固定待ちではなく `AssertCommandEventually` / `WaitScene` / `WaitFadeDone` (`ScenarioFragments`) で状態を待つ。フレーム順に依存する箇所だけ `WaitFrames` を理由コメント付きで使う
