@@ -35,21 +35,19 @@ public class HomeView : MonoBehaviour
     /// <summary>
     /// Personボタンのinteractable設定
     /// </summary>
-    public void SetPersonButtonInteractable(bool interactable) => personButton.interactable = interactable;
 
     /// <summary>
     /// Dreamボタンのinteractable設定
     /// </summary>
-    public void SetDreamButtonInteractable(bool interactable) => dreamButton.interactable = interactable;
 
     /// <summary>
     /// 初期化
     /// </summary>
     public void Initialize()
     {
-        // 未実装のボタンを無効化
-        personButton.interactable = false;
-        dreamButton.interactable = false;
+        // 未実装のボタンは押せない飾りになるので出さない (実装するときに戻す)
+        personButton.gameObject.SetActive(false);
+        dreamButton.gameObject.SetActive(false);
 
         InitSpeaking().Forget();
     }
