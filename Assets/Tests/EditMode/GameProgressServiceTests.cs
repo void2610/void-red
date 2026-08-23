@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 
 /// <summary>
@@ -39,5 +40,35 @@ public class GameProgressServiceTests
         _service.ResetToDefaultData();
 
         Assert.AreEqual(GameConstants.EMOTION_REFILL_PER_FLOOR * EmotionWallet.ALL_EMOTIONS.Length, _service.PrepareWalletForFloor(1).Total);
+    }
+
+    [Test]
+    public void 洗礼の結果はセーブされ次の起動で戻る()
+    {
+        var lot = AuctionTestFactory.CreateLot(0);
+        var bid = new EmotionBid();
+        bid.Set(EmotionType.Sadness, 2);
+        var won = new WonLot(lot, 0, bid, false, new Dictionary<string, int>());
+        var remaining = new EmotionWallet();
+        remaining.Add(EmotionType.Joy, 7);
+
+        _service.RecordAuctionClearAndSave(remaining, won, new[] { won }, new[] { "rival0" });
+        var reloaded = new GameProgressService(new SaveDataManager());
+
+        Assert.AreEqual(7, reloaded.PlayerWallet.Get(EmotionType.Joy), "持ち越しリソース");
+        CollectionAssert.Contains(reloaded.Persona.IntegratedLotIds, lot.LotId, "統合した記憶");
+        CollectionAssert.Contains(reloaded.Persona.CollectionLotIds, lot.LotId, "コレクション");
+        CollectionAssert.Contains(reloaded.CollapsedParticipantIds, "rival0", "人格崩壊した参加者");
+    }
+
+    [Test]
+    public void 洗礼を終えると次の階層では改めて補充される()
+    {
+        var before = _service.PrepareWalletForFloor(1).Total;
+        var lot = AuctionTestFactory.CreateLot(0);
+        var won = new WonLot(lot, 0, new EmotionBid(), false, new Dictionary<string, int>());
+        _service.RecordAuctionClearAndSave(_service.PrepareWalletForFloor(1), won, new[] { won }, new string[0]);
+
+        Assert.Greater(_service.PrepareWalletForFloor(2).Total, before, "階層を抜けたら控えを捨てて補充し直す");
     }
 }
