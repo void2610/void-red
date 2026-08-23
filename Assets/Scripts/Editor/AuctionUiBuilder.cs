@@ -380,19 +380,61 @@ public static class AuctionUiBuilder
         var root = PrefabUtility.LoadPrefabContents(ACQUIRED_TEXT_PREFAB);
         try
         {
+            // 内訳は 3 行あるので、1 件分の高さを確保しないと隣の札の説明と重なって読めなくなる
             var rso = new SerializedObject(root.GetComponent<RectTransform>());
-            rso.FindProperty("m_SizeDelta.y").floatValue = 96f;
+            rso.FindProperty("m_SizeDelta.x").floatValue = 300f;
+            rso.FindProperty("m_SizeDelta.y").floatValue = 170f;
             rso.ApplyModifiedPropertiesWithoutUndo();
 
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
                 var tso = new SerializedObject(text);
-                tso.FindProperty("m_fontSize").floatValue = 17f;
-                tso.FindProperty("m_fontSizeBase").floatValue = 17f;
+                tso.FindProperty("m_fontSize").floatValue = 15f;
+                tso.FindProperty("m_fontSizeBase").floatValue = 15f;
                 tso.FindProperty("m_enableAutoSizing").boolValue = false;
                 tso.ApplyModifiedPropertiesWithoutUndo();
             }
             PrefabUtility.SaveAsPrefabAsset(root, ACQUIRED_TEXT_PREFAB);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        ApplyAcquisitionTextGrid();
+    }
+
+    /// <summary>
+    /// 内訳を札と同じ 3 列に並べ、1 件ずつ札の真下に来るようにする
+    /// </summary>
+    private static void ApplyAcquisitionTextGrid()
+    {
+        var root = PrefabUtility.LoadPrefabContents(ACQUISITION_PREFAB);
+        try
+        {
+            var container = root.GetComponentsInChildren<RectTransform>(true).FirstOrDefault(r => r.name == "TextContainer");
+            if (!container) return;
+
+            var grid = container.GetComponent<GridLayoutGroup>();
+            if (grid)
+            {
+                var gso = new SerializedObject(grid);
+                gso.FindProperty("m_CellSize.x").floatValue = 310f;
+                gso.FindProperty("m_CellSize.y").floatValue = 175f;
+                gso.FindProperty("m_Constraint").enumValueIndex = (int)GridLayoutGroup.Constraint.FixedColumnCount;
+                gso.FindProperty("m_ConstraintCount").intValue = 3;
+                gso.FindProperty("m_ChildAlignment").enumValueIndex = (int)TextAnchor.UpperCenter;
+                gso.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var cso = new SerializedObject(container);
+            cso.FindProperty("m_AnchoredPosition.x").floatValue = 0f;
+            cso.FindProperty("m_AnchoredPosition.y").floatValue = -215f;
+            cso.FindProperty("m_SizeDelta.x").floatValue = 960f;
+            cso.FindProperty("m_SizeDelta.y").floatValue = 180f;
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            PrefabUtility.SaveAsPrefabAsset(root, ACQUISITION_PREFAB);
         }
         finally
         {
@@ -521,23 +563,34 @@ public static class AuctionUiBuilder
     {
         var root = Window(null, "BaptismView", "洗礼", out _, showClose: false);
         root.AddComponent<CanvasGroup>();
+        // 窓の論理サイズは 1067x600。鮮明化後テーマまで入るので幅を取り、折り返さない大きさにする
         var header = root.GetComponentsInChildren<TextMeshProUGUI>(true).First(t => t.name == "TitleText");
-        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -95), new Vector2(760, 50));
+        // 背景画像の上端に「オークション結果」が焼き込まれているので、その下に置く
+        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(90, -58), new Vector2(760, 44));
+        var hso = new SerializedObject(header);
+        hso.FindProperty("m_fontSize").floatValue = 18f;
+        hso.FindProperty("m_fontSizeBase").floatValue = 18f;
+        hso.ApplyModifiedPropertiesWithoutUndo();
 
         // 落札した記憶の一覧は旧リザルトの演出 (札 + 内訳のスタガー表示) を流用する
         var acquisition = InstantiatePrefab(ACQUISITION_PREFAB, root.transform).GetComponent<CardAcquisitionView>();
-        SetRect(acquisition.transform, new Vector2(0, 20), 1f);
+        SetRect(acquisition.transform, new Vector2(0, 55), 1f);
         ApplyAcquisitionTexts(acquisition);
         ApplyAcquisitionEntryLayout();
 
-        var remaining = Text(root, "RemainingText", "", 18, TextAlignmentOptions.MidlineLeft);
-        Place(remaining.rectTransform, new Vector2(0.5f, 0f), new Vector2(-180, 118), new Vector2(360, 26));
-        var collapsed = Text(root, "CollapsedText", "", 18, TextAlignmentOptions.MidlineLeft);
-        Place(collapsed.rectTransform, new Vector2(0.5f, 0f), new Vector2(-180, 90), new Vector2(360, 26));
-        var selected = Text(root, "SelectedText", "", 18, TextAlignmentOptions.MidlineLeft);
-        Place(selected.rectTransform, new Vector2(0.5f, 0f), new Vector2(-180, 62), new Vector2(360, 26));
+        // 窓は 1067x600 しかないので、内訳の並び (中央) を避けて上下の端に置く
+        // 内訳の並びが窓の下半分を占めるので、状況説明は札より上に置く
+        var selected = Text(root, "SelectedText", "", 18, TextAlignmentOptions.MidlineRight);
+        Place(selected.rectTransform, new Vector2(0.5f, 1f), new Vector2(300, -118), new Vector2(440, 26));
+        var remaining = Text(root, "RemainingText", "", 16, TextAlignmentOptions.MidlineLeft);
+        Place(remaining.rectTransform, new Vector2(0.5f, 1f), new Vector2(-190, -110), new Vector2(300, 22));
+        var collapsed = Text(root, "CollapsedText", "", 16, TextAlignmentOptions.MidlineLeft);
+        Place(collapsed.rectTransform, new Vector2(0.5f, 1f), new Vector2(-110, -132), new Vector2(560, 22));
         var finish = ButtonPrefab(root, "FinishButton", "洗礼を受ける", new Vector2(200, 44));
-        Place(finish.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(210, 84), new Vector2(200, 44));
+        Place(finish.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(390, 28), new Vector2(200, 44));
+
+        // 見出しは札の一覧より後ろに回ると隠れるので最前面に出す
+        header.transform.SetAsLastSibling();
 
         var view = root.AddComponent<BaptismView>();
         Wire(view, ("headerText", header), ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected),
