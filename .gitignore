@@ -121,3 +121,7 @@ tools/**/obj/
 # System.CodeDom は Editor 除外の手動設定を持つため dll の meta のみ追跡 (Unity 標準 System との CS0433 回避)
 !/Assets/Packages/System.CodeDom.*/**/*.dll.meta
 outputs/
+
+# Test Runner が一時生成するシーン
+Assets/InitTestScene*.unity
+Assets/InitTestScene*.unity.meta
