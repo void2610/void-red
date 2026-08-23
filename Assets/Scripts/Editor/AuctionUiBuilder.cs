@@ -223,6 +223,14 @@ public static class AuctionUiBuilder
             var portraitBack = portrait.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name == "PlayerBack");
             if (portraitBack) portraitBack.gameObject.SetActive(false);
 
+            // 立ち絵は見せるだけ。クリックを受けると入札ウィンドウのボタンを覆ってしまう
+            foreach (var img in portrait.GetComponentsInChildren<Image>(true))
+            {
+                var iso = new SerializedObject(img);
+                iso.FindProperty("m_RaycastTarget").boolValue = false;
+                iso.ApplyModifiedPropertiesWithoutUndo();
+            }
+
             // カットインは再生時だけ出す
             cutIn.gameObject.SetActive(false);
             AddDialogueTextBackdrop(cutIn);
@@ -284,6 +292,12 @@ public static class AuctionUiBuilder
         SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(0, -138), 0.85f);
         SetRect((so.FindProperty("bidWindowView").objectReferenceValue as Component)?.transform, new Vector2(75, 75), 0.92f);
         SetRect(participantBar.transform, new Vector2(0, 78), 1f);
+
+        // 入札ウィンドウの「外側をクリックで閉じる」全画面ボタンが、感情ホイールと +/- のクリックを奪う
+        foreach (var back in auction.GetComponentsInChildren<Button>(true).Where(b => b.name == "BackButton"))
+        {
+            back.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
