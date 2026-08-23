@@ -23,14 +23,20 @@ public class ParticipantIconView : MonoBehaviour
 
     /// <summary>頭上に出ている数字 (観察の推定なら ? 付き)</summary>
     public string BidLabel => bidText.text;
+    private const float SELECTED_SCALE = 1.08f;
 
     public void HideBid() => bidText.text = "";
 
     public void SetWinner(bool isWinner) => winnerMark.SetActive(isWinner);
 
-    public void SetSelected(bool selected) => frame.color = new Color(frame.color.r, frame.color.g, frame.color.b, selected ? 1f : 0.35f);
-
     public void SetSelectable(bool selectable) => selectButton.interactable = selectable && !Participant.IsPlayer && Participant.CanBid;
+
+    /// <summary>対話の相手を選んでいることを、枠の濃さと少しの拡大で示す</summary>
+    public void SetSelected(bool selected)
+    {
+        frame.color = new Color(frame.color.r, frame.color.g, frame.color.b, selected ? 1f : 0.3f);
+        transform.localScale = Vector3.one * (selected ? SELECTED_SCALE : 1f);
+    }
 
     public void ShowBid(int total)
     {
