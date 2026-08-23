@@ -17,10 +17,11 @@ public static class AuctionTestFactory
         bool distinctRivalBids = false,
         int rivalCount = 4,
         CompetitionPolicy policy = CompetitionPolicy.Never,
-        int lotCount = GameConstants.LOTS_PER_FLOOR)
+        int lotCount = GameConstants.LOTS_PER_FLOOR,
+        int resonance = 0)
     {
         var floor = ScriptableObject.CreateInstance<FloorData>();
-        var lots = Enumerable.Range(0, lotCount).Select(i => CreateLot(i, i == keyLotIndex)).ToList();
+        var lots = Enumerable.Range(0, lotCount).Select(i => CreateLot(i, i == keyLotIndex, resonance)).ToList();
         var rivals = Enumerable.Range(0, rivalCount)
             .Select(i => CreateRival(i, distinctRivalBids ? rivalBid + i : rivalBid, reactionScale, policy))
             .ToList();
@@ -35,12 +36,13 @@ public static class AuctionTestFactory
         return new AuctionSession(floor, wallet, "ノア", new System.Random(1), competitionTimeout);
     }
 
-    public static MemoryLotData CreateLot(int index, bool isKey = false)
+    public static MemoryLotData CreateLot(int index, bool isKey = false, int resonance = 0)
     {
         var lot = ScriptableObject.CreateInstance<MemoryLotData>();
         lot.name = $"lot{index}";
         SetPrivate(lot, "title", $"記憶{index}");
         SetPrivate(lot, "emotion", EmotionType.Joy);
+        SetPrivate(lot, "resonance", resonance);
         SetPrivate(lot, "isKey", isKey);
         return lot;
     }

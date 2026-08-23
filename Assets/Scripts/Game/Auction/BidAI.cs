@@ -16,7 +16,9 @@ public static class BidAI
     {
         var profile = p.Data.Profile;
         var isFavorite = lot.Emotion == p.Data.Emotion;
-        var amount = (isFavorite ? profile.FavoriteBid : profile.BaseBid) + rng.Next(-profile.Spread, profile.Spread + 1) + p.CarryToNext;
+        // 共鳴の高い記憶にはライバルの入札も集まり、目玉ほど競りが激しくなる
+        var resonanceBonus = lot.Resonance * GameConstants.RESONANCE_BID_BONUS_MAX / 100;
+        var amount = (isFavorite ? profile.FavoriteBid : profile.BaseBid) + resonanceBonus + rng.Next(-profile.Spread, profile.Spread + 1) + p.CarryToNext;
         p.CarryToNext = 0;
         return Compose(p, lot, Math.Max(0, amount));
     }

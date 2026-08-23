@@ -25,6 +25,9 @@ public static class AuctionDataBuilder
         string Prompt, string A, string B, BidReaction ReactA, BidReaction ReactB,
         string ObserveLine, string ProvokeLine, string EmpathizeLine, string PersuadeLine, string FailLine);
 
+    /// <summary>目玉に置く共鳴値。他のロットより明確に高くする</summary>
+    private const int HEADLINE_RESONANCE = 95;
+
     private record Lot(string Id, string Title, EmotionType Emotion, string Flavor, int Resonance, bool IsKey = false);
 
     [MenuItem("VoidRed/Auction/Build Data")]
@@ -154,13 +157,15 @@ public static class AuctionDataBuilder
         var docQueue = new Queue<Lot>(doc);
         for (var floor = 0; floor <= 4; floor++)
         {
+            // 目玉の位置を出現順と相関させないため階層ごとにずらす (02)。最終階層は鍵が目玉を兼ねる
+            var headlineSlot = floor == 4 ? 5 : (floor * 7 + 3) % 5 + 1;
             for (var n = 1; n <= 5; n++)
             {
                 var id = $"{floor}-{n}";
                 if (docQueue.Count > 0 && (n == 1 || n == 3))
                 {
                     var d = docQueue.Dequeue();
-                    yield return new Lot(id, d.Title, d.Emotion, d.Flavor, d.Resonance);
+                    yield return new Lot(id, d.Title, d.Emotion, d.Flavor, n == headlineSlot ? HEADLINE_RESONANCE : d.Resonance);
                     continue;
                 }
                 var e = emotions[placeholderIndex % emotions.Length];
@@ -170,7 +175,8 @@ public static class AuctionDataBuilder
                     yield return new Lot(id, "楽園への鍵", EmotionType.Anger, "壊したくなかったものの、最後の一片。", 100, true);
                     continue;
                 }
-                yield return new Lot(id, $"名もなき記憶 {id}", e, "まだ言葉になっていない記憶の断片。", 20 + (placeholderIndex * 13) % 60);
+                var resonance = n == headlineSlot ? HEADLINE_RESONANCE : 20 + (placeholderIndex * 13) % 36;
+                yield return new Lot(id, $"名もなき記憶 {id}", e, "まだ言葉になっていない記憶の断片。", resonance);
             }
         }
     }

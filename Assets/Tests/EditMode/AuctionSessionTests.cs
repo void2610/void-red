@@ -280,4 +280,21 @@ public class AuctionSessionTests
 
     private static AuctionSession CreateSession(int rivalBid, float competitionTimeout = 10f, string clarifiedTheme = "", int keyLotIndex = -1, int reactionScale = 100, bool distinctRivalBids = false) =>
         AuctionTestFactory.CreateSession(rivalBid, competitionTimeout, clarifiedTheme, keyLotIndex, reactionScale, distinctRivalBids);
+
+    [Test]
+    public void 共鳴の高い記憶ほどライバルの入札が厚くなる()
+    {
+        var plain = PlannedTotal(resonance: 0);
+        var headline = PlannedTotal(resonance: 100);
+
+        Assert.Greater(headline, plain, "目玉の記憶には入札が集まる");
+    }
+
+    /// <summary>指定した共鳴値のロットに対するライバルの入札予定枚数</summary>
+    private static int PlannedTotal(int resonance)
+    {
+        var session = AuctionTestFactory.CreateSession(rivalBid: 2, resonance: resonance);
+        session.BeginNextLot();
+        return session.Rivals[0].PlannedBid.Total;
+    }
 }

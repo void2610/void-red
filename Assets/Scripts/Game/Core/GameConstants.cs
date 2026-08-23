@@ -35,6 +35,11 @@ public static class GameConstants
     public const int NPC_MAX_RAISE_MARGIN = 2;
 
     /// <summary>
+    /// 共鳴値 100 の記憶 (目玉) に NPC が上乗せする枚数。共鳴が高いほど競りが集まる
+    /// </summary>
+    public const int RESONANCE_BID_BONUS_MAX = 3;
+
+    /// <summary>
     /// 無落札のまま残りロットがこの数以下になった NPC は、人格崩壊を避けようと必死に食い下がる
     /// </summary>
     public const int DESPERATE_REMAINING_LOTS = 2;
