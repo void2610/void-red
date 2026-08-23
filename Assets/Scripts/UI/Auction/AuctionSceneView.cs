@@ -54,6 +54,9 @@ public class AuctionSceneView : MonoBehaviour
     /// <summary>頭上に出ている数字 (検証用の読み取り)</summary>
     public string BidLabelOf(AuctionParticipant participant) => IconOf(participant).BidLabel;
 
+    /// <summary>洗礼やゲームオーバーでは卓が終わっているので、参加者の列ごと引っ込める</summary>
+    public void SetParticipantBarVisible(bool visible) => participantBar.gameObject.SetActive(visible);
+
     /// <summary>
     /// 対話フェーズの入力を 1 つ待つ (相手の選び直し / コマンド / 入札へ進む)
     /// </summary>

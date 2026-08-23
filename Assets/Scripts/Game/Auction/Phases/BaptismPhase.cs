@@ -14,6 +14,7 @@ public class BaptismPhase : IAuctionPhase
         var view = context.View;
         var session = context.Session;
 
+        view.SetParticipantBarVisible(false);
         await view.Announcement.DisplayAnnouncement("洗礼", 1.6f);
         await view.Baptism.ShowAsync(session);
         await UniTask.WaitUntil(() => view.Baptism.FinishRequested, cancellationToken: ct);

@@ -11,6 +11,7 @@ public class GameOverPhase : IAuctionPhase
     public async UniTask RunAsync(AuctionContext context, CancellationToken ct)
     {
         var view = context.View;
+        view.SetParticipantBarVisible(false);
         view.GameOver.Show(context.Session.Floor.FloorIndex, context.Session.MissedKey);
         await UniTask.WaitUntil(() => view.GameOver.RetryRequested.HasValue, cancellationToken: ct);
         var toRetry = view.GameOver.RetryRequested.Value;
