@@ -25,6 +25,7 @@ public static class AuctionUiBuilder
     private const string DIALOGUE_PORTRAIT_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialoguePortraitView.prefab";
     private const string DIALOGUE_CHOICES_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialogueChoicesView.prefab";
     private const string ACQUISITION_PREFAB = "Assets/Prefabs/NewBattleSceneView/RewardPhase/CardAcquisitionView.prefab";
+    private const string ACQUIRED_TEXT_PREFAB = "Assets/Prefabs/NewBattleSceneView/RewardPhase/AcquiredCardTextView.prefab";
 
     // 旧ルール専用で、新オークションでは使わないプレハブインスタンス
     private static readonly string[] OBSOLETE_OBJECTS =
@@ -358,6 +359,34 @@ public static class AuctionUiBuilder
         if (next) next.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// 洗礼の内訳は 3 行 (競売番号 / 入札と歪み / 他の入札) 出すため、行の高さと文字を詰める
+    /// </summary>
+    private static void ApplyAcquisitionEntryLayout()
+    {
+        var root = PrefabUtility.LoadPrefabContents(ACQUIRED_TEXT_PREFAB);
+        try
+        {
+            var rso = new SerializedObject(root.GetComponent<RectTransform>());
+            rso.FindProperty("m_SizeDelta.y").floatValue = 96f;
+            rso.ApplyModifiedPropertiesWithoutUndo();
+
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                var tso = new SerializedObject(text);
+                tso.FindProperty("m_fontSize").floatValue = 17f;
+                tso.FindProperty("m_fontSizeBase").floatValue = 17f;
+                tso.FindProperty("m_enableAutoSizing").boolValue = false;
+                tso.ApplyModifiedPropertiesWithoutUndo();
+            }
+            PrefabUtility.SaveAsPrefabAsset(root, ACQUIRED_TEXT_PREFAB);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
     private static Sprite LoadSprite(string path)
     {
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
@@ -486,6 +515,7 @@ public static class AuctionUiBuilder
         var acquisition = InstantiatePrefab(ACQUISITION_PREFAB, root.transform).GetComponent<CardAcquisitionView>();
         SetRect(acquisition.transform, new Vector2(0, 20), 1f);
         ApplyAcquisitionTexts(acquisition);
+        ApplyAcquisitionEntryLayout();
 
         var remaining = Text(root, "RemainingText", "", 18, TextAlignmentOptions.MidlineLeft);
         Place(remaining.rectTransform, new Vector2(0.5f, 0f), new Vector2(-180, 118), new Vector2(360, 26));
