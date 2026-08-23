@@ -313,9 +313,18 @@ public static class AuctionUiBuilder
         var so = new SerializedObject(competition);
         SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(0, -170), 0.42f);
 
+        // タイマーは見出しのリボンに重ならないよう右へ寄せる
+        SetRect((so.FindProperty("timerImage").objectReferenceValue as Component)?.transform, new Vector2(-430, 245), 0.9f);
+
+        // 見出しはリボンの装飾に埋もれるため一段下げる
+        SetRect((so.FindProperty("instructionText").objectReferenceValue as Component)?.transform, new Vector2(0, -20), 1f);
+
         // 検証や配線から引けるよう、上乗せボタンに名前を付ける
         var raise = so.FindProperty("raiseButton").objectReferenceValue as Button;
         if (raise) raise.gameObject.name = "RaiseButton";
+
+        // 天秤の裏に隠れると押せることが分からないため、ホイールの隣に出す
+        SetRect(raise?.transform, new Vector2(-235, -168), 0.28f);
 
         var portraits = competition.GetComponentsInChildren<Image>(true).Where(i => i.name is "Player" or "Enemy").ToList();
         so.FindProperty("playerPortrait").objectReferenceValue = portraits.FirstOrDefault(i => i.name == "Player");
