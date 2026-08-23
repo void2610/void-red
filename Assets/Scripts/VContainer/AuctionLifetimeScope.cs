@@ -23,10 +23,10 @@ public class AuctionLifetimeScope : LifetimeScope
             var allFloorData = resolver.Resolve<AllFloorData>();
             var progress = resolver.Resolve<GameProgressService>();
             var request = resolver.Resolve<AuctionStartRequest>();
-            var floorIndex = request.ConsumeFloorOverride() ?? (floorOverride >= 0 ? floorOverride : (progress.GetNextNode() as AuctionNode)?.FloorIndex ?? 0);
-            var seed = request.ConsumeSeed() ?? seedOverride;
+            var floorIndex = request.FloorOverride ?? (floorOverride >= 0 ? floorOverride : (progress.GetNextNode() as AuctionNode)?.FloorIndex ?? 0);
+            var seed = request.Seed ?? seedOverride;
             var rng = seed == 0 ? new System.Random() : new System.Random(seed);
-            var timeout = request.ConsumeCompetitionTimeout() ?? GameConstants.COMPETITION_TIMEOUT_SECONDS;
+            var timeout = request.CompetitionTimeout ?? GameConstants.COMPETITION_TIMEOUT_SECONDS;
             return new AuctionSession(allFloorData.GetFloor(floorIndex), progress.PrepareWalletForFloor(floorIndex), "ノア", rng, timeout);
         }, Lifetime.Scoped);
 

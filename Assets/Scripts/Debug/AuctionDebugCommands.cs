@@ -26,6 +26,9 @@ public sealed class AuctionDebugCommands
         _progress = progress;
     }
 
+    [LiminalCommand("Auction/Floor", Description = "回している階層の番号を返す")]
+    public int Floor() => Session().Floor.FloorIndex;
+
     [LiminalCommand("Auction/Phase", Description = "現在のフェーズを返す")]
     public string Phase() => Session().Phase.ToString();
 

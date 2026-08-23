@@ -17,6 +17,7 @@ public class HomePresenter : IStartable, IDisposable
     private readonly SceneTransitionManager _sceneTransitionManager;
     private readonly IConfirmationDialog _confirmationDialogService;
     private readonly AllFloorData _allFloorData;
+    private readonly AuctionStartRequest _auctionStartRequest;
 
     private StoryNode _currentNode;
     private readonly CompositeDisposable _disposables = new();
@@ -29,13 +30,15 @@ public class HomePresenter : IStartable, IDisposable
         GameProgressService gameProgressService,
         SceneTransitionManager sceneTransitionManager,
         IConfirmationDialog confirmationDialogService,
-        AllFloorData allFloorData)
+        AllFloorData allFloorData,
+        AuctionStartRequest auctionStartRequest)
     {
         _homeView = homeView;
         _gameProgressService = gameProgressService;
         _sceneTransitionManager = sceneTransitionManager;
         _confirmationDialogService = confirmationDialogService;
         _allFloorData = allFloorData;
+        _auctionStartRequest = auctionStartRequest;
     }
 
     private static string DescribeNextNode(StoryNode node)
@@ -79,6 +82,9 @@ public class HomePresenter : IStartable, IDisposable
 
     public void Start()
     {
+        // 階層をまたいだので、デバッグ起動の予約 (階層 / seed / 競合秒数) はここで捨てる
+        _auctionStartRequest.Clear();
+
         // Viewを初期化
         _homeView.Initialize();
 

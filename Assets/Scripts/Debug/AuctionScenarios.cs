@@ -43,7 +43,7 @@ public static class AuctionScenarios
         Description = "5 ロットすべて 0 枚で流すとゲームオーバー。やり直すと同じ階層が進行度を変えずに再開する")]
     public static IEnumerable<ScenarioStep> NoWinIsGameOverAndRetrySameFloor()
     {
-        foreach (var step in StartAuction()) yield return step;
+        foreach (var step in StartAuction(floor: 2)) yield return step;
         for (var lot = 0; lot < 5; lot++) foreach (var step in PlayLot(win: false)) yield return step;
         yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "GameOver", 40f, "無落札はゲームオーバー");
         yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "0");
@@ -51,7 +51,8 @@ public static class AuctionScenarios
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "RetryButton"));
         yield return WaitFadeDone();
         foreach (var step in WaitScene("AuctionScene")) yield return step;
-        yield return ScenarioStep.AssertCommandEventually("Auction/PlayerResources", null, "40", 20f, "手持ちは補充し直される");
+        yield return ScenarioStep.AssertCommandEventually("Auction/Floor", null, "2", 20f, "同じ階層をやり直す");
+        yield return ScenarioStep.AssertCommandReturns("Auction/PlayerResources", null, "40", "やり直しても補充は重ならない");
         yield return ScenarioStep.AssertCommandReturns("Progress/CurrentNode", null, "prologue1", "進行度は動かない");
         yield return ScenarioStep.AssertCommandReturns("Progress/IntegratedCount", null, "0");
     }
