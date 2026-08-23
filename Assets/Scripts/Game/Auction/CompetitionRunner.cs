@@ -23,11 +23,6 @@ public class CompetitionRunner
         foreach (var npc in session.Competition.Competitors.Where(c => !c.IsPlayer)) _nextRaiseAt[npc] = now + NextInterval();
     }
 
-    private float NextInterval()
-    {
-        return GameConstants.NPC_RAISE_INTERVAL_MIN + (float)_rng.NextDouble() * (GameConstants.NPC_RAISE_INTERVAL_MAX - GameConstants.NPC_RAISE_INTERVAL_MIN);
-    }
-
     /// <summary>
     /// 1 ステップ進める。まだ競っているなら true
     /// </summary>
@@ -43,5 +38,10 @@ public class CompetitionRunner
             _nextRaiseAt[npc] = now + NextInterval();
         }
         return true;
+    }
+
+    private float NextInterval()
+    {
+        return GameConstants.NPC_RAISE_INTERVAL_MIN + (float)_rng.NextDouble() * (GameConstants.NPC_RAISE_INTERVAL_MAX - GameConstants.NPC_RAISE_INTERVAL_MIN);
     }
 }
