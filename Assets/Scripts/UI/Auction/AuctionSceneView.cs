@@ -38,6 +38,12 @@ public class AuctionSceneView : MonoBehaviour
     /// <summary>対話フェーズの入力を受け付けているか (演出中は false)</summary>
     public bool IsWaitingDialogueInput { get; private set; }
 
+    /// <summary>逆対話の二択を待っているか</summary>
+    public bool IsWaitingCounterChoice { get; private set; }
+
+    /// <summary>卓に並んでいる参加者アイコン (Canvas 直下のバーに生成されるため、この View の子ではない)</summary>
+    public IReadOnlyList<ParticipantIconView> Icons => _icons;
+
     private readonly List<ParticipantIconView> _icons = new();
     private readonly Subject<AuctionParticipant> _onTargetChanged = new();
     private readonly CompositeDisposable _disposables = new();
@@ -147,8 +153,21 @@ public class AuctionSceneView : MonoBehaviour
     public async UniTask<int> WaitCounterChoiceAsync(CounterDialogue counter, CancellationToken ct)
     {
         await announcement.DisplayAnnouncement($"{counter.ChoiceA}  /  {counter.ChoiceB}", 1.2f);
-        var index = await dialogue.WaitForCommandAsync();
-        return index % 2;
+
+        // 相手からの問いかけへの返答なので、対話コマンドの入力を閉じていても、使用済みでも必ず答えられるようにする
+        dialogue.SetCommandAvailability(_ => true);
+        dialogue.SetChoicesInteractable(true);
+        IsWaitingCounterChoice = true;
+        try
+        {
+            var index = await dialogue.WaitForCommandAsync();
+            return index % 2;
+        }
+        finally
+        {
+            IsWaitingCounterChoice = false;
+            dialogue.SetChoicesInteractable(false);
+        }
     }
 
     /// <summary>確定ボタンが押されるまで待つ (WhenAny に混ぜるため戻り値を揃える)</summary>
