@@ -260,7 +260,7 @@ public static class AuctionUiBuilder
                 var instance = InstantiatePrefab(DIALOGUE_CHOICES_PREFAB, root.transform);
                 choices = instance.GetComponent<DialogueChoicesView>();
             }
-            SetRect(choices.transform, new Vector2(-295, 35), 0.55f);
+            SetRect(choices.transform, new Vector2(-300, -55), 0.58f);
             SetRect(choices.GetComponentsInChildren<RectTransform>(true).First(t => t.name == "Buttons"), Vector2.zero, 1f);
             ApplyDialogueCommands(choices);
             OrderChoiceButtons(choices);
@@ -287,10 +287,10 @@ public static class AuctionUiBuilder
     private static void ApplyAuctionLayout(AuctionView auction, GameObject participantBar)
     {
         var so = new SerializedObject(auction);
-        SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(-40, 70), 1.1f);
-        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-430, -110), 0.42f);
+        SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(215, 75), 1.15f);
+        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-405, 95), 0.42f);
         SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(0, -138), 0.85f);
-        SetRect((so.FindProperty("bidWindowView").objectReferenceValue as Component)?.transform, new Vector2(75, 75), 0.92f);
+        SetRect((so.FindProperty("bidWindowView").objectReferenceValue as Component)?.transform, new Vector2(140, 70), 0.9f);
         SetRect(participantBar.transform, new Vector2(0, 78), 1f);
 
 
