@@ -197,12 +197,13 @@ public sealed class AuctionDebugCommands
         return View().Baptism.HeaderLabel.Contains(clarified);
     }
 
-    [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを押して対話相手を選ぶ")]
+    [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを実際のクリック経路で押して対話相手を選ぶ")]
     public string SelectTarget(string name)
     {
         var icon = Icons().First(i => i.Participant.DisplayName == name);
-        if (!icon.GetComponentInChildren<Button>(true).interactable) throw new InvalidOperationException($"今は選べない: {name}");
-        icon.GetComponentInChildren<Button>(true).onClick.Invoke();
+        var button = icon.GetComponentInChildren<Button>(true);
+        if (!button.interactable) throw new InvalidOperationException($"今は選べない: {name}");
+        UiDebugCommands.ClickThrough(button);
         return name;
     }
 
