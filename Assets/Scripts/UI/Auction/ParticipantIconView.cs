@@ -23,6 +23,9 @@ public class ParticipantIconView : MonoBehaviour
 
     /// <summary>頭上に出ている数字 (観察の推定なら ? 付き)</summary>
     public string BidLabel => bidText.text;
+
+    /// <summary>卓から外れた表示になっているか</summary>
+    public bool IsOutShown => outMark.activeSelf;
     private const float SELECTED_SCALE = 1.08f;
     private static readonly Color OUT_TINT = new(0.3f, 0.3f, 0.32f);
 

@@ -70,6 +70,7 @@ public static class AuctionScenarios
         yield return ScenarioStep.Run("Auction/BidMatchingAndMismatched", Args("matching", 5, "mismatched", 12));
         yield return ScenarioStep.Run("Auction/Confirm");
         yield return ScenarioStep.AssertCommandEventually("Auction/LastWinner", null, "ノア", 20f);
+        yield return ScenarioStep.AssertCommandReturns("Auction/BidsShown", null, "True", "開示した額は決着がついても消えない");
         yield return ScenarioStep.AssertCommandReturns("Auction/WonDistortion", Args("index", 0), "12", "不一致の枚数がそのまま歪みになる");
         yield return ScenarioStep.AssertCommandReturns("Auction/WonViaCompetition", Args("index", 0), "False");
 
@@ -145,6 +146,7 @@ public static class AuctionScenarios
         foreach (var step in StartAuction()) yield return step;
         yield return ScenarioStep.Run("Auction/DrainRival", Args("name", "アルヴ"));
         yield return ScenarioStep.AssertCommandReturns("Auction/CanUseDialogue", Args("name", "アルヴ", "command", "Observe"), "False", "卓から外れた相手には対話できない");
+        yield return ScenarioStep.AssertCommandReturns("Auction/IsOutShown", Args("name", "アルヴ"), "True", "卓から外れたことが見た目にも出る");
         foreach (var step in OpenBidding()) yield return step;
         yield return ScenarioStep.Run("Auction/Confirm");
         yield return ScenarioStep.AssertCommandEventually("Auction/LastBidderCount", null, "3", 20f, "主人公 0 枚とアルヴを除く 3 人だけが入札に参加した");

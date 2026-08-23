@@ -33,6 +33,9 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/ObservedBid", Description = "観察で見えた入札予定として頭上に出ている数字を返す (? 付き。未観察なら空)")]
     public string ObservedBid(string name) => View().BidLabelOf(Rival(name));
 
+    [LiminalCommand("Auction/IsOutShown", Description = "指定参加者が卓から外れた表示になっているか")]
+    public bool IsOutShown(string name) => View().IsOutShownOf(Participant(name));
+
     [LiminalCommand("Auction/ObservedBidMatchesPlanned", Description = "頭上に出ている観察結果が相手の入札予定と一致するか")]
     public bool ObservedBidMatchesPlanned(string name) => ObservedBid(name) == $"?{Rival(name).PlannedBid.Total}";
 
@@ -178,6 +181,13 @@ public sealed class AuctionDebugCommands
 
     [LiminalCommand("Auction/BaptismHeader", Description = "洗礼の見出しに出ている文言を返す")]
     public string BaptismHeader() => View().Baptism.HeaderLabel;
+
+    [LiminalCommand("Auction/BidsShown", Description = "直前の開示で入札した全員の頭上に額が出ているか")]
+    public bool BidsShown()
+    {
+        var reveal = Session().LastReveal;
+        return reveal != null && reveal.Bidders.All(b => !string.IsNullOrEmpty(View().BidLabelOf(b)));
+    }
 
     [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼の見出しに鮮明化後のテーマが出ているか")]
     public bool BaptismHeaderClarified()

@@ -54,6 +54,9 @@ public class AuctionSceneView : MonoBehaviour
     /// <summary>頭上に出ている数字 (検証用の読み取り)</summary>
     public string BidLabelOf(AuctionParticipant participant) => IconOf(participant).BidLabel;
 
+    /// <summary>卓から外れた表示になっているか (検証用の読み取り)</summary>
+    public bool IsOutShownOf(AuctionParticipant participant) => IconOf(participant).IsOutShown;
+
     /// <summary>洗礼やゲームオーバーでは卓が終わっているので、参加者の列ごと引っ込める</summary>
     public void SetParticipantBarVisible(bool visible) => participantBar.gameObject.SetActive(visible);
 
