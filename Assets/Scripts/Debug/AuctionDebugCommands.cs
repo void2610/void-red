@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
 using Void2610.LiminalPalette;
 
 /// <summary>
 /// 記憶オークションを LiminalPalette から起動 / 観測 / 操作するデバッグコマンド群
-/// 操作は実 UI のボタンを経由し、観測はシーンローカルの AuctionSession を引いて読む
+/// 操作は実 UI (感情ホイール / 入札ウィンドウ / 対話選択肢 / 参加者アイコン) を経由する
 /// </summary>
 public sealed class AuctionDebugCommands
 {
@@ -37,6 +38,15 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/LotEmotion", Description = "現在のロットの感情属性を返す")]
     public string LotEmotion() => Session().CurrentLot.Emotion.ToString();
 
+    [LiminalCommand("Auction/CurrentLotIsKey", Description = "今のロットが楽園への鍵か")]
+    public bool CurrentLotIsKey() => Session().CurrentLot.IsKey;
+
+    [LiminalCommand("Auction/MissedKey", Description = "楽園への鍵を取り逃したか")]
+    public bool MissedKey() => Session().MissedKey;
+
+    [LiminalCommand("Auction/ThemeClarified", Description = "記憶テーマが鮮明化したか (出品の過半を落札)")]
+    public bool ThemeClarified() => Session().IsThemeClarified;
+
     [LiminalCommand("Auction/PlayerResources", Description = "主人公の所持リソース総数を返す")]
     public int PlayerResources() => Session().Player.Wallet.Total;
 
@@ -55,8 +65,11 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/CanUseDialogue", Description = "指定ライバルに対話コマンドを使えるかを返す")]
     public bool CanUseDialogue(string name, string command) => Session().CanUseDialogue(Rival(name), Enum.Parse<DialogueCommand>(command));
 
-    [LiminalCommand("Auction/CounterPending", Description = "逆対話の二択が表示中かを返す")]
-    public bool CounterPending() => View().CounterDialogue.gameObject.activeSelf;
+    [LiminalCommand("Auction/DialogueTarget", Description = "現在選択中の対話相手を返す")]
+    public string DialogueTarget() => View().SelectedTarget?.DisplayName ?? "";
+
+    [LiminalCommand("Auction/SelectedEmotion", Description = "感情ホイールで選択中の属性を返す")]
+    public EmotionType SelectedEmotion() => View().Auction.GetComponentInChildren<EmotionResourceDisplayView>(true).SelectedEmotion;
 
     [LiminalCommand("Auction/Competing", Description = "競合フェーズ中かを返す")]
     public bool Competing() => Session().Phase == AuctionPhase.Competition;
@@ -66,6 +79,9 @@ public sealed class AuctionDebugCommands
 
     [LiminalCommand("Auction/LastWinner", Description = "直前のロットの落札者名を返す (流札なら空)")]
     public string LastWinner() => Session().LastWinner?.DisplayName ?? "";
+
+    [LiminalCommand("Auction/LastBidderCount", Description = "直前の開示で入札に参加した人数を返す (0 枚は不参加)")]
+    public int LastBidderCount() => Session().LastReveal.Bidders.Count;
 
     [LiminalCommand("Auction/WonCount", Description = "指定参加者の落札数を返す (主人公は ノア)")]
     public int WonCount(string name) => Participant(name).WonLots.Count;
@@ -82,8 +98,29 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/CollapseConsistent", Description = "全ライバルについて (崩壊 == 無落札) が成り立つかを返す")]
     public bool CollapseConsistent() => Session().Rivals.All(r => r.HasCollapsed == (r.WonLots.Count == 0));
 
+    [LiminalCommand("Auction/RememberPlanned", Description = "指定ライバルの入札予定枚数を控える (PlannedDelta 用)")]
+    public int RememberPlanned(string name) => _rememberedPlanned = Rival(name).PlannedBid.Total;
+
+    [LiminalCommand("Auction/PlannedDelta", Description = "控えた値からの入札予定の増減を返す")]
+    public int PlannedDelta(string name) => Rival(name).PlannedBid.Total - _rememberedPlanned;
+
+    [LiminalCommand("Auction/RememberLotEmotion", Description = "今のロットの属性を控える (PersonaEmotionIsRemembered 用)")]
+    public string RememberLotEmotion() => (_rememberedEmotion = Session().CurrentLot.Emotion).ToString();
+
+    [LiminalCommand("Auction/BidAmounts", Description = "現在積んでいる入札の合計枚数を返す")]
+    public int BidAmounts() => Session().Player.SubmittedBid?.Total ?? 0;
+
+    [LiminalCommand("Auction/AutoPlayFloor", Description = "5 ロットを実 UI で自動進行する。最初の winLots ロットは最大予定 + 1 枚で落札を狙い、残りは 0 枚で流す")]
+    public UniTask<string> AutoPlayFloor(int winLots = 1) => AutoPlayAsync(lot => lot < winLots, keyOnly: false);
+
+    [LiminalCommand("Auction/AutoPlayFloorWinningKey", Description = "5 ロットを自動進行し、鍵のロットだけ (winKey なら) 落札を狙う。他は 0 枚")]
+    public UniTask<string> AutoPlayFloorWinningKey(bool winKey = true) => AutoPlayAsync(_ => winKey ? CurrentLotIsKey() : !CurrentLotIsKey() && LotIndex() == 0, keyOnly: true);
+
     [LiminalCommand("Progress/PersonaEmotion", Description = "セーブ済みの主人公の感情状態を返す (未定なら None)")]
     public string PersonaEmotion() => _progress.Persona.EmotionState?.ToString() ?? "None";
+
+    [LiminalCommand("Progress/PersonaEmotionIsRemembered", Description = "セーブ済みの感情状態が控えたロット属性と一致するか")]
+    public bool PersonaEmotionIsRemembered() => _progress.Persona.EmotionState == _rememberedEmotion;
 
     [LiminalCommand("Progress/IntegratedCount", Description = "人格に統合した記憶の数を返す")]
     public int IntegratedCount() => _progress.Persona.IntegratedLotIds.Count;
@@ -100,191 +137,99 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Progress/CollapsedIds", Description = "人格崩壊した参加者 ID をカンマ区切りで返す")]
     public string CollapsedIds() => string.Join(",", _progress.CollapsedParticipantIds.OrderBy(x => x));
 
-    [LiminalCommand("Auction/ClickNextIfTie", Description = "競合の案内で止まっていれば「次へ」を押して競合を始める。押したら True")]
-    public bool ClickNextIfTie() => WaitingFor() == "Tie" && ClickNextIfWaiting();
-
-    [LiminalCommand("Auction/LastBidderCount", Description = "直前の開示で入札に参加した人数を返す (0 枚は不参加)")]
-    public int LastBidderCount() => Session().LastReveal.Bidders.Count;
-
-    [LiminalCommand("Auction/DialogueResultShown", Description = "対話パネルに結果のセリフが表示されているか")]
-    public bool DialogueResultShown() => !string.IsNullOrEmpty(View().DialoguePanel.ResultText);
-
-    [LiminalCommand("Auction/ObservedMatchesPlanned", Description = "観察結果に表示された枚数が相手の入札予定と一致するか")]
-    public bool ObservedMatchesPlanned(string name) => View().DialoguePanel.ResultText.Contains($"(入札予定: {Rival(name).PlannedBid.Total} 枚)");
-
-    [LiminalCommand("Auction/RememberPlanned", Description = "指定ライバルの入札予定枚数を控える (PlannedDelta 用)")]
-    public int RememberPlanned(string name) => _rememberedPlanned = Rival(name).PlannedBid.Total;
-
-    [LiminalCommand("Auction/PlannedDelta", Description = "控えた値からの入札予定の増減を返す")]
-    public int PlannedDelta(string name) => Rival(name).PlannedBid.Total - _rememberedPlanned;
-
-    [LiminalCommand("Auction/RememberLotEmotion", Description = "今のロットの属性を控える (PersonaEmotionIsRemembered 用)")]
-    public string RememberLotEmotion() => (_rememberedEmotion = Session().CurrentLot.Emotion).ToString();
-
-    [LiminalCommand("Progress/PersonaEmotionIsRemembered", Description = "セーブ済みの感情状態が控えたロット属性と一致するか")]
-    public bool PersonaEmotionIsRemembered() => _progress.Persona.EmotionState == _rememberedEmotion;
-
-    [LiminalCommand("Auction/CurrentLotIsKey", Description = "今のロットが楽園への鍵か")]
-    public bool CurrentLotIsKey() => Session().CurrentLot.IsKey;
-
-    [LiminalCommand("Auction/MissedKey", Description = "楽園への鍵を取り逃したか")]
-    public bool MissedKey() => Session().MissedKey;
-
-    [LiminalCommand("Auction/GameOverMessageMentionsKey", Description = "ゲームオーバー画面の本文が鍵の取り逃しを伝えているか")]
-    public bool GameOverMessageMentionsKey() => View().GameOver.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).First(t => t.name == "MessageText").text.Contains("鍵");
-
-    [LiminalCommand("Auction/ThemeClarified", Description = "記憶テーマが鮮明化したか (出品の過半を落札)")]
-    public bool ThemeClarified() => Session().IsThemeClarified;
-
-    [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼画面の見出しに鮮明化後のテーマが含まれているか")]
-    public bool BaptismHeaderClarified() => View().Baptism.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).First(t => t.name == "HeaderText").text.Contains(Session().Floor.ClarifiedTheme);
-
-    [LiminalCommand("Auction/AutoPlayFloorWinningKey", Description = "5 ロットを自動進行し、鍵のロットだけ (winKey なら) 落札を狙う。他は 0 枚")]
-    public async UniTask<string> AutoPlayFloorWinningKey(bool winKey = true)
-    {
-        var ct = View().destroyCancellationToken;
-        await UniTask.WaitUntil(() => WaitingFor() == "Theme", cancellationToken: ct);
-        ClickNextIfWaiting();
-        for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
-        {
-            await UniTask.WaitUntil(() => WaitingFor() == "LotIntro", cancellationToken: ct);
-            ClickNextIfWaiting();
-            await UniTask.WaitUntil(() => ActivePanel() == "Dialogue", cancellationToken: ct);
-            Click("ToBiddingButton");
-            await UniTask.WaitUntil(() => ActivePanel() == "Bid", cancellationToken: ct);
-            if (CurrentLotIsKey() && winKey) BidAboveTopRival();
-            else if (!CurrentLotIsKey() && !winKey && lot == 0) BidAboveTopRival();
-            Click("ConfirmButton");
-            await UniTask.WaitUntil(RevealReached, cancellationToken: ct);
-            ClickNextIfTie();
-            await UniTask.WaitUntil(() => WaitingFor() == "LotResult", cancellationToken: ct);
-            ClickNextIfWaiting();
-        }
-        await UniTask.WaitUntil(() => ActivePanel() is "Baptism" or "GameOver", cancellationToken: ct);
-        return $"won={WonCount("ノア")} panel={ActivePanel()}";
-    }
-
-    [LiminalCommand("Auction/ActivePanel", Description = "表示中のパネル名 (Counter / Dialogue / Bid / Competition / Baptism / GameOver / Next / None) を返す")]
+    [LiminalCommand("Auction/ActivePanel", Description = "表示中の主なパネル (Dialogue / Bid / Competition / Baptism / GameOver / None) を返す")]
     public string ActivePanel()
     {
         var v = View();
-        if (v.CounterDialogue.gameObject.activeSelf) return "Counter";
         if (v.Baptism.gameObject.activeSelf) return "Baptism";
         if (v.GameOver.gameObject.activeSelf) return "GameOver";
-        if (v.CompetitionPanel.gameObject.activeSelf) return "Competition";
-        if (v.DialoguePanel.gameObject.activeSelf) return "Dialogue";
-        if (v.BidPanel.gameObject.activeSelf) return "Bid";
-        return v.IsWaitingNext ? "Next" : "None";
+        if (Session().Phase == AuctionPhase.Competition) return "Competition";
+        if (Session().Phase == AuctionPhase.Bidding) return "Bid";
+        if (Session().Phase == AuctionPhase.Dialogue) return "Dialogue";
+        return "None";
     }
 
-    [LiminalCommand("Auction/ClickPlus", Description = "入札パネルの指定属性の + を押す (同名ボタンが 8 個あるため属性で引く)")]
-    public string ClickPlus(EmotionType emotion)
+    [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを押して対話相手を選ぶ")]
+    public string SelectTarget(string name)
     {
-        var item = View().BidPanel.GetComponentsInChildren<EmotionBidItemView>(true).First(i => i.Emotion == emotion);
-        var plus = item.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == "PlusButton");
-        if (!plus.interactable) throw new InvalidOperationException($"{emotion} の + は押せない");
-        plus.onClick.Invoke();
+        var icon = Icons().First(i => i.Participant.DisplayName == name);
+        if (!icon.GetComponentInChildren<Button>(true).interactable) throw new InvalidOperationException($"今は選べない: {name}");
+        icon.GetComponentInChildren<Button>(true).onClick.Invoke();
+        return name;
+    }
+
+    [LiminalCommand("Auction/UseDialogue", Description = "対話コマンドのボタンを押す (Observe / Provoke / Empathize / Persuade)")]
+    public string UseDialogue(string command)
+    {
+        var index = (int)Enum.Parse<DialogueCommand>(command);
+        var button = ChoiceButtons()[index];
+        if (!button.interactable) throw new InvalidOperationException($"押せない: {command}");
+        button.onClick.Invoke();
+        return command;
+    }
+
+    [LiminalCommand("Auction/SelectEmotion", Description = "感情ホイールを回して指定属性を選ぶ")]
+    public async UniTask<string> SelectEmotion(EmotionType emotion)
+    {
+        var wheel = View().Auction.GetComponentInChildren<EmotionResourceDisplayView>(true);
+        var button = wheel.GetComponentInChildren<Button>(true);
+        for (var i = 0; i < EmotionWallet.ALL_EMOTIONS.Length; i++)
+        {
+            if (SelectedEmotion() == emotion) return emotion.ToString();
+            button.onClick.Invoke();
+            await UniTask.WaitUntil(() => SelectedEmotion() == wheel.SelectedEmotion, cancellationToken: View().destroyCancellationToken);
+            await UniTask.Delay(350, cancellationToken: View().destroyCancellationToken);
+        }
+        if (SelectedEmotion() != emotion) throw new InvalidOperationException($"ホイールで {emotion} を選べなかった");
         return emotion.ToString();
     }
 
-    [LiminalCommand("Auction/ClickIntegrate", Description = "洗礼で指定ロット番号 (0 始まり) の「統合する」を押す")]
-    public string ClickIntegrate(int lotIndex)
+    [LiminalCommand("Auction/Increase", Description = "入札ウィンドウの + を count 回押す")]
+    public int Increase(int count = 1)
     {
-        var entry = View().Baptism.GetComponentsInChildren<WonLotEntryView>(true).First(e => e.WonLot.LotIndex == lotIndex);
-        entry.GetComponentInChildren<UnityEngine.UI.Button>(true).onClick.Invoke();
-        return entry.WonLot.Lot.LotId;
-    }
-
-    [LiminalCommand("Auction/WaitingFor", Description = "「次へ」待ちの区切りを返す (Theme / LotIntro / Tie / LotResult / None)")]
-    public string WaitingFor()
-    {
-        var v = View();
-        if (!v.IsWaitingNext) return "None";
-        var m = v.Message;
-        if (m.StartsWith("記憶テーマ")) return "Theme";
-        if (m.StartsWith("ロット")) return "LotIntro";
-        if (m.Contains("競合に入る")) return "Tie";
-        return "LotResult";
-    }
-
-    [LiminalCommand("Auction/RevealReached", Description = "一斉開示が終わって落札表示か競合の案内で止まっているか")]
-    public bool RevealReached()
-    {
-        var w = WaitingFor();
-        return w == "LotResult" || w == "Tie";
-    }
-
-    [LiminalCommand("Auction/ClickNextIfWaiting", Description = "「次へ」が出ていれば押す。押したら True")]
-    public bool ClickNextIfWaiting()
-    {
-        var v = View();
-        if (!v.IsWaitingNext) return false;
-        v.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == "NextButton").onClick.Invoke();
-        return true;
-    }
-
-    [LiminalCommand("Auction/LotIntroOrEndReached", Description = "次ロットの提示、または洗礼 / ゲームオーバーに到達したか")]
-    public bool LotIntroOrEndReached()
-    {
-        var panel = ActivePanel();
-        return panel == "Baptism" || panel == "GameOver" || WaitingFor() == "LotIntro";
-    }
-
-    [LiminalCommand("Auction/BidAll", Description = "入札パネルで手持ち全部を + で積む (実 UI 経由)")]
-    public int BidAll()
-    {
-        var count = 0;
-        foreach (var item in View().BidPanel.GetComponentsInChildren<EmotionBidItemView>(true))
+        var button = BidButton("IncreaseButton");
+        var pressed = 0;
+        for (var i = 0; i < count && button.interactable; i++)
         {
-            var plus = item.GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == "PlusButton");
-            while (plus.interactable) { plus.onClick.Invoke(); count++; }
+            button.onClick.Invoke();
+            pressed++;
         }
-        return count;
+        return pressed;
     }
 
-    [LiminalCommand("Auction/BidMatchingAndMismatched", Description = "今のロットと同じ属性を matching 枚、それ以外の属性を 1 属性 perEmotion 枚ずつ合計 mismatched 枚積む")]
-    public string BidMatchingAndMismatched(int matching, int mismatched, int perEmotion = 4)
+    [LiminalCommand("Auction/Decrease", Description = "入札ウィンドウの - を count 回押す")]
+    public int Decrease(int count = 1)
     {
-        var lotEmotion = Session().CurrentLot.Emotion;
-        for (var i = 0; i < matching; i++) ClickPlus(lotEmotion);
-        var remaining = mismatched;
-        foreach (var e in EmotionWallet.ALL_EMOTIONS.Where(x => x != lotEmotion))
+        var button = BidButton("DecreaseButton");
+        var pressed = 0;
+        for (var i = 0; i < count && button.interactable; i++)
         {
-            var take = Math.Min(Math.Min(remaining, perEmotion), Session().Player.Wallet.Get(e));
-            for (var i = 0; i < take; i++) ClickPlus(e);
-            remaining -= take;
-            if (remaining == 0) break;
+            button.onClick.Invoke();
+            pressed++;
         }
-        return $"{lotEmotion}x{matching} + other x{mismatched - remaining}";
+        return pressed;
     }
 
-    [LiminalCommand("Auction/BidToTieTopRival", Description = "ライバルの入札予定の最大枚数とちょうど同じ枚数を積む (競合を起こす)")]
-    public int BidToTieTopRival()
+    [LiminalCommand("Auction/Confirm", Description = "入札確定 (対話フェーズでは入札フェーズへ進む) ボタンを押す")]
+    public string Confirm()
     {
-        var target = MaxPlannedBid();
-        var placed = 0;
-        foreach (var e in EmotionWallet.ALL_EMOTIONS)
-        {
-            var owned = Session().Player.Wallet.Get(e);
-            for (var i = 0; i < owned && placed < target; i++) { ClickPlus(e); placed++; }
-        }
-        if (placed != target) throw new InvalidOperationException($"手持ち不足: {placed}/{target}");
-        return placed;
+        var button = View().Auction.GetComponentsInChildren<Button>(true).First(b => b.name == "ConfirmButton");
+        if (!button.interactable) throw new InvalidOperationException("確定ボタンが押せない");
+        button.onClick.Invoke();
+        return "confirmed";
     }
 
-    [LiminalCommand("Auction/RaiseUntilLeading", Description = "競合中、他の競合者の最大額を margin 枚上回るまで 1 枚ずつ上乗せする (実 UI 経由)")]
-    public int RaiseUntilLeading(int margin = 5)
+    [LiminalCommand("Auction/Raise", Description = "競合フェーズの上乗せボタンを count 回押す")]
+    public int Raise(int count = 1)
     {
-        var s = Session();
-        var c = s.Competition;
-        var raised = 0;
-        while (c.TotalOf(s.Player) < c.Competitors.Where(x => !x.IsPlayer).Max(c.TotalOf) + margin)
+        var button = View().Competition.GetComponentsInChildren<Button>(true).First(b => b.name == "RaiseButton");
+        var pressed = 0;
+        for (var i = 0; i < count && button.interactable; i++)
         {
-            var e = EmotionWallet.ALL_EMOTIONS.First(x => s.Player.Wallet.Get(x) > 0);
-            ClickPlus(e);
-            raised++;
+            button.onClick.Invoke();
+            pressed++;
         }
-        return raised;
+        return pressed;
     }
 
     [LiminalCommand("Auction/CompetitionLosersRefunded", Description = "直前の競合で負けた競合者に入札が返っているか (仕様では返らないので False)")]
@@ -294,8 +239,7 @@ public sealed class AuctionDebugCommands
         var c = s.Competition;
         var losers = c.Competitors.Where(x => x != s.LastWinner && !x.IsPlayer).ToList();
         if (losers.Count == 0) throw new InvalidOperationException("負けた NPC 競合者がいない");
-        // 階層開始時の 40 枚から競合の最終内訳ぶん減っていれば未返却
-        return losers.Any(l => l.Wallet.Total != GameConstants.EMOTION_REFILL_PER_FLOOR * EmotionWallet.ALL_EMOTIONS.Length - c.FinalBidOf(l).Total);
+        return losers.Any(l => l.Wallet.Total == GameConstants.EMOTION_REFILL_PER_FLOOR * EmotionWallet.ALL_EMOTIONS.Length);
     }
 
     [LiminalCommand("Auction/DrainRival", Description = "指定ライバルの手持ちを 0 にする (破産状態の再現)")]
@@ -303,56 +247,134 @@ public sealed class AuctionDebugCommands
     {
         var r = Rival(name);
         r.Wallet.LoadCounts(new int[EmotionWallet.ALL_EMOTIONS.Length]);
-        View().RefreshSlots();
+        View().RefreshParticipants();
         return r.DisplayName;
     }
 
+    [LiminalCommand("Auction/ClickIntegrate", Description = "洗礼で指定ロット番号 (0 始まり) の「統合する」を押す")]
+    public string ClickIntegrate(int lotIndex)
+    {
+        var entry = View().Baptism.GetComponentsInChildren<WonLotEntryView>(true).First(e => e.WonLot.LotIndex == lotIndex);
+        entry.GetComponentInChildren<Button>(true).onClick.Invoke();
+        return entry.WonLot.Lot.LotId;
+    }
+
+    [LiminalCommand("Auction/BidAll", Description = "手持ち全部を積む (ホイールを回しながら実 UI で + を押す)")]
+    public async UniTask<int> BidAll()
+    {
+        var placed = 0;
+        foreach (var e in EmotionWallet.ALL_EMOTIONS)
+        {
+            var owned = Session().Player.Wallet.Get(e);
+            if (owned == 0) continue;
+            await SelectEmotion(e);
+            placed += Increase(owned);
+        }
+        return placed;
+    }
+
+    [LiminalCommand("Auction/BidAmount", Description = "指定属性を count 枚積む (ホイールを回してから + を押す)")]
+    public async UniTask<int> BidAmount(EmotionType emotion, int count)
+    {
+        await SelectEmotion(emotion);
+        return Increase(count);
+    }
+
     [LiminalCommand("Auction/BidAboveTopRival", Description = "ライバルの入札予定の最大枚数 + 1 枚を積む (確実に単独最高額にする)")]
-    public int BidAboveTopRival()
+    public async UniTask<int> BidAboveTopRival()
     {
         var target = MaxPlannedBid() + 1;
         var placed = 0;
         foreach (var e in EmotionWallet.ALL_EMOTIONS)
         {
+            if (placed >= target) break;
             var owned = Session().Player.Wallet.Get(e);
-            for (var i = 0; i < owned && placed < target; i++) { ClickPlus(e); placed++; }
+            if (owned == 0) continue;
+            await SelectEmotion(e);
+            placed += Increase(Math.Min(owned, target - placed));
         }
         if (placed != target) throw new InvalidOperationException($"手持ち不足: {placed}/{target}");
         return placed;
     }
 
-    [LiminalCommand("Auction/AutoPlayFloor", Description = "テーマ公開から 5 ロットを実 UI で自動進行する。最初の winLots ロットは最大予定 + 1 枚で落札を狙い、残りは 0 枚で流す")]
-    public async UniTask<string> AutoPlayFloor(int winLots = 1)
+    [LiminalCommand("Auction/BidToTieTopRival", Description = "ライバルの入札予定の最大枚数とちょうど同じ枚数を積む (競合を起こす)")]
+    public async UniTask<int> BidToTieTopRival()
+    {
+        var target = MaxPlannedBid();
+        var placed = 0;
+        foreach (var e in EmotionWallet.ALL_EMOTIONS)
+        {
+            if (placed >= target) break;
+            var owned = Session().Player.Wallet.Get(e);
+            if (owned == 0) continue;
+            await SelectEmotion(e);
+            placed += Increase(Math.Min(owned, target - placed));
+        }
+        if (placed != target) throw new InvalidOperationException($"手持ち不足: {placed}/{target}");
+        return placed;
+    }
+
+    [LiminalCommand("Auction/BidMatchingAndMismatched", Description = "今のロットと同じ属性を matching 枚、それ以外を 1 属性 perEmotion 枚ずつ合計 mismatched 枚積む")]
+    public async UniTask<string> BidMatchingAndMismatched(int matching, int mismatched, int perEmotion = 4)
+    {
+        var lotEmotion = Session().CurrentLot.Emotion;
+        await BidAmount(lotEmotion, matching);
+        var remaining = mismatched;
+        foreach (var e in EmotionWallet.ALL_EMOTIONS.Where(x => x != lotEmotion))
+        {
+            if (remaining == 0) break;
+            var take = Math.Min(Math.Min(remaining, perEmotion), Session().Player.Wallet.Get(e));
+            if (take == 0) continue;
+            await BidAmount(e, take);
+            remaining -= take;
+        }
+        return $"{lotEmotion}x{matching} + other x{mismatched - remaining}";
+    }
+
+    [LiminalCommand("Auction/RaiseUntilLeading", Description = "競合中、他の競合者の最大額を margin 枚上回るまで上乗せする")]
+    public int RaiseUntilLeading(int margin = 5)
+    {
+        var s = Session();
+        var c = s.Competition;
+        var raised = 0;
+        while (c.TotalOf(s.Player) < c.Competitors.Where(x => !x.IsPlayer).Max(c.TotalOf) + margin)
+        {
+            if (Raise() == 0) throw new InvalidOperationException("上乗せできない");
+            raised++;
+        }
+        return raised;
+    }
+
+    private async UniTask<string> AutoPlayAsync(Func<int, bool> shouldWin, bool keyOnly)
     {
         var ct = View().destroyCancellationToken;
-        await UniTask.WaitUntil(() => WaitingFor() == "Theme", cancellationToken: ct);
-        ClickNextIfWaiting();
         for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
         {
-            await UniTask.WaitUntil(() => WaitingFor() == "LotIntro", cancellationToken: ct);
-            ClickNextIfWaiting();
             await UniTask.WaitUntil(() => ActivePanel() == "Dialogue", cancellationToken: ct);
-            Click("ToBiddingButton");
+            Confirm();
             await UniTask.WaitUntil(() => ActivePanel() == "Bid", cancellationToken: ct);
-            if (lot < winLots) BidAboveTopRival();
-            Click("ConfirmButton");
-            await UniTask.WaitUntil(RevealReached, cancellationToken: ct);
-            ClickNextIfTie();
-            await UniTask.WaitUntil(() => WaitingFor() == "LotResult", cancellationToken: ct);
-            ClickNextIfWaiting();
+            if (shouldWin(lot)) await BidAboveTopRival();
+            Confirm();
+            await UniTask.WaitUntil(() => ActivePanel() != "Bid", cancellationToken: ct);
+            await UniTask.WaitUntil(() => ActivePanel() is "Dialogue" or "Baptism" or "GameOver", cancellationToken: ct);
         }
         await UniTask.WaitUntil(() => ActivePanel() is "Baptism" or "GameOver", cancellationToken: ct);
         return $"won={WonCount("ノア")} panel={ActivePanel()}";
     }
 
-    private static void Click(string name)
+    private static Button BidButton(string name)
     {
-        View().GetComponentsInChildren<UnityEngine.UI.Button>(true).First(b => b.name == name && b.interactable).onClick.Invoke();
+        return View().Auction.GetComponentsInChildren<Button>(true).First(b => b.name == name);
     }
 
-    private static AuctionParticipant Participant(string name)
+    private static Button[] ChoiceButtons()
     {
-        return Session().Participants.FirstOrDefault(p => p.DisplayName == name) ?? throw new ArgumentException($"参加者が見つからない: {name}");
+        return View().Dialogue.GetComponentsInChildren<Button>(true).Where(b => b.name.StartsWith("Choice")).ToArray();
+    }
+
+    private static ParticipantIconView[] Icons()
+    {
+        return View().GetComponentsInChildren<ParticipantIconView>(true);
     }
 
     private static AuctionSession Session()
@@ -362,11 +384,16 @@ public sealed class AuctionDebugCommands
         return scope.Container.Resolve<AuctionSession>();
     }
 
-    private static AuctionView View()
+    private static AuctionSceneView View()
     {
-        var view = UnityEngine.Object.FindFirstObjectByType<AuctionView>();
-        if (view == null) throw new InvalidOperationException("AuctionView が無い");
+        var view = UnityEngine.Object.FindFirstObjectByType<AuctionSceneView>();
+        if (view == null) throw new InvalidOperationException("AuctionSceneView が無い");
         return view;
+    }
+
+    private static AuctionParticipant Participant(string name)
+    {
+        return Session().Participants.FirstOrDefault(p => p.DisplayName == name) ?? throw new ArgumentException($"参加者が見つからない: {name}");
     }
 
     private static AuctionParticipant Rival(string name)

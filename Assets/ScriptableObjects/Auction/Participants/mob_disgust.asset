@@ -15,6 +15,9 @@ MonoBehaviour:
   displayName: "\u5ACC\u60AA\u3059\u308B\u53C2\u52A0\u8005"
   emotion: 5
   portrait: {fileID: 0}
+  cutInSprite: {fileID: 0}
+  iconSprite: {fileID: 0}
+  themeColor: {r: 0.5, g: 0.3, b: 0.6, a: 1}
   isMob: 1
   profile:
     baseBid: 2

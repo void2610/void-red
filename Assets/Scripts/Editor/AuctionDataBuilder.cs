@@ -12,6 +12,14 @@ public static class AuctionDataBuilder
 {
     private const string ROOT = "Assets/ScriptableObjects/Auction";
 
+    // 立ち絵 / カットイン / アイコン / 所属色。素材が無いキャラは空のまま (UI 側で隠す)
+    private static readonly Dictionary<string, (string portrait, string cutIn, string icon, Color color)> VISUALS = new()
+    {
+        ["alv"] = ("Assets/Sprites/Character/Alv/Normal.png", "Assets/Sprites/Auction/Dialogue/cut-in_alv.png", "Assets/Sprites/Character/Alv/Alv_icon.png", new Color(0.45f, 0.5f, 0.85f)),
+        ["cerica"] = ("Assets/Sprites/Character/Cerica/Normal.png", "Assets/Sprites/Auction/Dialogue/cut-in_cerica.png", "Assets/Sprites/Character/Cerica/Cerica_icon.png", new Color(0.95f, 0.85f, 0.35f)),
+        ["veil"] = ("Assets/Sprites/Character/Veil/Normal.png", "", "", new Color(0.9f, 0.3f, 0.7f)),
+    };
+
     private record Rival(string Id, string Name, EmotionType Emotion, bool IsMob, int Base, int Fav, int Spread,
         BidReaction Provoke, BidReaction Empathize, BidReaction Persuade, bool PersuadeFav, int Scale, CompetitionPolicy Policy, int CounterChance,
         string Prompt, string A, string B, BidReaction ReactA, BidReaction ReactB,
@@ -145,6 +153,17 @@ public static class AuctionDataBuilder
         so.FindProperty("displayName").stringValue = r.Name;
         so.FindProperty("emotion").enumValueIndex = (int)r.Emotion;
         so.FindProperty("isMob").boolValue = r.IsMob;
+        if (VISUALS.TryGetValue(r.Id, out var visual))
+        {
+            so.FindProperty("portrait").objectReferenceValue = LoadSprite(visual.portrait);
+            so.FindProperty("cutInSprite").objectReferenceValue = LoadSprite(visual.cutIn);
+            so.FindProperty("iconSprite").objectReferenceValue = LoadSprite(visual.icon);
+            so.FindProperty("themeColor").colorValue = visual.color;
+        }
+        else
+        {
+            so.FindProperty("themeColor").colorValue = r.Emotion.GetColor();
+        }
         var p = so.FindProperty("profile");
         p.FindPropertyRelative("baseBid").intValue = r.Base;
         p.FindPropertyRelative("favoriteBid").intValue = r.Fav;
@@ -199,6 +218,11 @@ public static class AuctionDataBuilder
         for (var i = 0; i < lotIds.Length; i++) l.GetArrayElementAtIndex(i).objectReferenceValue = lots[lotIds[i]];
         so.ApplyModifiedPropertiesWithoutUndo();
         return asset;
+    }
+
+    private static Sprite LoadSprite(string path)
+    {
+        return string.IsNullOrEmpty(path) ? null : AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
     private static T LoadOrCreate<T>(string path) where T : ScriptableObject

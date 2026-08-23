@@ -10,7 +10,11 @@ public class ParticipantData : ScriptableObject
 {
     [SerializeField] private string displayName;
     [SerializeField] private EmotionType emotion;
+    [Header("見た目")]
     [SerializeField] private Sprite portrait;
+    [SerializeField] private Sprite cutInSprite;
+    [SerializeField] private Sprite iconSprite;
+    [SerializeField] private Color themeColor = Color.red;
     [SerializeField] private bool isMob;
     [SerializeField] private BiddingProfile profile = new();
 
@@ -18,6 +22,9 @@ public class ParticipantData : ScriptableObject
     public string DisplayName => displayName;
     public EmotionType Emotion => emotion;
     public Sprite Portrait => portrait;
+    public Sprite CutInSprite => cutInSprite;
+    public Sprite IconSprite => iconSprite;
+    public Color ThemeColor => themeColor;
     public bool IsMob => isMob;
     public BiddingProfile Profile => profile;
 }

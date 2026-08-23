@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -8,44 +9,37 @@ using VContainer.Unity;
 using Void2610.UnityTemplate;
 
 /// <summary>
-/// 1 階層分のオークションを View と結び付けて進行させる
-/// 5 ロットを回し、洗礼で統合を選ばせ、進行度を記録してロビーへ戻る
+/// 1 階層分のオークションを旧 UI 資産 (感情ホイール / 入札ウィンドウ / 対話カットイン / 天秤) で進行させる
+/// テーマ公開 → 5 ロット (対話 → 入札 → 開示 → 競合) → 洗礼 or ゲームオーバー
 /// </summary>
 public class AuctionPresenter : IStartable, IDisposable
 {
-    private readonly AuctionView _view;
+    private readonly AuctionSceneView _scene;
     private readonly AuctionSession _session;
     private readonly GameProgressService _progress;
     private readonly SceneTransitionManager _sceneTransition;
-    private readonly CompositeDisposable _disposables = new();
     private readonly CancellationTokenSource _cts = new();
     private readonly EmotionBid _draft = new();
-    private AuctionParticipant _dialogueTarget;
+
+    private EmotionType _selectedEmotion = EmotionType.Joy;
     private WonLot _chosen;
 
-    public AuctionPresenter(AuctionView view, AuctionSession session, GameProgressService progress, SceneTransitionManager sceneTransition)
+    public AuctionPresenter(AuctionSceneView scene, AuctionSession session, GameProgressService progress, SceneTransitionManager sceneTransition)
     {
-        _view = view;
+        _scene = scene;
         _session = session;
         _progress = progress;
         _sceneTransition = sceneTransition;
-    }
-
-    private static float NextNpcInterval()
-    {
-        return UnityEngine.Random.Range(GameConstants.NPC_RAISE_INTERVAL_MIN, GameConstants.NPC_RAISE_INTERVAL_MAX);
     }
 
     private async UniTask RunAsync(CancellationToken ct)
     {
         try
         {
-            await _view.WaitNextAsync($"記憶テーマ「{_session.Floor.ThemeTitle}」\n第 {_session.Floor.FloorIndex} 階層の記憶オークションを始める");
-            while (!_session.IsLastLot)
-            {
-                await RunLotAsync(ct);
-            }
+            await _scene.Theme.DisplayThemeWithKeywords(_session.Floor.ThemeTitle, true);
+            while (!_session.IsLastLot) await RunLotAsync(ct);
             _session.FinishLots();
+
             if (_session.IsPlayerGameOver)
             {
                 await RunGameOverAsync(ct);
@@ -56,116 +50,144 @@ public class AuctionPresenter : IStartable, IDisposable
         catch (OperationCanceledException)
         {
         }
-        catch (InvalidOperationException) when (_view == null || ct.IsCancellationRequested)
+        catch (InvalidOperationException) when (ct.IsCancellationRequested)
         {
-            // シーン破棄でボタンの Observable が完了し FirstAsync が空列挙で失敗する。進行の中断として扱う
+            // シーン破棄でボタンの Observable が完了する。進行の中断として扱う
         }
     }
 
     private async UniTask RunLotAsync(CancellationToken ct)
     {
         var lot = _session.BeginNextLot();
-        _view.HideBids();
-        _view.RefreshSlots();
-        _view.LotViewShow(lot, _session.CurrentLotIndex + 1);
-        await _view.WaitNextAsync($"ロット {_session.CurrentLotIndex + 1}『{lot.Title}』");
+        _scene.RefreshParticipants();
+        await _scene.Announcement.DisplayAnnouncement($"第 {_session.CurrentLotIndex + 1} 競売\n『{lot.Title}』", 1.6f);
+        _scene.Auction.Show();
+        _scene.Auction.ShowLot(lot);
 
         await RunDialogueAsync(ct);
         await RunBiddingAsync(ct);
+
         var reveal = _session.LastReveal;
-        foreach (var b in reveal.Bidders) _view.SlotOf(b).ShowBid(b.SubmittedBid.Total);
-        _view.RefreshSlots();
+        var rivalTop = reveal.Bidders.Where(b => !b.IsPlayer).Select(b => b.SubmittedBid.Total).DefaultIfEmpty(0).Max();
+        _scene.Auction.ShowBids(BidBreakdown(_session.Player.SubmittedBid), rivalTop);
+        _scene.ShowParticipantBids(reveal);
+        await UniTask.Delay(900, cancellationToken: ct);
 
         AuctionParticipant winner;
         if (reveal.IsTie)
         {
-            await _view.WaitNextAsync($"{reveal.TiedParticipants.Count} 人が同額。競合に入る");
+            await _scene.Auction.ShowResultAsync(false, true, false, RivalColor());
             winner = await RunCompetitionAsync(ct);
         }
         else
         {
             winner = _session.ResolveReveal();
+            await _scene.Auction.ShowResultAsync(winner != null && winner.IsPlayer, false, winner == null, RivalColor());
         }
-        _view.RefreshSlots();
-        if (winner != null) _view.SlotOf(winner).SetWinner(true);
-        await _view.WaitNextAsync(winner != null ? $"{winner.DisplayName} が『{lot.Title}』を落札" : $"『{lot.Title}』は流札");
+
+        _scene.RefreshParticipants();
+        _scene.HighlightWinner(winner);
+        await _scene.Announcement.DisplayAnnouncement(winner != null ? $"{winner.DisplayName} が落札" : "流札", 1.4f);
+        _scene.Auction.Clear();
+        _scene.Auction.Hide();
     }
 
     private async UniTask RunDialogueAsync(CancellationToken ct)
     {
-        _dialogueTarget = null;
-        _view.DialoguePanel.Show();
-        _view.DialoguePanel.SetInteractable(true);
-        _view.SetSlotsSelectable(true);
-        _view.SetMessage("対話コマンドで相手の出方を探る");
+        _scene.Dialogue.Show();
+        var target = _session.Rivals.First(r => r.CanBid);
+        await SelectTargetAsync(target);
 
-        using var d = new CompositeDisposable();
-        _view.OnSlotSelected.Subscribe(p =>
+        while (true)
         {
-            _dialogueTarget = p;
-            foreach (var s in _view.Slots) s.SetHighlighted(s.Participant == p);
-            _view.DialoguePanel.SetTarget(p, _session);
-        }).AddTo(d);
+            _scene.SetTargetSelectable(true);
+            _scene.Dialogue.SetCommandAvailability(i => _session.CanUseDialogue(CurrentTarget(), (DialogueCommand)i));
+            _scene.Auction.SetConfirmInteractable(true);
 
-        var counterPending = false;
-        _view.DialoguePanel.OnCommand.Subscribe(cmd =>
-        {
-            if (_dialogueTarget == null || !_session.CanUseDialogue(_dialogueTarget, cmd)) return;
-            var outcome = _session.UseDialogue(_dialogueTarget, cmd);
-            _view.DialoguePanel.ShowOutcome(outcome);
-            _view.DialoguePanel.SetTarget(_dialogueTarget, _session);
-            if (outcome.Counter != null)
+            var picked = await UniTask.WhenAny(
+                _scene.Dialogue.WaitForCommandAsync(),
+                _scene.WaitTargetChangedAsync(ct),
+                _scene.Auction.OnBiddingConfirmed.FirstAsync(ct).AsUniTask());
+
+            if (picked.winArgumentIndex == 2) break;
+            if (picked.winArgumentIndex == 1)
             {
-                counterPending = true;
-                _view.DialoguePanel.SetInteractable(false);
-                _view.SetSlotsSelectable(false);
-                _view.CounterDialogue.Show(outcome.Target, outcome.Counter);
+                await SelectTargetAsync(_scene.SelectedTarget);
+                continue;
             }
-        }).AddTo(d);
 
-        _view.CounterDialogue.OnChoice.Subscribe(choice =>
-        {
-            if (!counterPending) return;
-            counterPending = false;
-            _session.AnswerCounterDialogue(_dialogueTarget, choice);
-            _view.CounterDialogue.Hide();
-            _view.DialoguePanel.SetInteractable(true);
-            _view.SetSlotsSelectable(true);
-            _view.DialoguePanel.SetTarget(_dialogueTarget, _session);
-        }).AddTo(d);
+            var command = (DialogueCommand)picked.result1;
+            var current = CurrentTarget();
+            if (!_session.CanUseDialogue(current, command)) continue;
 
-        await _view.DialoguePanel.OnToBidding.Where(_ => !counterPending).FirstAsync(ct);
-        _view.DialoguePanel.Hide();
-        _view.SetSlotsSelectable(false);
-        foreach (var s in _view.Slots) s.SetHighlighted(false);
+            _scene.SetTargetSelectable(false);
+            _scene.Auction.SetConfirmInteractable(false);
+            var outcome = _session.UseDialogue(current, command);
+            await PlayDialogueOutcomeAsync(outcome, ct);
+        }
+
+        _scene.SetTargetSelectable(false);
+        _scene.Dialogue.Hide();
         _session.EnterBidding();
+    }
+
+    private async UniTask PlayDialogueOutcomeAsync(DialogueOutcome outcome, CancellationToken ct)
+    {
+        await _scene.Dialogue.ShowPlayerLineAsync(PlayerLine(outcome.Command));
+        await _scene.Dialogue.ShowTargetLineAsync(outcome.Line);
+
+        if (outcome.ObservedTotal.HasValue)
+            await _scene.Announcement.DisplayAnnouncement($"{outcome.Target.DisplayName} の入札予定: {outcome.ObservedTotal.Value} 枚", 1.5f);
+        else if (!outcome.Success)
+            await _scene.Announcement.DisplayAnnouncement("手応えがない", 1.2f);
+
+        if (outcome.Counter == null) return;
+
+        // 逆対話: 相手の問いかけに二択で答える
+        await _scene.Dialogue.ShowTargetLineAsync(outcome.Counter.Prompt);
+        var choice = await _scene.WaitCounterChoiceAsync(outcome.Counter, ct);
+        _session.AnswerCounterDialogue(outcome.Target, choice);
+        await _scene.Dialogue.ShowPlayerLineAsync(choice == 0 ? outcome.Counter.ChoiceA : outcome.Counter.ChoiceB);
     }
 
     private async UniTask RunBiddingAsync(CancellationToken ct)
     {
         _draft.Clear();
-        _view.BidPanel.ResetMode();
-        _view.BidPanel.Show();
-        _view.BidPanel.Refresh(_session.Player.Wallet, _draft);
-        _view.SetMessage("感情リソースを入札する。落札できなければ返ってくる");
+        _selectedEmotion = EmotionType.Joy;
+        _scene.Auction.SetSelectedEmotion(_selectedEmotion);
+        _scene.Auction.UpdateEmotionResources(Remaining());
+        _scene.Auction.ShowBidWindow(_session.CurrentLot, _selectedEmotion, 0);
+        _scene.Auction.SetEmotionInteractable(true);
+        _scene.Auction.SetConfirmInteractable(true);
+        UpdateBidInteractables();
 
         using var d = new CompositeDisposable();
-        _view.BidPanel.OnPlus.Subscribe(e =>
+        _scene.Auction.OnEmotionSelected.Subscribe(e =>
         {
-            if (_draft.Get(e) >= _session.Player.Wallet.Get(e)) return;
-            _draft.Add(e);
-            SeManager.Instance.PlaySe(e.ToResourceSeName(), pitch: 1f);
-            _view.BidPanel.Refresh(_session.Player.Wallet, _draft);
-        }).AddTo(d);
-        _view.BidPanel.OnMinus.Subscribe(e =>
-        {
-            if (_draft.Get(e) <= 0) return;
-            _draft.Add(e, -1);
-            _view.BidPanel.Refresh(_session.Player.Wallet, _draft);
+            _selectedEmotion = e;
+            _scene.Auction.SetBidEmotion(e);
+            _scene.Auction.UpdateBidAmount(_draft.Get(e));
+            UpdateBidInteractables();
         }).AddTo(d);
 
-        await _view.BidPanel.OnConfirm.FirstAsync(ct);
-        _view.BidPanel.Hide();
+        _scene.Auction.OnIncrease.Subscribe(_ =>
+        {
+            if (_draft.Get(_selectedEmotion) >= _session.Player.Wallet.Get(_selectedEmotion)) return;
+            _draft.Add(_selectedEmotion);
+            SeManager.Instance.PlaySe(_selectedEmotion.ToResourceSeName(), pitch: 1f);
+            AfterBidChanged();
+        }).AddTo(d);
+
+        _scene.Auction.OnDecrease.Subscribe(_ =>
+        {
+            if (_draft.Get(_selectedEmotion) <= 0) return;
+            _draft.Add(_selectedEmotion, -1);
+            AfterBidChanged();
+        }).AddTo(d);
+
+        await _scene.Auction.OnBiddingConfirmed.FirstAsync(ct);
+        _scene.Auction.HideBidWindow();
+        _scene.Auction.SetEmotionInteractable(false);
         _session.SubmitPlayerBid(_draft);
     }
 
@@ -173,23 +195,22 @@ public class AuctionPresenter : IStartable, IDisposable
     {
         _session.StartCompetition(Time.time);
         var competition = _session.Competition;
-        _view.CompetitionPanel.Show(competition);
-        _view.RefreshSlots();
         var playerCompeting = competition.Competitors.Contains(_session.Player);
-        if (playerCompeting)
-        {
-            _view.BidPanel.RefreshAsRaise(_session.Player.Wallet);
-            _view.BidPanel.Show();
-        }
-        _view.SetMessage(playerCompeting ? "1 枚ずつ上乗せできる。競合に入った分は返ってこない" : "他の参加者同士の競合を見守る");
+        var rivalTop = competition.Competitors.Where(c => !c.IsPlayer).Select(competition.TotalOf).DefaultIfEmpty(0).Max();
+
+        _scene.Competition.Initialize(playerCompeting ? competition.TotalOf(_session.Player) : 0, rivalTop, Remaining());
+        _scene.Competition.SetInstruction(playerCompeting ? "上乗せして競り勝て" : "競合を見守る");
+        _scene.Competition.SetEmotionInteractable(playerCompeting);
+        _scene.Competition.SetRaiseInteractable(playerCompeting);
 
         using var d = new CompositeDisposable();
-        _view.BidPanel.OnPlus.Subscribe(e =>
+        _scene.Competition.OnEmotionSelected.Subscribe(e => _selectedEmotion = e).AddTo(d);
+        _scene.Competition.OnRaise.Subscribe(_ =>
         {
-            if (!_session.TryPlayerRaise(e, Time.time)) return;
-            SeManager.Instance.PlaySe(e.ToResourceSeName(), pitch: 1f);
-            _view.BidPanel.RefreshAsRaise(_session.Player.Wallet);
-            _view.RefreshSlots();
+            if (!_session.TryPlayerRaise(_selectedEmotion, Time.time)) return;
+            SeManager.Instance.PlaySe(_selectedEmotion.ToResourceSeName(), pitch: 1f);
+            _scene.Competition.UpdateResources(Remaining());
+            _scene.RefreshParticipants();
         }).AddTo(d);
 
         var npcNext = competition.Competitors.Where(c => !c.IsPlayer).ToDictionary(c => c, _ => Time.time + NextNpcInterval());
@@ -198,34 +219,37 @@ public class AuctionPresenter : IStartable, IDisposable
             foreach (var npc in npcNext.Keys.ToList())
             {
                 if (Time.time < npcNext[npc]) continue;
-                if (_session.TryNpcRaise(npc, Time.time)) _view.RefreshSlots();
+                if (_session.TryNpcRaise(npc, Time.time)) SeManager.Instance.PlaySe("SE_RESOURCE_ANGER", pitch: 1f);
                 npcNext[npc] = Time.time + NextNpcInterval();
             }
-            _view.CompetitionPanel.Refresh(competition, Time.time);
-            foreach (var c in competition.Competitors) _view.SlotOf(c).ShowBid(competition.TotalOf(c));
+            var top = competition.Competitors.Where(c => !c.IsPlayer).Select(competition.TotalOf).DefaultIfEmpty(0).Max();
+            _scene.Competition.UpdateBids(competition.TotalOf(_session.Player), top);
+            _scene.Competition.UpdateTimer(competition.RemainingSeconds(Time.time), competition.TimeoutSeconds);
+            _scene.ShowCompetitionTotals(competition);
+            if (playerCompeting) _scene.Competition.SetRaiseInteractable(_session.Player.Wallet.Total > 0);
             await UniTask.Yield(ct);
         }
 
-        _view.BidPanel.Hide();
-        _view.CompetitionPanel.Hide();
-        return _session.ResolveCompetition();
+        _scene.Competition.Hide();
+        var winner = _session.ResolveCompetition();
+        await _scene.Auction.ShowResultAsync(winner != null && winner.IsPlayer, false, false, RivalColor());
+        return winner;
     }
 
     private async UniTask RunBaptismAsync(CancellationToken ct)
     {
         _chosen = null;
-        _view.HideAllPanels();
-        _view.Baptism.Show(_session);
-        _view.SetMessage("洗礼: 落札した記憶から 1 つを人格に統合する");
+        await _scene.Announcement.DisplayAnnouncement("洗礼", 1.6f);
+        _scene.Baptism.Show(_session);
 
         using var d = new CompositeDisposable();
-        _view.Baptism.OnIntegrate.Subscribe(w =>
+        _scene.Baptism.OnIntegrate.Subscribe(w =>
         {
             _chosen = w;
-            _view.Baptism.SetSelected(w);
+            _scene.Baptism.SetSelected(w);
         }).AddTo(d);
 
-        await _view.Baptism.OnFinish.Where(_ => _chosen != null).FirstAsync(ct);
+        await _scene.Baptism.OnFinish.Where(_ => _chosen != null).FirstAsync(ct);
         _session.Finish();
         var collapsed = _session.Rivals.Where(r => r.HasCollapsed).Select(r => r.Data.ParticipantId);
         _progress.RecordAuctionClearAndSave(_session.Player.Wallet, _chosen, _session.Player.WonLots, collapsed);
@@ -234,19 +258,73 @@ public class AuctionPresenter : IStartable, IDisposable
 
     private async UniTask RunGameOverAsync(CancellationToken ct)
     {
-        _view.HideAllPanels();
-        _view.GameOver.Show(_session.Floor.FloorIndex, _session.MissedKey);
-        _view.SetMessage("ゲームオーバー");
-        var retry = _view.GameOver.OnRetry.Select(_ => true);
-        var lobby = _view.GameOver.OnLobby.Select(_ => false);
-        var toRetry = await Observable.Merge(retry, lobby).FirstAsync(ct);
+        _scene.GameOver.Show(_session.Floor.FloorIndex, _session.MissedKey);
+        var toRetry = await Observable.Merge(
+            _scene.GameOver.OnRetry.Select(_ => true),
+            _scene.GameOver.OnLobby.Select(_ => false)).FirstAsync(ct);
         // 進行度は変えず、同じ階層をやり直す
         await _sceneTransition.TransitionToSceneWithFade(toRetry ? SceneType.Auction : SceneType.Home);
     }
 
+    private async UniTask SelectTargetAsync(AuctionParticipant target)
+    {
+        _scene.SetSelectedTarget(target);
+        await _scene.Dialogue.SetTargetAsync(target.Data);
+        await _scene.Rival.ChangePortraitAsync(target.Data.Portrait);
+    }
+
+    private AuctionParticipant CurrentTarget()
+    {
+        return _scene.SelectedTarget;
+    }
+
+    private void AfterBidChanged()
+    {
+        _scene.Auction.UpdateBidAmount(_draft.Get(_selectedEmotion));
+        _scene.Auction.UpdateEmotionResources(Remaining());
+        UpdateBidInteractables();
+    }
+
+    private void UpdateBidInteractables()
+    {
+        _scene.Auction.SetIncreaseInteractable(_draft.Get(_selectedEmotion) < _session.Player.Wallet.Get(_selectedEmotion));
+    }
+
+    private Dictionary<EmotionType, int> Remaining()
+    {
+        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, e => _session.Player.Wallet.Get(e) - _draft.Get(e));
+    }
+
+    private static Dictionary<EmotionType, int> BidBreakdown(EmotionBid bid)
+    {
+        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, bid.Get);
+    }
+
+    private Color RivalColor()
+    {
+        return _scene.SelectedTarget?.Data != null ? _scene.SelectedTarget.Data.ThemeColor : Color.red;
+    }
+
+    private static string PlayerLine(DialogueCommand command)
+    {
+        return command switch
+        {
+            DialogueCommand.Observe => "……あなたの手の内、見せてもらう。",
+            DialogueCommand.Provoke => "その程度で、この記憶が欲しいの？",
+            DialogueCommand.Empathize => "その気持ち、分かる気がする。",
+            DialogueCommand.Persuade => "その記憶は、あなたには必要ないはず。",
+            _ => "……。",
+        };
+    }
+
+    private static float NextNpcInterval()
+    {
+        return UnityEngine.Random.Range(GameConstants.NPC_RAISE_INTERVAL_MIN, GameConstants.NPC_RAISE_INTERVAL_MAX);
+    }
+
     public void Start()
     {
-        _view.Initialize(_session);
+        _scene.Initialize(_session);
         BgmManager.Instance.PlayBGM("Battle");
         RunAsync(_cts.Token).Forget();
     }
@@ -255,6 +333,5 @@ public class AuctionPresenter : IStartable, IDisposable
     {
         _cts.Cancel();
         _cts.Dispose();
-        _disposables.Dispose();
     }
 }

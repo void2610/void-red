@@ -12,6 +12,8 @@ public class MemoryLotData : ScriptableObject
     [Tooltip("記憶テーマとの適合度。プレイヤーには見せず名称とフレーバーから推測させる")]
     [SerializeField, Range(0, 100)] private int resonance;
     [SerializeField] private Sprite image;
+    [Tooltip("札のカーテン絵のバリエーション (CardView の curtainSprites を引く)")]
+    [SerializeField] private MemoryType visualStyle = MemoryType.AmbiguousMemory;
     [Tooltip("楽園への鍵。最終階層ではこれを落札しないと洗礼を受けられない")]
     [SerializeField] private bool isKey;
 
@@ -21,5 +23,6 @@ public class MemoryLotData : ScriptableObject
     public EmotionType Emotion => emotion;
     public int Resonance => resonance;
     public Sprite Image => image;
+    public MemoryType VisualStyle => visualStyle;
     public bool IsKey => isKey;
 }

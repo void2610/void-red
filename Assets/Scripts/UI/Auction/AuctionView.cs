@@ -2,112 +2,123 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using R3;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Void2610.UnityTemplate;
 
 /// <summary>
-/// オークション画面のルート View。各フェーズのパネルと参加者スロットを束ねる
+/// オークションフェーズの View
+/// 場に出ているロット (記憶) と、感情ホイール・入札ウィンドウを束ねる
 /// </summary>
-public class AuctionView : MonoBehaviour
+public class AuctionView : BasePhaseView
 {
-    [SerializeField] private TextMeshProUGUI floorText;
-    [SerializeField] private TextMeshProUGUI themeText;
-    [SerializeField] private TextMeshProUGUI messageText;
-    [SerializeField] private Transform slotContainer;
-    [SerializeField] private GameObject slotPrefab;
-    [SerializeField] private LotView lotView;
-    [SerializeField] private DialoguePanelView dialoguePanel;
-    [SerializeField] private CounterDialogueView counterDialogue;
-    [SerializeField] private BidPanelView bidPanel;
-    [SerializeField] private CompetitionPanelView competitionPanel;
-    [SerializeField] private BaptismView baptismView;
-    [SerializeField] private GameOverView gameOverView;
-    [SerializeField] private Button nextButton;
+    [Header("ロット表示")]
+    [SerializeField] private Transform cardContainer;
+    [SerializeField] private AuctionCardView auctionCardPrefab;
 
-    public DialoguePanelView DialoguePanel => dialoguePanel;
-    public CounterDialogueView CounterDialogue => counterDialogue;
-    public BidPanelView BidPanel => bidPanel;
-    public CompetitionPanelView CompetitionPanel => competitionPanel;
-    public BaptismView Baptism => baptismView;
-    public GameOverView GameOver => gameOverView;
-    public IReadOnlyList<ParticipantSlotView> Slots => _slots;
-    public Observable<AuctionParticipant> OnSlotSelected => _onSlotSelected;
-    public Observable<Unit> OnNext => nextButton.OnClickAsObservable();
-    public bool IsWaitingNext => nextButton.gameObject.activeSelf;
-    public string Message => messageText.text;
+    [Header("入札UI")]
+    [SerializeField] private BidWindowView bidWindowView;
+    [SerializeField] private Button confirmBiddingButton;
 
-    private readonly List<ParticipantSlotView> _slots = new();
-    private readonly Subject<AuctionParticipant> _onSlotSelected = new();
-    private readonly CompositeDisposable _disposables = new();
+    [Header("感情リソース表示")]
+    [SerializeField] private EmotionResourceDisplayView emotionResourceDisplayView;
 
-    public void SetMessage(string text) => messageText.text = text;
+    [Header("ロット登場アニメーション")]
+    [SerializeField] private StaggeredSlideInGroup cardStagger;
 
-    public void SetNextInteractable(bool on) => nextButton.interactable = on;
+    /// <summary>感情ホイールで選択中の属性が変わった</summary>
+    public Observable<EmotionType> OnEmotionSelected => emotionResourceDisplayView.OnEmotionSelected;
 
-    public ParticipantSlotView SlotOf(AuctionParticipant p) => _slots.First(s => s.Participant == p);
+    /// <summary>入札ウィンドウの + / -</summary>
+    public Observable<Unit> OnIncrease => bidWindowView.OnIncrease;
+    public Observable<Unit> OnDecrease => bidWindowView.OnDecrease;
+    public Observable<Unit> OnBiddingConfirmed => confirmBiddingButton.OnClickAsObservable();
 
-    public void LotViewShow(MemoryLotData lot, int number) => lotView.Show(lot, number);
+    public AuctionCardView CurrentCard => _cards.Count > 0 ? _cards[^1] : null;
 
-    public void Initialize(AuctionSession session)
+    private readonly List<AuctionCardView> _cards = new();
+
+    public override void Show() => CanvasGroup.Show();
+
+    public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
+
+    public void SetSelectedEmotion(EmotionType emotion) => emotionResourceDisplayView.SetSelectedEmotion(emotion);
+
+    public void SetEmotionInteractable(bool interactable) => emotionResourceDisplayView.SetInteractable(interactable);
+
+    public void SetConfirmInteractable(bool interactable) => confirmBiddingButton.interactable = interactable;
+
+    public void SetIncreaseInteractable(bool interactable) => bidWindowView.SetIncreaseInteractable(interactable);
+
+    public void UpdateBidAmount(int amount) => bidWindowView.UpdateBidAmount(amount);
+
+    public void SetBidEmotion(EmotionType emotion) => bidWindowView.SetEmotion(emotion);
+
+    public void HideBidWindow() => bidWindowView.Hide();
+
+    /// <summary>入札ウィンドウの表示 (ロット名 / 属性 / 枚数)</summary>
+    public void ShowBidWindow(MemoryLotData lot, EmotionType emotion, int amount)
     {
-        floorText.text = $"第 {session.Floor.FloorIndex} 階層";
-        themeText.text = $"記憶テーマ「{session.Floor.ThemeTitle}」";
-        foreach (var p in session.Participants)
+        bidWindowView.Show();
+        bidWindowView.SetCardName(lot.Title);
+        bidWindowView.SetEmotion(emotion);
+        bidWindowView.UpdateBidAmount(amount);
+    }
+
+    /// <summary>新しいロットを場に出す</summary>
+    public void ShowLot(MemoryLotData lot)
+    {
+        Clear();
+        var card = Instantiate(auctionCardPrefab, cardContainer);
+        card.Initialize(lot);
+        card.SetInteractable(false);
+        _cards.Add(card);
+        cardStagger.Play();
+    }
+
+    /// <summary>入札内訳と他参加者の最高額を札の上に出す</summary>
+    public void ShowBids(Dictionary<EmotionType, int> playerBids, int rivalTopBid)
+    {
+        var card = CurrentCard;
+        if (!card) return;
+        card.BidInfoView.ShowBidAmounts(rivalTopBid);
+        card.BidInfoView.ShowPlayerBidsWithEmotion(playerBids);
+    }
+
+    /// <summary>落札結果を札に反映する</summary>
+    public async UniTask ShowResultAsync(bool isPlayerWon, bool isDraw, bool noBids, Color rivalColor)
+    {
+        var card = CurrentCard;
+        if (!card) return;
+
+        if (noBids)
         {
-            var slot = Instantiate(slotPrefab, slotContainer).GetComponent<ParticipantSlotView>();
-            slot.Bind(p);
-            slot.OnSelected.Subscribe(_onSlotSelected.OnNext).AddTo(_disposables);
-            _slots.Add(slot);
+            await card.FadeOutAsync();
+            return;
         }
-        HideAllPanels();
-    }
-
-    public void RefreshSlots()
-    {
-        foreach (var s in _slots) s.Refresh();
-    }
-
-    public void HideBids()
-    {
-        foreach (var s in _slots)
+        if (isDraw)
         {
-            s.HideBid();
-            s.SetWinner(false);
-            s.SetHighlighted(false);
+            card.CardView.SetGrowEffect(CardView.CardBidState.DrawBid, rivalColor);
+            card.BidInfoView.ShowDraw();
+            SeManager.Instance.PlaySe("SE_RESULT_CLASH", pitch: 1f);
+            await UniTask.Delay(400);
+            return;
         }
+        card.CardView.SetGrowEffect(isPlayerWon ? CardView.CardBidState.PlayerBid : CardView.CardBidState.EnemyBid, rivalColor);
+        card.BidInfoView.ShowResult(isPlayerWon);
+        SeManager.Instance.PlaySe(isPlayerWon ? "SE_RESULT_WIN" : "SE_RESULT_LOSE", pitch: 1f);
+        await UniTask.Delay(700);
     }
 
-    public void SetSlotsSelectable(bool on)
+    public void Clear()
     {
-        foreach (var s in _slots) s.SetSelectable(on);
-    }
-
-    public void HideAllPanels()
-    {
-        dialoguePanel.Hide();
-        counterDialogue.Hide();
-        bidPanel.Hide();
-        competitionPanel.Hide();
-        baptismView.Hide();
-        gameOverView.Hide();
-        nextButton.gameObject.SetActive(false);
-    }
-
-    /// <summary>
-    /// 「次へ」が押されるまで待つ。演出の区切りをプレイヤーに委ねる
-    /// </summary>
-    public async UniTask WaitNextAsync(string message)
-    {
-        SetMessage(message);
-        nextButton.gameObject.SetActive(true);
-        nextButton.interactable = true;
-        await OnNext.FirstAsync(destroyCancellationToken);
-        nextButton.gameObject.SetActive(false);
+        cardStagger.Cancel();
+        foreach (var card in _cards) Destroy(card.gameObject);
+        _cards.Clear();
     }
 
     private void OnDestroy()
     {
-        _disposables.Dispose();
+        Clear();
     }
 }

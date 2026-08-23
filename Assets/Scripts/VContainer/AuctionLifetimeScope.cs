@@ -17,7 +17,7 @@ public class AuctionLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponentInHierarchy<AuctionView>();
+        builder.RegisterComponentInHierarchy<AuctionSceneView>();
         builder.Register(resolver =>
         {
             var allFloorData = resolver.Resolve<AllFloorData>();
@@ -30,7 +30,8 @@ public class AuctionLifetimeScope : LifetimeScope
             return new AuctionSession(allFloorData.GetFloor(floorIndex), progress.PrepareWalletForFloor(), "ノア", rng, timeout);
         }, Lifetime.Scoped);
 
-        builder.RegisterSettingsFeature();
+        // オークション画面には設定ボタンを置かないため、バトル用の登録 (SettingButtonView 無し) を使う
+        builder.RegisterSettingsFeatureForBattle();
         builder.RegisterEntryPoint<AuctionPresenter>();
     }
 }
