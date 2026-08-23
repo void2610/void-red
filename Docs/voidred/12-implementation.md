@@ -37,7 +37,7 @@
 | 洗礼: 内訳と歪みを見せ 1 つだけ統合、残りはコレクション | `BaptismView` が旧リザルトの `CardAcquisitionView` (札 + 内訳のスタガー表示) を内包し、札をクリックして選ぶ。`PersonaState.Integrate` で統合。感情状態は入札の主属性 (同数なら記憶の属性) |
 | リソース持ち越し + 階層ごとに 8 × 5 補充 | `GameProgressService.PrepareWalletForFloor` (`Refill` は加算)。ゲームオーバーのやり直しで補充が重ならないよう、階層に入ったときの手持ちを控えて復元する |
 | 記憶テーマの鮮明化 | 出品の過半 (3/5) を落札したとき洗礼の見出しに鮮明化後テーマを出す (`IsThemeClarified`) |
-| ロビー | HomeScene の旧デッキ / 図鑑ボタンを「人格」「記憶コレクション」に転用。進行案内は `HomeView.SetProgressText` |
+| ロビー | HomeScene の旧デッキ / 図鑑ボタンを「人格」「記憶コレクション」に転用。進行案内は `HomeView.SetProgressText`。未実装の「人物ファイル」「回想夢」は `HomeView.Initialize` で非表示にしている (実装するときに戻す) |
 | 4 階層の獲得必須の記憶 (楽園への鍵) | `MemoryLotData.IsKey`。鍵のある階層で取り逃すと `MissedKey` でゲームオーバー (同階層やり直し)。初期データでは `4-5『楽園への鍵』` |
 | ヘルプ | `HelpData/Battle/*` の本文をオークションのルールに書き換え (画像は旧バトルのまま) |
 | 入札のマウスホイール操作 | `EmotionBidItemView.OnScroll` で行の上のホイールを +/- に変換 |
