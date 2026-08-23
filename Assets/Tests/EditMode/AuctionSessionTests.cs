@@ -322,6 +322,25 @@ public class AuctionSessionTests
         foreach (var rival in session.Rivals) Assert.LessOrEqual(rival.PlannedBid.Total, rival.Wallet.Total, $"{rival.DisplayName} が手持ちを超えて入札している");
     }
 
+    [Test]
+    public void 枯れた属性では上乗せできない()
+    {
+        var session = AuctionTestFactory.CreateSession(rivalBid: 2);
+        session.BeginNextLot();
+        session.EnterBidding();
+        var bid = new EmotionBid();
+        bid.Set(session.CurrentLot.Emotion, 2);
+        Assert.IsTrue(session.SubmitPlayerBid(bid).IsTie, "同数で競合に入る前提");
+        session.StartCompetition(0f);
+
+        var drained = EmotionWallet.ALL_EMOTIONS.First(e => e != session.CurrentLot.Emotion);
+        var stocked = EmotionWallet.ALL_EMOTIONS.First(e => e != drained && session.Player.Wallet.Get(e) > 0);
+        session.Player.Wallet.TryConsume(drained, session.Player.Wallet.Get(drained));
+
+        Assert.IsFalse(session.TryPlayerRaise(drained, 1f), "手持ちの無い属性では上乗せできない");
+        Assert.IsTrue(session.TryPlayerRaise(stocked, 1f), "手持ちのある属性なら上乗せできる");
+    }
+
     /// <summary>指定した共鳴値のロットに対するライバルの入札予定枚数</summary>
     private static int PlannedTotal(int resonance)
     {

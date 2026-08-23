@@ -27,10 +27,14 @@ public class CompetitionPhase : IAuctionPhase
         var topRival = competition.Competitors.Where(c => !c.IsPlayer).OrderByDescending(competition.TotalOf).FirstOrDefault();
         view.Competition.SetPortraits(view.PlayerPortrait, topRival?.Data ? topRival.Data.Portrait : null);
         view.Competition.SetEmotionInteractable(playerCompeting);
-        view.Competition.SetRaiseInteractable(playerCompeting);
+        UpdateRaiseInteractable(context, playerCompeting);
 
         using var d = new CompositeDisposable();
-        view.Competition.OnEmotionSelected.Subscribe(e => _selected = e).AddTo(d);
+        view.Competition.OnEmotionSelected.Subscribe(e =>
+        {
+            _selected = e;
+            UpdateRaiseInteractable(context, playerCompeting);
+        }).AddTo(d);
         view.Competition.OnRaise.Subscribe(_ =>
         {
             if (!session.TryPlayerRaise(_selected, Time.time)) return;
@@ -46,13 +50,22 @@ public class CompetitionPhase : IAuctionPhase
             view.Competition.UpdateBids(competition.TotalOf(session.Player), RivalTop(competition));
             view.Competition.UpdateTimer(competition.RemainingSeconds(Time.time), competition.TimeoutSeconds);
             view.ShowCompetitionTotals(competition);
-            if (playerCompeting) view.Competition.SetRaiseInteractable(session.Player.Wallet.Total > 0);
+            UpdateRaiseInteractable(context, playerCompeting);
             await UniTask.Yield(ct);
         }
 
         view.Competition.Hide();
         var winner = session.ResolveCompetition();
         await view.Auction.ShowResultAsync(winner != null && winner.IsPlayer, false, false, RevealPhase.RivalColor(context));
+    }
+
+    /// <summary>
+    /// 上乗せは選んでいる属性を 1 枚使うので、その属性が枯れていたら押せなくする
+    /// (総数だけで判定すると、押せるのに上乗せできない状態が生まれる)
+    /// </summary>
+    private void UpdateRaiseInteractable(AuctionContext context, bool playerCompeting)
+    {
+        context.View.Competition.SetRaiseInteractable(playerCompeting && context.Session.Player.Wallet.Get(_selected) > 0);
     }
 
     private static int RivalTop(CompetitionState competition)
