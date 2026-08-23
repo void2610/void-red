@@ -1,6 +1,5 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using R3;
 
 /// <summary>
 /// ゲームオーバー: 進行度を変えずに同じ階層をやり直すか、ロビーへ戻る
@@ -13,9 +12,8 @@ public class GameOverPhase : IAuctionPhase
     {
         var view = context.View;
         view.GameOver.Show(context.Session.Floor.FloorIndex, context.Session.MissedKey);
-        var toRetry = await Observable.Merge(
-            view.GameOver.OnRetry.Select(_ => true),
-            view.GameOver.OnLobby.Select(_ => false)).FirstAsync(ct);
+        await UniTask.WaitUntil(() => view.GameOver.RetryRequested.HasValue, cancellationToken: ct);
+        var toRetry = view.GameOver.RetryRequested.Value;
         await context.SceneTransition.TransitionToSceneWithFade(toRetry ? SceneType.Auction : SceneType.Home);
     }
 }

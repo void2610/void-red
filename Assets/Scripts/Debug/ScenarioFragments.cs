@@ -16,6 +16,7 @@ internal static class ScenarioFragments
     /// <summary>進行度とセーブ済みノベル状態を初期化し、決定的な開始状態を作る定型前文</summary>
     public static IEnumerable<ScenarioStep> ResetProgress()
     {
+        yield return ScenarioStep.Run("Auction/Speed", Args("value", 1f));
         yield return ScenarioStep.Run("Progress/Reset");
         yield return ScenarioStep.Run("Novel/ClearSavedState");
         yield return ScenarioStep.AssertCommandReturns("Progress/CurrentNode", null, "prologue1", "初期ノード確認");

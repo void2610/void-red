@@ -138,16 +138,24 @@ public sealed class AuctionDebugCommands
     public bool LotSettled() => Session().Phase is AuctionPhase.LotResult or AuctionPhase.Baptism or AuctionPhase.GameOver or AuctionPhase.Dialogue && Session().LastReveal != null;
 
     [LiminalCommand("Auction/ActivePanel", Description = "表示中の主なパネル (Dialogue / Bid / Competition / Baptism / GameOver / None) を返す")]
-    public string ActivePanel()
+    public string ActivePanel() => Session().Phase switch
     {
-        var v = View();
-        if (v.Baptism.gameObject.activeSelf) return "Baptism";
-        if (v.GameOver.gameObject.activeSelf) return "GameOver";
-        if (Session().Phase == AuctionPhase.Competition) return "Competition";
-        if (Session().Phase == AuctionPhase.Bidding) return "Bid";
-        if (Session().Phase == AuctionPhase.Dialogue) return "Dialogue";
-        return "None";
-    }
+        AuctionPhase.Baptism => "Baptism",
+        AuctionPhase.GameOver => "GameOver",
+        AuctionPhase.Competition => "Competition",
+        AuctionPhase.Bidding => "Bid",
+        AuctionPhase.Dialogue => "Dialogue",
+        _ => "None",
+    };
+
+    [LiminalCommand("Auction/BaptismReady", Description = "洗礼画面に落札した記憶の札が並び終えたか")]
+    public bool BaptismReady() => View().Baptism.GetComponentsInChildren<AcquiredCardView>(true).Length == Session().Player.WonLots.Count;
+
+    [LiminalCommand("Auction/BaptismSelected", Description = "洗礼で統合する記憶が選ばれているか")]
+    public bool BaptismSelected() => View().Baptism.SelectedLot != null;
+
+    [LiminalCommand("Auction/Speed", Description = "演出の早送り倍率を変える (検証用)")]
+    public float Speed(float value = 1f) => Time.timeScale = Mathf.Clamp(value, 0.1f, 20f);
 
     [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを押して対話相手を選ぶ")]
     public string SelectTarget(string name)
@@ -251,12 +259,13 @@ public sealed class AuctionDebugCommands
         return r.DisplayName;
     }
 
-    [LiminalCommand("Auction/ClickIntegrate", Description = "洗礼で指定ロット番号 (0 始まり) の「統合する」を押す")]
+    [LiminalCommand("Auction/ClickIntegrate", Description = "洗礼で指定ロット番号 (0 始まり) の札を選ぶ")]
     public string ClickIntegrate(int lotIndex)
     {
-        var entry = View().Baptism.GetComponentsInChildren<WonLotEntryView>(true).First(e => e.WonLot.LotIndex == lotIndex);
-        entry.GetComponentInChildren<Button>(true).onClick.Invoke();
-        return entry.WonLot.Lot.LotId;
+        var card = View().Baptism.GetComponentsInChildren<AcquiredCardView>(true).First(c => c.WonLot.LotIndex == lotIndex);
+        var button = card.GetComponentsInChildren<Button>(true).First(b => b.interactable);
+        button.onClick.Invoke();
+        return card.WonLot.Lot.LotId;
     }
 
     [LiminalCommand("Auction/BidAll", Description = "手持ち全部を積む (ホイールを回しながら実 UI で + を押す)")]
@@ -393,11 +402,12 @@ public sealed class AuctionDebugCommands
         return p;
     }
 
-    [LiminalCommand("Auction/Start", Description = "進行度と無関係に指定階層のオークションを開始する。seed 0 はランダム、timeout は競合の確定秒数")]
-    public string Start(int floor = 0, int seed = 1, float timeout = 10f)
+    [LiminalCommand("Auction/Start", Description = "進行度と無関係に指定階層のオークションを開始する。seed 0 はランダム、timeout は競合の確定秒数、speed は演出の早送り倍率")]
+    public string Start(int floor = 0, int seed = 1, float timeout = 10f, float speed = 1f)
     {
         _request.Set(floor, seed, timeout);
+        Time.timeScale = Mathf.Clamp(speed, 0.1f, 20f);
         _sceneTransition.TransitionToSceneWithFade(SceneType.Auction).Forget();
-        return $"floor={floor} seed={seed}";
+        return $"floor={floor} seed={seed} speed={Time.timeScale}";
     }
 }

@@ -24,6 +24,7 @@ public static class AuctionUiBuilder
     private const string DIALOGUE_PHASE_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialoguePhaseView.prefab";
     private const string DIALOGUE_PORTRAIT_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialoguePortraitView.prefab";
     private const string DIALOGUE_CHOICES_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialogueChoicesView.prefab";
+    private const string ACQUISITION_PREFAB = "Assets/Prefabs/NewBattleSceneView/RewardPhase/CardAcquisitionView.prefab";
 
     // 旧ルール専用で、新オークションでは使わないプレハブインスタンス
     private static readonly string[] OBSOLETE_OBJECTS =
@@ -62,8 +63,7 @@ public static class AuctionUiBuilder
         LoadFont();
         BuildDialoguePhasePrefab();
         BuildParticipantIcon();
-        var wonEntry = BuildWonLotEntry();
-        BuildBaptism(wonEntry);
+        BuildBaptism();
         BuildGameOver();
         AssetDatabase.SaveAssets();
         Debug.Log("[AuctionUiBuilder] プレハブ生成完了");
@@ -341,6 +341,23 @@ public static class AuctionUiBuilder
         button.gameObject.name = "ConfirmButton";
     }
 
+    /// <summary>
+    /// 旧リザルトの文言を洗礼のものに差し替え、進行用の「次へ」は洗礼ボタンに一本化する
+    /// </summary>
+    private static void ApplyAcquisitionTexts(CardAcquisitionView acquisition)
+    {
+        foreach (var text in acquisition.GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            var so = new SerializedObject(text);
+            var current = so.FindProperty("m_text");
+            if (current.stringValue.Contains("獲得カード")) current.stringValue = "落札した記憶";
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        var next = acquisition.GetComponentsInChildren<Button>(true).FirstOrDefault();
+        if (next) next.gameObject.SetActive(false);
+    }
+
     private static Sprite LoadSprite(string path)
     {
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
@@ -458,19 +475,18 @@ public static class AuctionUiBuilder
         return bar;
     }
 
-    private static GameObject BuildBaptism(GameObject wonEntryPrefab)
+    private static GameObject BuildBaptism()
     {
         var root = Window(null, "BaptismView", "洗礼", out _, showClose: false);
+        root.AddComponent<CanvasGroup>();
         var header = root.GetComponentsInChildren<TextMeshProUGUI>(true).First(t => t.name == "TitleText");
-        var container = Rect("EntryContainer", root, new Vector2(720, 360));
-        Place(container.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -10), new Vector2(720, 360));
-        var layout = container.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 6;
-        layout.childAlignment = TextAnchor.UpperCenter;
-        layout.childControlWidth = false;
-        layout.childControlHeight = false;
-        layout.childForceExpandWidth = false;
-        layout.childForceExpandHeight = false;
+        Place(header.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -95), new Vector2(760, 50));
+
+        // 落札した記憶の一覧は旧リザルトの演出 (札 + 内訳のスタガー表示) を流用する
+        var acquisition = InstantiatePrefab(ACQUISITION_PREFAB, root.transform).GetComponent<CardAcquisitionView>();
+        SetRect(acquisition.transform, new Vector2(0, 20), 1f);
+        ApplyAcquisitionTexts(acquisition);
+
         var remaining = Text(root, "RemainingText", "", 18, TextAlignmentOptions.MidlineLeft);
         Place(remaining.rectTransform, new Vector2(0.5f, 0f), new Vector2(-180, 118), new Vector2(360, 26));
         var collapsed = Text(root, "CollapsedText", "", 18, TextAlignmentOptions.MidlineLeft);
@@ -481,8 +497,8 @@ public static class AuctionUiBuilder
         Place(finish.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(210, 84), new Vector2(200, 44));
 
         var view = root.AddComponent<BaptismView>();
-        Wire(view, ("headerText", header), ("entryContainer", container.transform), ("entryPrefab", wonEntryPrefab),
-            ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected), ("finishButton", finish));
+        Wire(view, ("headerText", header), ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected),
+            ("acquisitionView", acquisition), ("finishButton", finish));
         return SavePrefab(root, "BaptismView");
     }
 
@@ -498,26 +514,6 @@ public static class AuctionUiBuilder
         var view = root.AddComponent<GameOverView>();
         Wire(view, ("messageText", message), ("retryButton", retry), ("lobbyButton", lobby));
         return SavePrefab(root, "GameOverView");
-    }
-
-    private static GameObject BuildWonLotEntry()
-    {
-        var root = Rect("WonLotEntry", null, new Vector2(700, 84));
-        var frame = Image(root, "Frame", Color.white);
-        Stretch(frame);
-        var inner = Image(root, "Inner", new Color(0.12f, 0.08f, 0.1f, 0.95f));
-        Stretch(inner, 2);
-        var title = Text(root, "TitleText", "ロット", 19, TextAlignmentOptions.MidlineLeft);
-        Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(300, -18), new Vector2(560, 26));
-        var detail = Text(root, "DetailText", "", 14, TextAlignmentOptions.TopLeft);
-        Place(detail.rectTransform, new Vector2(0f, 1f), new Vector2(300, -54), new Vector2(560, 44));
-        var distortion = Text(root, "DistortionText", "歪み", 17, TextAlignmentOptions.Center);
-        Place(distortion.rectTransform, new Vector2(1f, 1f), new Vector2(-70, -20), new Vector2(120, 26));
-        var integrate = ButtonPrefab(root, "IntegrateButton", "統合する", new Vector2(120, 34));
-        Place(integrate.GetComponent<RectTransform>(), new Vector2(1f, 0f), new Vector2(-70, 24), new Vector2(120, 34));
-        var view = root.AddComponent<WonLotEntryView>();
-        Wire(view, ("titleText", title), ("detailText", detail), ("distortionText", distortion), ("integrateButton", integrate), ("frame", frame));
-        return SavePrefab(root, "WonLotEntry");
     }
 
     private static GameObject BuildCollectionEntry()

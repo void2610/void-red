@@ -14,6 +14,8 @@ using Void2610.UnityTemplate;
 /// </summary>
 public class AuctionPresenter : IStartable, IDisposable
 {
+    /// <summary>いま走っているフェーズ (進行が止まったときの手掛かり)</summary>
+    public string CurrentPhaseName { get; private set; } = "";
     private readonly AuctionContext _context;
     private readonly IReadOnlyList<IAuctionPhase> _phases;
     private readonly CancellationTokenSource _cts = new();
@@ -32,6 +34,7 @@ public class AuctionPresenter : IStartable, IDisposable
             {
                 var phase = _phases.FirstOrDefault(p => p.CanRun(_context.Session));
                 if (phase == null) throw new InvalidOperationException($"進行できるフェーズが無い: {_context.Session.Phase}");
+                CurrentPhaseName = phase.GetType().Name;
                 await phase.RunAsync(_context, ct);
             }
         }

@@ -15,6 +15,7 @@ public class CompetitionState
 
     private readonly List<AuctionParticipant> _competitors;
     private readonly Dictionary<AuctionParticipant, EmotionBid> _raises = new();
+    private readonly float _startedAt;
     private float _lastActionTime;
 
     public CompetitionState(MemoryLotData lot, IEnumerable<AuctionParticipant> competitors, float now, float timeoutSeconds)
@@ -23,6 +24,7 @@ public class CompetitionState
         _competitors = competitors.ToList();
         foreach (var c in _competitors) _raises[c] = new EmotionBid();
         _lastActionTime = now;
+        _startedAt = now;
         TimeoutSeconds = timeoutSeconds;
     }
 
@@ -33,7 +35,11 @@ public class CompetitionState
 
     public float RemainingSeconds(float now) => Math.Max(0f, TimeoutSeconds - (now - _lastActionTime));
 
-    public bool IsTimedOut(float now) => now - _lastActionTime >= TimeoutSeconds;
+    /// <summary>
+    /// 最後の上乗せから確定時間が経った、または競合そのものが長引きすぎた
+    /// (上乗せが続く限り終わらないと進行が止まるため、絶対的な打ち切りを持つ)
+    /// </summary>
+    public bool IsTimedOut(float now) => now - _lastActionTime >= TimeoutSeconds || now - _startedAt >= TimeoutSeconds * GameConstants.COMPETITION_HARD_LIMIT_RATIO;
 
     /// <summary>
     /// 同数のまま誰も上乗せできなくなった (全員リソース切れ)

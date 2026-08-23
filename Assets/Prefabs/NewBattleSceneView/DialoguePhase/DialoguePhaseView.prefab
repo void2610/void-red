@@ -481,7 +481,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 404790864600353134, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_text
-      value: "\u89B3\u5BDF\u3059\u308B"
+      value: "\u6311\u767A\u3059\u308B"
       objectReference: {fileID: 0}
     - target: {fileID: 1193251023342396351, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -495,13 +495,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueChoice_Persuade
       objectReference: {fileID: 0}
+    - target: {fileID: 2187646882352872035, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 79.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2187646882352872035, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -164
+      objectReference: {fileID: 0}
     - target: {fileID: 2750265497107705337, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 558c993700a034f7f8da5637bcabbfd4, type: 3}
+      objectReference: {fileID: 21300000, guid: cd6cc6d93e8f54ad2b4b854288551503, type: 3}
     - target: {fileID: 3607223742749043790, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Name
-      value: DialogueChoice_Observe
+      value: DialogueChoice_Provoke
       objectReference: {fileID: 0}
     - target: {fileID: 4275177689923751685, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -514,30 +522,38 @@ PrefabInstance:
     - target: {fileID: 4836775438537377932, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: de7cb7f317b5c4a0b85159f21d23e28b, type: 3}
+      objectReference: {fileID: 21300000, guid: 558c993700a034f7f8da5637bcabbfd4, type: 3}
+    - target: {fileID: 4962667167994278313, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 79.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4962667167994278313, guid: e245c412f77b845b79422c820ae1b076, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -268.50003
+      objectReference: {fileID: 0}
     - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: 'choiceButtons.Array.data[0]'
       value: 
-      objectReference: {fileID: 2463099100137524986}
+      objectReference: {fileID: 5123941698267573135}
     - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: 'choiceButtons.Array.data[1]'
       value: 
-      objectReference: {fileID: 8695419356481373488}
+      objectReference: {fileID: 2463099100137524986}
     - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: 'choiceButtons.Array.data[2]'
       value: 
-      objectReference: {fileID: 5123941698267573135}
+      objectReference: {fileID: 8695419356481373488}
     - target: {fileID: 5037747274776359112, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: 'choiceButtons.Array.data[3]'
       value: 
       objectReference: {fileID: 515312367370681244}
     - target: {fileID: 6285376528195619131, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Name
-      value: DialogueChoice_Empathize
+      value: DialogueChoice_Observe
       objectReference: {fileID: 0}
     - target: {fileID: 6853600556032393892, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_text
-      value: "\u6311\u767A\u3059\u308B"
+      value: "\u5171\u611F\u3059\u308B"
       objectReference: {fileID: 0}
     - target: {fileID: 6882031426847463832, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Pivot.x
@@ -629,7 +645,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6965750734127574043, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_text
-      value: "\u5171\u611F\u3059\u308B"
+      value: "\u89B3\u5BDF\u3059\u308B"
       objectReference: {fileID: 0}
     - target: {fileID: 6991872696553816092, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Name
@@ -637,20 +653,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7533841169017579396, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Name
-      value: DialogueChoice_Provoke
+      value: DialogueChoice_Empathize
       objectReference: {fileID: 0}
     - target: {fileID: 8892743911674928918, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 79.2
+      value: 144.59993
       objectReference: {fileID: 0}
     - target: {fileID: 8892743911674928918, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -268.50003
+      value: -76.1
       objectReference: {fileID: 0}
     - target: {fileID: 8982462049878992435, guid: e245c412f77b845b79422c820ae1b076, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: cd6cc6d93e8f54ad2b4b854288551503, type: 3}
+      objectReference: {fileID: 21300000, guid: de7cb7f317b5c4a0b85159f21d23e28b, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

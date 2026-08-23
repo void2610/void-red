@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using R3;
 
 /// <summary>
 /// 洗礼: 落札した記憶から 1 つを人格に統合し、階層を締めてロビーへ戻る
@@ -14,19 +13,12 @@ public class BaptismPhase : IAuctionPhase
     {
         var view = context.View;
         var session = context.Session;
-        WonLot chosen = null;
 
         await view.Announcement.DisplayAnnouncement("洗礼", 1.6f);
-        view.Baptism.Show(session);
+        await view.Baptism.ShowAsync(session);
+        await UniTask.WaitUntil(() => view.Baptism.FinishRequested, cancellationToken: ct);
 
-        using var d = new CompositeDisposable();
-        view.Baptism.OnIntegrate.Subscribe(w =>
-        {
-            chosen = w;
-            view.Baptism.SetSelected(w);
-        }).AddTo(d);
-
-        await view.Baptism.OnFinish.Where(_ => chosen != null).FirstAsync(ct);
+        var chosen = view.Baptism.SelectedLot;
         session.Finish();
         var collapsed = session.Rivals.Where(r => r.HasCollapsed).Select(r => r.Data.ParticipantId);
         context.Progress.RecordAuctionClearAndSave(session.Player.Wallet, chosen, session.Player.WonLots, collapsed);

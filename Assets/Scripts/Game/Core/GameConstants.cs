@@ -25,6 +25,11 @@ public static class GameConstants
     public const float NPC_RAISE_INTERVAL_MAX = 2f;
 
     /// <summary>
+    /// 競合フェーズ全体の打ち切り時間 (確定時間の何倍まで粘れるか)
+    /// </summary>
+    public const float COMPETITION_HARD_LIMIT_RATIO = 4f;
+
+    /// <summary>
     /// NPC が競合で上乗せできる枚数の上限 (提出額 + この値)。際限のない競り上げで決着しなくなるのを防ぐ
     /// </summary>
     public const int NPC_MAX_RAISE_MARGIN = 2;

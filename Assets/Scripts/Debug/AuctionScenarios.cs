@@ -26,7 +26,9 @@ public static class AuctionScenarios
         yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "1");
         yield return ScenarioStep.AssertCommandReturns("Auction/CollapseConsistent", null, "True", "無落札のライバルだけが人格崩壊する");
 
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismReady", null, "True", 20f, "洗礼の札が並ぶまで待つ");
         yield return ScenarioStep.Run("Auction/ClickIntegrate", Args("lotIndex", 0));
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismSelected", null, "True", 10f, "統合する記憶の選択が反映されるまで待つ");
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "FinishButton"));
         foreach (var step in WaitScene("HomeScene")) yield return step;
         yield return ScenarioStep.AssertCommandReturns("Progress/IntegratedCount", null, "1");
@@ -72,7 +74,9 @@ public static class AuctionScenarios
 
         for (var lot = 0; lot < 4; lot++) foreach (var step in PlayLot(win: false)) yield return step;
         yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "Baptism", 40f);
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismReady", null, "True", 20f, "洗礼の札が並ぶまで待つ");
         yield return ScenarioStep.Run("Auction/ClickIntegrate", Args("lotIndex", 0));
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismSelected", null, "True", 10f, "統合する記憶の選択が反映されるまで待つ");
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "FinishButton"));
         foreach (var step in WaitScene("HomeScene")) yield return step;
         yield return ScenarioStep.AssertCommandReturns("Progress/TotalDistortion", null, "12");
@@ -199,7 +203,8 @@ public static class AuctionScenarios
     {
         foreach (var step in ResetProgress()) yield return step;
         yield return WaitFadeDone();
-        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = floor, ["seed"] = seed, ["timeout"] = competitionTimeout });
+        // 検証は演出を早送りする (待ち時間で Unity を長時間占有しない)
+        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = floor, ["seed"] = seed, ["timeout"] = competitionTimeout, ["speed"] = 6f });
         foreach (var step in WaitScene("AuctionScene")) yield return step;
         yield return ScenarioStep.AssertCommandEventually("Auction/DialogueReady", null, "True", 60f, "テーマ公開 → 最初のロットの対話フェーズ待ち");
     }
