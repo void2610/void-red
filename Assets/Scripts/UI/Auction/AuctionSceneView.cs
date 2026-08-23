@@ -50,13 +50,14 @@ public class AuctionSceneView : MonoBehaviour
         SetTargetSelectable(true);
         IsWaitingDialogueInput = true;
         auction.SetConfirmLabel("入札へ");
+        auction.ResetConfirm();
         dialogue.SetCommandAvailability(i => SelectedTarget != null && session.CanUseDialogue(SelectedTarget, (DialogueCommand)i));
         auction.SetConfirmInteractable(true);
 
         var picked = await UniTask.WhenAny(
             dialogue.WaitForCommandAsync(),
             _onTargetChanged.FirstAsync(ct).AsUniTask(),
-            auction.OnBiddingConfirmed.FirstAsync(ct).AsUniTask());
+            WaitConfirmAsync(ct));
 
         IsWaitingDialogueInput = false;
         return picked.winArgumentIndex switch
@@ -142,6 +143,13 @@ public class AuctionSceneView : MonoBehaviour
         await announcement.DisplayAnnouncement($"{counter.ChoiceA}  /  {counter.ChoiceB}", 1.2f);
         var index = await dialogue.WaitForCommandAsync();
         return index % 2;
+    }
+
+    /// <summary>確定ボタンが押されるまで待つ (WhenAny に混ぜるため戻り値を揃える)</summary>
+    private async UniTask<int> WaitConfirmAsync(CancellationToken ct)
+    {
+        await UniTask.WaitUntil(() => auction.ConfirmRequested, cancellationToken: ct);
+        return 0;
     }
 
     private ParticipantIconView IconOf(AuctionParticipant p)

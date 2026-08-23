@@ -32,14 +32,19 @@ public class AuctionView : BasePhaseView
     /// <summary>入札ウィンドウの + / -</summary>
     public Observable<Unit> OnIncrease => bidWindowView.OnIncrease;
     public Observable<Unit> OnDecrease => bidWindowView.OnDecrease;
-    public Observable<Unit> OnBiddingConfirmed => confirmBiddingButton.OnClickAsObservable();
+    /// <summary>確定ボタンが押されたか。購読の張り忘れで押下を取りこぼさないようフラグで持つ</summary>
+    public bool ConfirmRequested { get; private set; }
 
     public AuctionCardView CurrentCard => _cards.Count > 0 ? _cards[^1] : null;
     public EmotionType SelectedEmotion => emotionResourceDisplayView.SelectedEmotion;
 
     private readonly List<AuctionCardView> _cards = new();
+    private readonly CompositeDisposable _disposables = new();
 
     public override void Show() => CanvasGroup.Show();
+
+    /// <summary>確定の受け付けを開始する (フェーズの入口で呼ぶ)</summary>
+    public void ResetConfirm() => ConfirmRequested = false;
 
     public void UpdateEmotionResources(IReadOnlyDictionary<EmotionType, int> resources) => emotionResourceDisplayView.UpdateResources(resources);
 
@@ -119,6 +124,12 @@ public class AuctionView : BasePhaseView
         cardStagger.Cancel();
         foreach (var card in _cards) Destroy(card.gameObject);
         _cards.Clear();
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        confirmBiddingButton.OnClickAsObservable().Subscribe(_ => ConfirmRequested = true).AddTo(_disposables);
     }
 
     private void OnDestroy()
