@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1682279902016129544
+--- !u!1 &261235807154754165
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8537088132263058144}
-  - component: {fileID: 1257058277824191739}
-  - component: {fileID: 6291159066967590597}
+  - component: {fileID: 9200740956464255606}
+  - component: {fileID: 9193915973472890272}
+  - component: {fileID: 5639064852503343879}
   m_Layer: 0
   m_Name: DialogueTextBackdrop
   m_TagString: Untagged
@@ -18,13 +18,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &8537088132263058144
+--- !u!224 &9200740956464255606
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1682279902016129544}
+  m_GameObject: {fileID: 261235807154754165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -37,21 +37,21 @@ RectTransform:
   m_AnchoredPosition: {x: -315, y: 329.99997}
   m_SizeDelta: {x: 960, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &1257058277824191739
+--- !u!222 &9193915973472890272
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1682279902016129544}
+  m_GameObject: {fileID: 261235807154754165}
   m_CullTransparentMesh: 1
---- !u!114 &6291159066967590597
+--- !u!114 &5639064852503343879
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1682279902016129544}
+  m_GameObject: {fileID: 261235807154754165}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -366,7 +366,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7124691614296364725, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
       propertyPath: hiddenX
-      value: 520
+      value: 700
       objectReference: {fileID: 0}
     - target: {fileID: 8007374317896804043, guid: ee9c999d52ee442e288919c4c2d447a9, type: 3}
       propertyPath: m_LocalScale.x
@@ -522,7 +522,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8327950005707174764, guid: 85a37a036604e42768389bba1d49fbec, type: 3}
       insertIndex: 2
-      addedObject: {fileID: 8537088132263058144}
+      addedObject: {fileID: 9200740956464255606}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8363756311001279870, guid: 85a37a036604e42768389bba1d49fbec, type: 3}
       insertIndex: -1

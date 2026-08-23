@@ -214,7 +214,7 @@ public static class AuctionUiBuilder
 
             // 立ち絵は右端に小さく置き、参加者バーに被らせない (Canvas の参照解像度は 800x600)
             var pso = new SerializedObject(portrait);
-            pso.FindProperty("hiddenX").floatValue = 520f;
+            pso.FindProperty("hiddenX").floatValue = 700f;
             pso.FindProperty("shownX").floatValue = 250f;
             pso.ApplyModifiedPropertiesWithoutUndo();
             SetRect(portrait.transform, new Vector2(250, -70), 0.2f);
@@ -293,11 +293,7 @@ public static class AuctionUiBuilder
         SetRect((so.FindProperty("bidWindowView").objectReferenceValue as Component)?.transform, new Vector2(75, 75), 0.92f);
         SetRect(participantBar.transform, new Vector2(0, 78), 1f);
 
-        // 入札ウィンドウの「外側をクリックで閉じる」全画面ボタンが、感情ホイールと +/- のクリックを奪う
-        foreach (var back in auction.GetComponentsInChildren<Button>(true).Where(b => b.name == "BackButton"))
-        {
-            back.gameObject.SetActive(false);
-        }
+
     }
 
     /// <summary>
@@ -318,8 +314,18 @@ public static class AuctionUiBuilder
         foreach (var t in order.Where(t => t)) t.SetAsLastSibling();
 
         // 入札ウィンドウは場の中で最前面に出す
-        var bidWindow = new SerializedObject(auction).FindProperty("bidWindowView").objectReferenceValue as Component;
+        var auctionSo = new SerializedObject(auction);
+        var bidWindow = auctionSo.FindProperty("bidWindowView").objectReferenceValue as Component;
         bidWindow?.transform.SetAsLastSibling();
+
+        // 入札ウィンドウは「外側クリックで閉じる」全画面ボタンを内包する。これが感情ホイールを覆い、
+        // 押すとウィンドウ自体が閉じてしまうので、表示は残したままクリック判定だけ外す
+        foreach (var back in auction.GetComponentsInChildren<Button>(true).Where(b => b.name == "BackButton" && b.targetGraphic))
+        {
+            var gso = new SerializedObject(back.targetGraphic);
+            gso.FindProperty("m_RaycastTarget").boolValue = false;
+            gso.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     /// <summary>
