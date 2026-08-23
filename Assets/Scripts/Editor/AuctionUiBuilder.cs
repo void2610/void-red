@@ -270,12 +270,16 @@ public static class AuctionUiBuilder
     /// 画面配置のラフに寄せる: 中央にロット、左下に感情ホイール、右下に確定、下端に参加者
     /// 位置はここで一括管理する (プレハブを直接いじらない)
     /// </summary>
+    /// <summary>
+    /// 操作系 (ホイール / 対話コマンド / 確定ボタン) を画面左に集め、立ち絵と参加者バーに重ねない (ラフ ui-bid-screen 準拠)
+    /// </summary>
     private static void ApplyAuctionLayout(AuctionView auction, GameObject participantBar)
     {
         var so = new SerializedObject(auction);
-        SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(0, 60), 1f);
-        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-330, -190), 0.38f);
-        SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(310, -175), 0.85f);
+        SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(-40, 70), 1.1f);
+        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-430, -110), 0.42f);
+        SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(0, -138), 0.85f);
+        SetRect((so.FindProperty("bidWindowView").objectReferenceValue as Component)?.transform, new Vector2(75, 75), 0.92f);
         SetRect(participantBar.transform, new Vector2(0, 78), 1f);
     }
 
