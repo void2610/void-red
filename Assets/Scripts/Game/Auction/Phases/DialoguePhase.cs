@@ -57,9 +57,14 @@ public class DialoguePhase : IAuctionPhase
         await view.Dialogue.ShowTargetLineAsync(outcome.Line);
 
         if (outcome.ObservedTotal.HasValue)
+        {
+            view.ShowObservedBid(outcome.Target, outcome.ObservedTotal.Value);
             await view.Announcement.DisplayAnnouncement($"{outcome.Target.DisplayName} の入札予定: {outcome.ObservedTotal.Value} 枚", 1.5f);
+        }
         else if (!outcome.Success)
+        {
             await view.Announcement.DisplayAnnouncement("手応えがない", 1.2f);
+        }
 
         if (outcome.Counter == null) return;
 

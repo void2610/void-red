@@ -26,6 +26,12 @@ public sealed class AuctionDebugCommands
         _progress = progress;
     }
 
+    [LiminalCommand("Auction/ObservedBid", Description = "観察で見えた入札予定として頭上に出ている数字を返す (? 付き。未観察なら空)")]
+    public string ObservedBid(string name) => View().BidLabelOf(Rival(name));
+
+    [LiminalCommand("Auction/ObservedBidMatchesPlanned", Description = "頭上に出ている観察結果が相手の入札予定と一致するか")]
+    public bool ObservedBidMatchesPlanned(string name) => ObservedBid(name) == $"?{Rival(name).PlannedBid.Total}";
+
     [LiminalCommand("Auction/Floor", Description = "回している階層の番号を返す")]
     public int Floor() => Session().Floor.FloorIndex;
 

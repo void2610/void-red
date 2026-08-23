@@ -42,6 +42,12 @@ public class AuctionSceneView : MonoBehaviour
     private readonly Subject<AuctionParticipant> _onTargetChanged = new();
     private readonly CompositeDisposable _disposables = new();
 
+    /// <summary>観察した相手の入札予定を頭上に出し続ける (ロットが変わるまで覚えている)</summary>
+    public void ShowObservedBid(AuctionParticipant target, int total) => IconOf(target).ShowObservedBid(total);
+
+    /// <summary>頭上に出ている数字 (検証用の読み取り)</summary>
+    public string BidLabelOf(AuctionParticipant participant) => IconOf(participant).BidLabel;
+
     /// <summary>
     /// 対話フェーズの入力を 1 つ待つ (相手の選び直し / コマンド / 入札へ進む)
     /// </summary>

@@ -21,7 +21,8 @@ public class ParticipantIconView : MonoBehaviour
     public AuctionParticipant Participant { get; private set; }
     public Observable<AuctionParticipant> OnSelected => selectButton.OnClickAsObservable().Select(_ => Participant);
 
-    public void ShowBid(int total) => bidText.text = total.ToString();
+    /// <summary>頭上に出ている数字 (観察の推定なら ? 付き)</summary>
+    public string BidLabel => bidText.text;
 
     public void HideBid() => bidText.text = "";
 
@@ -30,6 +31,19 @@ public class ParticipantIconView : MonoBehaviour
     public void SetSelected(bool selected) => frame.color = new Color(frame.color.r, frame.color.g, frame.color.b, selected ? 1f : 0.35f);
 
     public void SetSelectable(bool selectable) => selectButton.interactable = selectable && !Participant.IsPlayer && Participant.CanBid;
+
+    public void ShowBid(int total)
+    {
+        bidText.text = total.ToString();
+        bidText.color = Color.white;
+    }
+
+    /// <summary>観察で見えた入札予定。開示前の推定なので色で区別する</summary>
+    public void ShowObservedBid(int total)
+    {
+        bidText.text = $"?{total}";
+        bidText.color = new Color(0.75f, 0.85f, 1f);
+    }
 
     public void Bind(AuctionParticipant participant)
     {

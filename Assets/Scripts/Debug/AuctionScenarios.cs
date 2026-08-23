@@ -112,6 +112,8 @@ public static class AuctionScenarios
         yield return ScenarioStep.Run("Auction/UseDialogue", Args("command", "Observe"));
         yield return ScenarioStep.AssertCommandEventually("Auction/CanUseDialogue", Args("name", "アルヴ", "command", "Observe"), "False", 20f, "観察は 1 度きり");
         yield return ScenarioStep.AssertCommandEventually("Auction/DialogueReady", null, "True", 40f, "演出後は対話フェーズに戻る");
+        yield return ScenarioStep.AssertCommandReturns("Auction/PlannedDelta", Args("name", "アルヴ"), "0", "観察そのものは入札予定を動かさない");
+        yield return ScenarioStep.AssertCommandReturns("Auction/ObservedBidMatchesPlanned", Args("name", "アルヴ"), "True", "頭上の数字が相手の入札予定と一致する");
     }
 
     [LiminalScenario(
