@@ -148,6 +148,9 @@ public sealed class AuctionDebugCommands
         _ => "None",
     };
 
+    [LiminalCommand("Auction/GameOverMessageMentionsKey", Description = "ゲームオーバーの本文が鍵の取り逃しを伝えているか")]
+    public bool GameOverMessageMentionsKey() => View().GameOver.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text.Contains("鍵"));
+
     [LiminalCommand("Auction/BaptismReady", Description = "洗礼画面に落札した記憶の札が並び終えたか")]
     public bool BaptismReady() => View().Baptism.GetComponentsInChildren<AcquiredCardView>(true).Length == Session().Player.WonLots.Count;
 
@@ -156,6 +159,14 @@ public sealed class AuctionDebugCommands
 
     [LiminalCommand("Auction/Speed", Description = "演出の早送り倍率を変える (検証用)")]
     public float Speed(float value = 1f) => Time.timeScale = Mathf.Clamp(value, 0.1f, 20f);
+
+    [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼の見出しに鮮明化後のテーマが出ているか")]
+    public bool BaptismHeaderClarified()
+    {
+        var clarified = Session().Floor.ClarifiedTheme;
+        if (string.IsNullOrEmpty(clarified)) return false;
+        return View().Baptism.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text.Contains(clarified));
+    }
 
     [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを押して対話相手を選ぶ")]
     public string SelectTarget(string name)
