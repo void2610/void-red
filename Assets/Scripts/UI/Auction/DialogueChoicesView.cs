@@ -22,7 +22,12 @@ public class DialogueChoicesView : MonoBehaviour
     /// 選択肢が押されるまで待機する
     /// </summary>
     /// <returns>押された選択肢の番号</returns>
-    public UniTask<int> WaitForSelectionAsync() => _selectionCompletionSource.Task;
+    public UniTask<int> WaitForSelectionAsync()
+    {
+        // Show() を経ずに呼ばれても待てるようにする (呼び出し順で壊れない)
+        _selectionCompletionSource ??= new UniTaskCompletionSource<int>();
+        return _selectionCompletionSource.Task;
+    }
 
     public void Show()
     {

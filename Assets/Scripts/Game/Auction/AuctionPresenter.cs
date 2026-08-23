@@ -51,8 +51,26 @@ public class AuctionPresenter : IStartable, IDisposable
         }
         catch (Exception e)
         {
-            // 進行が黙って止まると原因が分からなくなるため、必ずログに残す
-            Debug.LogError($"[AuctionPresenter] 進行が停止した: {e}");
+            // 進行が黙って止まると画面が操作できないまま戻れなくなる。ログに残してロビーへ帰す
+            Debug.LogError($"[AuctionPresenter] 進行が停止した ({CurrentPhaseName}): {e}");
+            await ReturnToLobbyAsync();
+        }
+    }
+
+    /// <summary>
+    /// 進行が続けられなくなったときの逃げ道。シーンが生きているうちにロビーへ戻す
+    /// </summary>
+    private async UniTask ReturnToLobbyAsync()
+    {
+        if (_cts.IsCancellationRequested) return;
+
+        try
+        {
+            await _context.SceneTransition.TransitionToSceneWithFade(SceneType.Home);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[AuctionPresenter] ロビーへ戻れなかった: {e}");
         }
     }
 

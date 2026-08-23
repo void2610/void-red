@@ -46,6 +46,6 @@ public class AuctionCardView : MonoBehaviour
     public async UniTask FadeOutAsync()
     {
         var canvasGroup = GetComponent<CanvasGroup>();
-        await canvasGroup.FadeOut(0.25f).ToUniTask();
+        await canvasGroup.FadeOut(0.25f).ToUniTask(cancellationToken: destroyCancellationToken);
     }
 }

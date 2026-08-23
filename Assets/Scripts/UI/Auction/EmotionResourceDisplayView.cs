@@ -86,7 +86,7 @@ public class EmotionResourceDisplayView : MonoBehaviour
                 }
             })
             .AddTo(gameObject)
-            .ToUniTask()
+            .ToUniTask(cancellationToken: destroyCancellationToken)
             .ContinueWith(() =>
             {
                 _isRotating = false;

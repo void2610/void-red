@@ -65,20 +65,20 @@ public class DialogueCutInView : MonoBehaviour
             .AddTo(gameObject);
         _bgFadeHandle = backgroundCanvasGroup.FadeIn(fadeDuration, Ease.OutCubic);
         _slideHandle = rectTransform.MoveToX(_initialX, slideDuration, Ease.OutCubic);
-        await _slideHandle.ToUniTask();
+        await _slideHandle.ToUniTask(cancellationToken: destroyCancellationToken);
 
-        await UniTask.Delay((int)(displayDuration * 1000));
+        await UniTask.Delay((int)(displayDuration * 1000), cancellationToken: destroyCancellationToken);
 
         // フェードアウト
         _fadeHandle = _canvasGroup.FadeOut(exitDuration, Ease.InCubic);
         _bgFadeHandle = backgroundCanvasGroup.FadeOut(exitDuration, Ease.InCubic);
-        await _fadeHandle.ToUniTask();
+        await _fadeHandle.ToUniTask(cancellationToken: destroyCancellationToken);
 
         rectTransform.anchoredPosition = new Vector2(_initialX, rectTransform.anchoredPosition.y);
         SetVisible(false);
 
         // 次のカットインとの間隔
-        await UniTask.Delay((int)(intervalDuration * 1000));
+        await UniTask.Delay((int)(intervalDuration * 1000), cancellationToken: destroyCancellationToken);
     }
 
     /// <summary>

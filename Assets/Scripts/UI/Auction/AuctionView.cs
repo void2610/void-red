@@ -105,13 +105,13 @@ public class AuctionView : BasePhaseView
             card.CardView.SetGrowEffect(CardView.CardBidState.DrawBid, rivalColor);
             card.BidInfoView.ShowDraw();
             SeManager.Instance.PlaySe("SE_RESULT_CLASH", pitch: 1f);
-            await UniTask.Delay(400);
+            await UniTask.Delay(400, cancellationToken: destroyCancellationToken);
             return;
         }
         card.CardView.SetGrowEffect(isPlayerWon ? CardView.CardBidState.PlayerBid : CardView.CardBidState.EnemyBid, rivalColor);
         card.BidInfoView.ShowResult(isPlayerWon);
         SeManager.Instance.PlaySe(isPlayerWon ? "SE_RESULT_WIN" : "SE_RESULT_LOSE", pitch: 1f);
-        await UniTask.Delay(700);
+        await UniTask.Delay(700, cancellationToken: destroyCancellationToken);
     }
 
     public void Clear()

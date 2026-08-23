@@ -66,12 +66,6 @@ public class CardAcquisitionView : MonoBehaviour
         textStagger.Play();
     }
 
-    public async UniTask WaitForNextAndHideAsync()
-    {
-        await _onNextButtonClicked.FirstAsync();
-        Hide();
-    }
-
     public void Hide()
     {
         cardStagger.Cancel();
