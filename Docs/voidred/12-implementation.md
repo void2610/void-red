@@ -31,7 +31,7 @@
 | 観察は枚数のみ、逆対話は各ロット各キャラ 1 回 | `DialogueOutcome.ObservedTotal` / `CounterFiredThisLot` |
 | 対話への反応はキャラごと | `BiddingProfile` の `BidReaction` (None / 増減 / 大幅増減 / Random / Withdraw / ShiftToNext / PullFromNext) と `ReactionScale` |
 | 人格崩壊 = 無落札、主人公はゲームオーバーで同階層やり直し | `FinishLots` で判定。`GameOverView` の「やり直す」は進行度を変えずに `AuctionScene` を再ロード |
-| 洗礼: 内訳と歪みを見せ 1 つだけ統合、残りはコレクション | `BaptismView` + `PersonaState.Integrate`。感情状態は入札の主属性 (同数なら記憶の属性) |
+| 洗礼: 内訳と歪みを見せ 1 つだけ統合、残りはコレクション | `BaptismView` が旧リザルトの `CardAcquisitionView` (札 + 内訳のスタガー表示) を内包し、札をクリックして選ぶ。`PersonaState.Integrate` で統合。感情状態は入札の主属性 (同数なら記憶の属性) |
 | リソース持ち越し + 階層ごとに 8 × 5 補充 | `GameProgressService.PrepareWalletForFloor` (`Refill` は加算) |
 | 記憶テーマの鮮明化 | 出品の過半 (3/5) を落札したとき洗礼の見出しに鮮明化後テーマを出す (`IsThemeClarified`) |
 | ロビー | HomeScene の旧デッキ / 図鑑ボタンを「人格」「記憶コレクション」に転用。進行案内は `HomeView.SetProgressText` |
@@ -65,6 +65,17 @@
 | 重なり順 | `ApplyDrawOrder()` に列挙する |
 
 数値を直してビルダーを流し直すのが基本。プレハブを手で触ると再生成で消える。
+
+## UI 操作を待つときの作法
+
+演出を挟む画面では「フェーズが変わった瞬間」と「操作を受け付ける瞬間」がずれる。
+検証がその隙間で操作すると取りこぼすため、次のようにしている。
+
+- 対話フェーズ: `AuctionSceneView.IsWaitingDialogueInput` (`Auction/DialogueReady`) が立ってから押す
+- 洗礼: 札が並んだか (`Auction/BaptismReady`)、選択が反映されたか (`Auction/BaptismSelected`) を待つ
+- 洗礼 / ゲームオーバーのボタンは Observable を待たず **View 側がフラグで受ける** (`FinishRequested` / `RetryRequested`)。
+  Presenter の購読開始前に押されても取りこぼさない
+- 検証時は `Auction/Start` の `speed` で演出を早送りする (既定 6 倍)。`ScenarioFragments.ResetProgress()` が毎回 1 倍に戻す
 
 ## 検証
 
