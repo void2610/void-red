@@ -58,19 +58,7 @@ public class CompetitionRunnerTests
     /// <summary>全員同額で競合に入った状態のセッションを作る</summary>
     private static AuctionSession CreateTiedSession(int rivalCount, CompetitionPolicy policy, float competitionTimeout)
     {
-        var floor = ScriptableObject.CreateInstance<FloorData>();
-        var lots = Enumerable.Range(0, GameConstants.LOTS_PER_FLOOR).Select(CreateLot).ToList();
-        var rivals = Enumerable.Range(0, rivalCount).Select(i => CreateRival(i, policy)).ToList();
-        SetPrivate(floor, "floorIndex", 0);
-        SetPrivate(floor, "themeTitle", "テスト");
-        SetPrivate(floor, "clarifiedTheme", "");
-        SetPrivate(floor, "lots", lots);
-        SetPrivate(floor, "rivals", rivals);
-
-        var wallet = new EmotionWallet();
-        wallet.Refill(GameConstants.EMOTION_REFILL_PER_FLOOR);
-        var session = new AuctionSession(floor, wallet, "ノア", new System.Random(1), competitionTimeout);
-
+        var session = AuctionTestFactory.CreateSession(rivalBid: 2, competitionTimeout: competitionTimeout, rivalCount: rivalCount, policy: policy);
         session.BeginNextLot();
         session.EnterBidding();
         var bid = new EmotionBid();
@@ -79,37 +67,5 @@ public class CompetitionRunnerTests
         Assert.IsTrue(reveal.IsTie, "全員同額で競合に入る前提");
         session.StartCompetition(0f);
         return session;
-    }
-
-    private static MemoryLotData CreateLot(int index)
-    {
-        var lot = ScriptableObject.CreateInstance<MemoryLotData>();
-        lot.name = $"lot{index}";
-        SetPrivate(lot, "title", $"記憶{index}");
-        SetPrivate(lot, "emotion", EmotionType.Joy);
-        return lot;
-    }
-
-    private static ParticipantData CreateRival(int index, CompetitionPolicy policy)
-    {
-        var data = ScriptableObject.CreateInstance<ParticipantData>();
-        data.name = $"rival{index}";
-        SetPrivate(data, "displayName", $"ライバル{index}");
-        SetPrivate(data, "emotion", EmotionType.Joy);
-        var profile = new BiddingProfile();
-        SetPrivate(profile, "baseBid", 2);
-        SetPrivate(profile, "favoriteBid", 2);
-        SetPrivate(profile, "spread", 0);
-        SetPrivate(profile, "competitionPolicy", policy);
-        SetPrivate(profile, "counterDialogueChance", 0);
-        SetPrivate(data, "profile", profile);
-        return data;
-    }
-
-    private static void SetPrivate(object target, string field, object value)
-    {
-        var info = target.GetType().GetField(field, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        Assert.NotNull(info, $"{target.GetType().Name} に {field} が無い");
-        info.SetValue(target, value);
     }
 }

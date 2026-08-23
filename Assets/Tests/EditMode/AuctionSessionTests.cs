@@ -239,56 +239,6 @@ public class AuctionSessionTests
     private static EmotionType MismatchedEmotion(EmotionType lotEmotion) =>
         EmotionWallet.ALL_EMOTIONS.First(e => e != lotEmotion);
 
-    /// <summary>
-    /// ライバル全員が同じ枚数を入れる決定的なセッションを組む
-    /// </summary>
-    private static AuctionSession CreateSession(int rivalBid, float competitionTimeout = 10f, string clarifiedTheme = "", int keyLotIndex = -1, int reactionScale = 100, bool distinctRivalBids = false)
-    {
-        var floor = ScriptableObject.CreateInstance<FloorData>();
-        var lots = Enumerable.Range(0, GameConstants.LOTS_PER_FLOOR).Select(i => CreateLot(i, i == keyLotIndex)).ToList();
-        var rivals = Enumerable.Range(0, 4).Select(i => CreateRival(i, distinctRivalBids ? rivalBid + i : rivalBid, reactionScale)).ToList();
-        SetPrivate(floor, "floorIndex", 0);
-        SetPrivate(floor, "themeTitle", "テスト");
-        SetPrivate(floor, "clarifiedTheme", clarifiedTheme);
-        SetPrivate(floor, "lots", lots);
-        SetPrivate(floor, "rivals", rivals);
-
-        var wallet = new EmotionWallet();
-        wallet.Refill(GameConstants.EMOTION_REFILL_PER_FLOOR);
-        return new AuctionSession(floor, wallet, "ノア", new System.Random(1), competitionTimeout);
-    }
-
-    private static MemoryLotData CreateLot(int index, bool isKey = false)
-    {
-        var lot = ScriptableObject.CreateInstance<MemoryLotData>();
-        lot.name = $"lot{index}";
-        SetPrivate(lot, "title", $"記憶{index}");
-        SetPrivate(lot, "emotion", EmotionType.Joy);
-        SetPrivate(lot, "isKey", isKey);
-        return lot;
-    }
-
-    private static ParticipantData CreateRival(int index, int bid, int reactionScale = 100)
-    {
-        var data = ScriptableObject.CreateInstance<ParticipantData>();
-        data.name = $"rival{index}";
-        SetPrivate(data, "displayName", $"ライバル{index}");
-        SetPrivate(data, "emotion", EmotionType.Anger);
-        var profile = new BiddingProfile();
-        SetPrivate(profile, "baseBid", bid);
-        SetPrivate(profile, "favoriteBid", bid);
-        SetPrivate(profile, "spread", 0);
-        SetPrivate(profile, "competitionPolicy", CompetitionPolicy.Never);
-        SetPrivate(profile, "reactionScale", reactionScale);
-        SetPrivate(profile, "counterDialogueChance", 0);
-        SetPrivate(data, "profile", profile);
-        return data;
-    }
-
-    private static void SetPrivate(object target, string field, object value)
-    {
-        var info = target.GetType().GetField(field, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        Assert.NotNull(info, $"{target.GetType().Name} に {field} が無い");
-        info.SetValue(target, value);
-    }
+    private static AuctionSession CreateSession(int rivalBid, float competitionTimeout = 10f, string clarifiedTheme = "", int keyLotIndex = -1, int reactionScale = 100, bool distinctRivalBids = false) =>
+        AuctionTestFactory.CreateSession(rivalBid, competitionTimeout, clarifiedTheme, keyLotIndex, reactionScale, distinctRivalBids);
 }
