@@ -223,6 +223,7 @@ public static class AuctionUiBuilder
 
             // カットインは再生時だけ出す
             cutIn.gameObject.SetActive(false);
+            AddDialogueTextBackdrop(cutIn);
 
             // 対話中の暗幕。全画面に伸ばして薄くし、背景を潰さない
             var back = root.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name == "Back");
@@ -440,6 +441,33 @@ public static class AuctionUiBuilder
         {
             PrefabUtility.UnloadPrefabContents(root);
         }
+    }
+
+    /// <summary>
+    /// セリフは背景の壁と同系色で潰れるので、文字の後ろに帯を敷く (カットインと一緒に動くよう同じ親に置く)
+    /// </summary>
+    private static void AddDialogueTextBackdrop(DialogueCutInView cutIn)
+    {
+        var text = cutIn.GetComponentsInChildren<TextMeshProUGUI>(true).FirstOrDefault(t => t.name == "DialogueText");
+        if (!text) return;
+
+        var existing = text.transform.parent.Find("DialogueTextBackdrop");
+        if (existing) UnityEngine.Object.DestroyImmediate(existing.gameObject);
+
+        var backdrop = new GameObject("DialogueTextBackdrop", typeof(RectTransform), typeof(Image));
+        backdrop.transform.SetParent(text.transform.parent, false);
+        backdrop.transform.SetSiblingIndex(text.transform.GetSiblingIndex());
+
+        var image = backdrop.GetComponent<Image>();
+        image.color = new Color(0f, 0f, 0f, 0.55f);
+        image.raycastTarget = false;
+
+        var rt = backdrop.GetComponent<RectTransform>();
+        rt.anchorMin = text.rectTransform.anchorMin;
+        rt.anchorMax = text.rectTransform.anchorMax;
+        rt.pivot = text.rectTransform.pivot;
+        rt.anchoredPosition = text.rectTransform.anchoredPosition;
+        rt.sizeDelta = text.rectTransform.sizeDelta + new Vector2(60f, -30f);
     }
 
     private static Sprite LoadSprite(string path)
