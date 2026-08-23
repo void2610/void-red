@@ -290,6 +290,38 @@ public class AuctionSessionTests
         Assert.Greater(headline, plain, "目玉の記憶には入札が集まる");
     }
 
+    [Test]
+    public void 挑発で降りたライバルはそのロットだけ卓から外れる()
+    {
+        var session = AuctionTestFactory.CreateSession(rivalBid: 3);
+        session.BeginNextLot();
+        var target = session.Rivals[0];
+        target.Withdrawn = true;
+
+        session.EnterBidding();
+        var bid = new EmotionBid();
+        bid.Set(session.CurrentLot.Emotion, 5);
+        session.SubmitPlayerBid(bid);
+
+        Assert.IsNull(target.SubmittedBid, "降りた相手は入札しない");
+        Assert.IsFalse(session.CanUseDialogue(target, DialogueCommand.Observe), "降りた相手には対話できない");
+
+        session.ResolveReveal();
+        session.BeginNextLot();
+
+        Assert.IsFalse(target.Withdrawn, "次のロットでは戻る");
+        Assert.IsTrue(target.CanBid);
+    }
+
+    [Test]
+    public void ライバルは手持ちを超える枚数を入札しない()
+    {
+        var session = AuctionTestFactory.CreateSession(rivalBid: 99);
+        session.BeginNextLot();
+
+        foreach (var rival in session.Rivals) Assert.LessOrEqual(rival.PlannedBid.Total, rival.Wallet.Total, $"{rival.DisplayName} が手持ちを超えて入札している");
+    }
+
     /// <summary>指定した共鳴値のロットに対するライバルの入札予定枚数</summary>
     private static int PlannedTotal(int resonance)
     {
