@@ -110,12 +110,6 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/BidAmounts", Description = "現在積んでいる入札の合計枚数を返す")]
     public int BidAmounts() => Session().Player.SubmittedBid?.Total ?? 0;
 
-    [LiminalCommand("Auction/AutoPlayFloor", Description = "5 ロットを実 UI で自動進行する。最初の winLots ロットは最大予定 + 1 枚で落札を狙い、残りは 0 枚で流す")]
-    public UniTask<string> AutoPlayFloor(int winLots = 1) => AutoPlayAsync(lot => lot < winLots, keyOnly: false);
-
-    [LiminalCommand("Auction/AutoPlayFloorWinningKey", Description = "5 ロットを自動進行し、鍵のロットだけ (winKey なら) 落札を狙う。他は 0 枚")]
-    public UniTask<string> AutoPlayFloorWinningKey(bool winKey = true) => AutoPlayAsync(_ => winKey ? CurrentLotIsKey() : !CurrentLotIsKey() && LotIndex() == 0, keyOnly: true);
-
     [LiminalCommand("Progress/PersonaEmotion", Description = "セーブ済みの主人公の感情状態を返す (未定なら None)")]
     public string PersonaEmotion() => _progress.Persona.EmotionState?.ToString() ?? "None";
 
@@ -136,6 +130,12 @@ public sealed class AuctionDebugCommands
 
     [LiminalCommand("Progress/CollapsedIds", Description = "人格崩壊した参加者 ID をカンマ区切りで返す")]
     public string CollapsedIds() => string.Join(",", _progress.CollapsedParticipantIds.OrderBy(x => x));
+
+    [LiminalCommand("Auction/DialogueReady", Description = "対話フェーズの入力を受け付けているか")]
+    public bool DialogueReady() => View().IsWaitingDialogueInput;
+
+    [LiminalCommand("Auction/LotSettled", Description = "今のロットの決着 (落札 / 流札) がついたか")]
+    public bool LotSettled() => Session().Phase is AuctionPhase.LotResult or AuctionPhase.Baptism or AuctionPhase.GameOver or AuctionPhase.Dialogue && Session().LastReveal != null;
 
     [LiminalCommand("Auction/ActivePanel", Description = "表示中の主なパネル (Dialogue / Bid / Competition / Baptism / GameOver / None) を返す")]
     public string ActivePanel()
@@ -297,6 +297,13 @@ public sealed class AuctionDebugCommands
         return placed;
     }
 
+    [LiminalCommand("Auction/BidAboveTopRivalIfKey", Description = "鍵のロットなら最大予定 + 1 枚を積む。winKey が false のときは最初のロットだけ積む")]
+    public async UniTask<int> BidAboveTopRivalIfKey(bool winKey)
+    {
+        if (winKey ? CurrentLotIsKey() : !CurrentLotIsKey() && LotIndex() == 0) return await BidAboveTopRival();
+        return 0;
+    }
+
     [LiminalCommand("Auction/BidToTieTopRival", Description = "ライバルの入札予定の最大枚数とちょうど同じ枚数を積む (競合を起こす)")]
     public async UniTask<int> BidToTieTopRival()
     {
@@ -343,23 +350,6 @@ public sealed class AuctionDebugCommands
             raised++;
         }
         return raised;
-    }
-
-    private async UniTask<string> AutoPlayAsync(Func<int, bool> shouldWin, bool keyOnly)
-    {
-        var ct = View().destroyCancellationToken;
-        for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
-        {
-            await UniTask.WaitUntil(() => ActivePanel() == "Dialogue", cancellationToken: ct);
-            Confirm();
-            await UniTask.WaitUntil(() => ActivePanel() == "Bid", cancellationToken: ct);
-            if (shouldWin(lot)) await BidAboveTopRival();
-            Confirm();
-            await UniTask.WaitUntil(() => ActivePanel() != "Bid", cancellationToken: ct);
-            await UniTask.WaitUntil(() => ActivePanel() is "Dialogue" or "Baptism" or "GameOver", cancellationToken: ct);
-        }
-        await UniTask.WaitUntil(() => ActivePanel() is "Baptism" or "GameOver", cancellationToken: ct);
-        return $"won={WonCount("ノア")} panel={ActivePanel()}";
     }
 
     private static Button BidButton(string name)

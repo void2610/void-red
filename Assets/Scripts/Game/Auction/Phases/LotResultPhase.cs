@@ -6,10 +6,14 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class LotResultPhase : IAuctionPhase
 {
-    public bool CanRun(AuctionSession session) => session.Phase == AuctionPhase.LotResult;
+    // 同じロットの結果を二度流さない (Phase は落札確定後も LotResult のままのため)
+    private int _shownLotIndex = -1;
+
+    public bool CanRun(AuctionSession session) => session.Phase == AuctionPhase.LotResult && _shownLotIndex != session.CurrentLotIndex;
 
     public async UniTask RunAsync(AuctionContext context, CancellationToken ct)
     {
+        _shownLotIndex = context.Session.CurrentLotIndex;
         var view = context.View;
         var session = context.Session;
         var winner = session.LastWinner;

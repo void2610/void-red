@@ -42,6 +42,11 @@ public class AuctionPresenter : IStartable, IDisposable
         {
             // シーン破棄でボタンの Observable が完了する。進行の中断として扱う
         }
+        catch (Exception e)
+        {
+            // 進行が黙って止まると原因が分からなくなるため、必ずログに残す
+            Debug.LogError($"[AuctionPresenter] 進行が停止した: {e}");
+        }
     }
 
     public void Start()

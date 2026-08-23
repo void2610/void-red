@@ -161,6 +161,9 @@ public class AuctionSession
         var leader = Competition.Leader();
         if (leader == npc) return false;
 
+        // 際限なく競り上げると決着しないため、提出額に応じた上限で降りる
+        if (Competition.RaisesOf(npc).Total >= npc.SubmittedBid.Total + GameConstants.NPC_MAX_RAISE_MARGIN) return false;
+
         var isFavorite = CurrentLot.Emotion == npc.Data.Emotion;
         var chance = npc.Data.Profile.CompetitionPolicy switch
         {

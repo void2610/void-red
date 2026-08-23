@@ -35,6 +35,9 @@ public class AuctionSceneView : MonoBehaviour
     public AuctionParticipant SelectedTarget { get; private set; }
     public Sprite PlayerPortrait => playerPortrait;
 
+    /// <summary>対話フェーズの入力を受け付けているか (演出中は false)</summary>
+    public bool IsWaitingDialogueInput { get; private set; }
+
     private readonly List<ParticipantIconView> _icons = new();
     private readonly Subject<AuctionParticipant> _onTargetChanged = new();
     private readonly CompositeDisposable _disposables = new();
@@ -45,6 +48,7 @@ public class AuctionSceneView : MonoBehaviour
     public async UniTask<DialogueInput> WaitDialogueInputAsync(AuctionSession session, CancellationToken ct)
     {
         SetTargetSelectable(true);
+        IsWaitingDialogueInput = true;
         auction.SetConfirmLabel("入札へ");
         dialogue.SetCommandAvailability(i => SelectedTarget != null && session.CanUseDialogue(SelectedTarget, (DialogueCommand)i));
         auction.SetConfirmInteractable(true);
@@ -54,6 +58,7 @@ public class AuctionSceneView : MonoBehaviour
             _onTargetChanged.FirstAsync(ct).AsUniTask(),
             auction.OnBiddingConfirmed.FirstAsync(ct).AsUniTask());
 
+        IsWaitingDialogueInput = false;
         return picked.winArgumentIndex switch
         {
             0 => DialogueInput.OfCommand((DialogueCommand)picked.result1),
@@ -65,6 +70,7 @@ public class AuctionSceneView : MonoBehaviour
     /// <summary>対話中の入力を一時的に止める (演出中)</summary>
     public void SetInputEnabled(bool enabled)
     {
+        IsWaitingDialogueInput = enabled && IsWaitingDialogueInput;
         SetTargetSelectable(enabled);
         dialogue.SetChoicesInteractable(enabled);
         auction.SetConfirmInteractable(enabled);
@@ -140,8 +146,9 @@ public class AuctionSceneView : MonoBehaviour
 
     private ParticipantIconView IconOf(AuctionParticipant p)
     {
-        return _icons.First(i => i.Participant == p);
+        return _icons.FirstOrDefault(i => i.Participant == p);
     }
+
 
     private void OnDestroy()
     {

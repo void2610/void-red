@@ -26,9 +26,10 @@ public class CompetitionState
         TimeoutSeconds = timeoutSeconds;
     }
 
-    public int TotalOf(AuctionParticipant p) => p.SubmittedBid.Total + _raises[p].Total;
+    /// <summary>競合に入っていない参加者は 0 を返す (見学側の表示に使う)</summary>
+    public int TotalOf(AuctionParticipant p) => _raises.TryGetValue(p, out var raises) ? p.SubmittedBid.Total + raises.Total : 0;
 
-    public EmotionBid RaisesOf(AuctionParticipant p) => _raises[p];
+    public EmotionBid RaisesOf(AuctionParticipant p) => _raises.TryGetValue(p, out var raises) ? raises : new EmotionBid();
 
     public float RemainingSeconds(float now) => Math.Max(0f, TimeoutSeconds - (now - _lastActionTime));
 

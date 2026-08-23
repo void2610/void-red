@@ -21,8 +21,13 @@ public static class GameConstants
     /// <summary>
     /// NPC が競合で上乗せを検討する間隔 (秒) の下限 / 上限
     /// </summary>
-    public const float NPC_RAISE_INTERVAL_MIN = 1.5f;
-    public const float NPC_RAISE_INTERVAL_MAX = 4f;
+    public const float NPC_RAISE_INTERVAL_MIN = 0.8f;
+    public const float NPC_RAISE_INTERVAL_MAX = 2f;
+
+    /// <summary>
+    /// NPC が競合で上乗せできる枚数の上限 (提出額 + この値)。際限のない競り上げで決着しなくなるのを防ぐ
+    /// </summary>
+    public const int NPC_MAX_RAISE_MARGIN = 2;
 
     /// <summary>
     /// 最終階層の番号 (0〜4 の 5 階層)
