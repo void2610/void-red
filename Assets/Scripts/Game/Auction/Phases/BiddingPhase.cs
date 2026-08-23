@@ -23,6 +23,7 @@ public class BiddingPhase : IAuctionPhase
         _selected = view.Auction.SelectedEmotion;
 
         view.Auction.SetConfirmLabel("入札を確定");
+        view.Auction.SetConfirmVisible(true);
         view.Auction.ResetConfirm();
         view.Auction.ShowBidWindow(session.CurrentLot, _selected, 0);
         view.Auction.UpdateEmotionResources(Remaining(session));
@@ -57,6 +58,7 @@ public class BiddingPhase : IAuctionPhase
         await UniTask.WaitUntil(() => view.Auction.ConfirmRequested, cancellationToken: ct);
         view.Auction.HideBidWindow();
         view.Auction.SetEmotionInteractable(false);
+        view.Auction.SetConfirmVisible(false);
         session.SubmitPlayerBid(_draft);
     }
 

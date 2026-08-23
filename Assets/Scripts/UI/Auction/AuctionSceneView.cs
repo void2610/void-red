@@ -64,6 +64,7 @@ public class AuctionSceneView : MonoBehaviour
         auction.SetConfirmLabel("入札へ");
         auction.ResetConfirm();
         dialogue.SetCommandAvailability(i => SelectedTarget != null && session.CanUseDialogue(SelectedTarget, (DialogueCommand)i));
+        auction.SetConfirmVisible(true);
         auction.SetConfirmInteractable(true);
 
         var picked = await UniTask.WhenAny(

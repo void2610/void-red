@@ -54,6 +54,9 @@ public class AuctionView : BasePhaseView
 
     public void SetConfirmInteractable(bool interactable) => confirmBiddingButton.interactable = interactable;
 
+    /// <summary>開示や競合の最中は確定ボタン自体を引っ込める (押せないボタンを出したままにしない)</summary>
+    public void SetConfirmVisible(bool visible) => confirmBiddingButton.gameObject.SetActive(visible);
+
     /// <summary>確定ボタンの文言をフェーズに合わせて変える</summary>
     public void SetConfirmLabel(string label) => confirmBiddingButton.GetComponentInChildren<TMPro.TextMeshProUGUI>(true).text = label;
 

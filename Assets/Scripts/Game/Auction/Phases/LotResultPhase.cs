@@ -18,9 +18,10 @@ public class LotResultPhase : IAuctionPhase
         var session = context.Session;
         var winner = session.LastWinner;
 
-        view.RefreshParticipants();
+        // 開示した入札額は告知が終わるまで残す (誰がいくら入れたかを読む時間が要る)
         view.HighlightWinner(winner);
         await view.Announcement.DisplayAnnouncement(winner != null ? $"{winner.DisplayName} が落札" : "流札", 1.4f);
+        view.RefreshParticipants();
         view.Auction.Clear();
         view.Auction.Hide();
 
