@@ -27,6 +27,35 @@ public static class AuctionDataBuilder
 
     private record Lot(string Id, string Title, EmotionType Emotion, string Flavor, int Resonance, bool IsKey = false);
 
+    /// <summary>感情ごとの札の絵柄 (素材が無い属性は共通の下地を使う)</summary>
+    private static Sprite LotSprite(EmotionType emotion)
+    {
+        return emotion switch
+        {
+            EmotionType.Joy => LoadSprite("Assets/Sprites/Card/card_joy_red.png"),
+            EmotionType.Trust => LoadSprite("Assets/Sprites/Card/card_trust_blue.png"),
+            EmotionType.Fear => LoadSprite("Assets/Sprites/Card/card_fear_red.png"),
+            EmotionType.Surprise => LoadSprite("Assets/Sprites/Card/card_surprise_blue.png"),
+            EmotionType.Sadness => LoadSprite("Assets/Sprites/Card/card_blue.png"),
+            EmotionType.Disgust => LoadSprite("Assets/Sprites/Card/card_purple.png"),
+            EmotionType.Anger => LoadSprite("Assets/Sprites/Card/card_red.png"),
+            EmotionType.Anticipation => LoadSprite("Assets/Sprites/Card/card_green.png"),
+            _ => LoadSprite("Assets/Sprites/Card/card_base.png"),
+        };
+    }
+
+    /// <summary>札のカーテン絵。感情で 4 種を振り分けて彩りを出す</summary>
+    private static MemoryType LotVisualStyle(EmotionType emotion)
+    {
+        return emotion switch
+        {
+            EmotionType.Joy or EmotionType.Anticipation => MemoryType.SelfMemory,
+            EmotionType.Trust or EmotionType.Surprise => MemoryType.OtherMemory,
+            EmotionType.Fear or EmotionType.Sadness => MemoryType.SpecificOtherMemory,
+            _ => MemoryType.AmbiguousMemory,
+        };
+    }
+
     [MenuItem("VoidRed/Auction/Build Data")]
     public static void Build()
     {
@@ -199,6 +228,8 @@ public static class AuctionDataBuilder
         so.FindProperty("emotion").enumValueIndex = (int)l.Emotion;
         so.FindProperty("resonance").intValue = l.Resonance;
         so.FindProperty("isKey").boolValue = l.IsKey;
+        so.FindProperty("image").objectReferenceValue = LotSprite(l.Emotion);
+        so.FindProperty("visualStyle").enumValueIndex = (int)LotVisualStyle(l.Emotion);
         so.ApplyModifiedPropertiesWithoutUndo();
         return asset;
     }

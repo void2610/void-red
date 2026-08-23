@@ -15,16 +15,6 @@ public class BiddingPhase : IAuctionPhase
 
     public bool CanRun(AuctionSession session) => session.Phase == AuctionPhase.Bidding;
 
-    private void UpdateIncreaseInteractable(AuctionContext context)
-    {
-        context.View.Auction.SetIncreaseInteractable(_draft.Get(_selected) < context.Session.Player.Wallet.Get(_selected));
-    }
-
-    private Dictionary<EmotionType, int> Remaining(AuctionSession session)
-    {
-        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, e => session.Player.Wallet.Get(e) - _draft.Get(e));
-    }
-
     public async UniTask RunAsync(AuctionContext context, CancellationToken ct)
     {
         var view = context.View;
@@ -32,6 +22,7 @@ public class BiddingPhase : IAuctionPhase
         _draft.Clear();
         _selected = view.Auction.SelectedEmotion;
 
+        view.Auction.SetConfirmLabel("入札を確定");
         view.Auction.ShowBidWindow(session.CurrentLot, _selected, 0);
         view.Auction.UpdateEmotionResources(Remaining(session));
         view.Auction.SetEmotionInteractable(true);
@@ -66,6 +57,16 @@ public class BiddingPhase : IAuctionPhase
         view.Auction.HideBidWindow();
         view.Auction.SetEmotionInteractable(false);
         session.SubmitPlayerBid(_draft);
+    }
+
+    private void UpdateIncreaseInteractable(AuctionContext context)
+    {
+        context.View.Auction.SetIncreaseInteractable(_draft.Get(_selected) < context.Session.Player.Wallet.Get(_selected));
+    }
+
+    private Dictionary<EmotionType, int> Remaining(AuctionSession session)
+    {
+        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, e => session.Player.Wallet.Get(e) - _draft.Get(e));
     }
 
     private void AfterChanged(AuctionContext context)

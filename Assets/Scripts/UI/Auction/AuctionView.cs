@@ -49,6 +49,9 @@ public class AuctionView : BasePhaseView
 
     public void SetConfirmInteractable(bool interactable) => confirmBiddingButton.interactable = interactable;
 
+    /// <summary>確定ボタンの文言をフェーズに合わせて変える</summary>
+    public void SetConfirmLabel(string label) => confirmBiddingButton.GetComponentInChildren<TMPro.TextMeshProUGUI>(true).text = label;
+
     public void SetIncreaseInteractable(bool interactable) => bidWindowView.SetIncreaseInteractable(interactable);
 
     public void UpdateBidAmount(int amount) => bidWindowView.UpdateBidAmount(amount);

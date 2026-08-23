@@ -16,4 +16,6 @@ MonoBehaviour:
   flavor: "\u307E\u3060\u8A00\u8449\u306B\u306A\u3063\u3066\u3044\u306A\u3044\u8A18\u61B6\u306E\u65AD\u7247\u3002"
   emotion: 3
   resonance: 72
-  image: {fileID: 0}
+  image: {fileID: 21300000, guid: 249c543c0e225482ab124d072c79c21e, type: 3}
+  visualStyle: 1
+  isKey: 0

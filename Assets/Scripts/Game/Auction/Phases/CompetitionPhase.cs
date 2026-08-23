@@ -14,21 +14,6 @@ public class CompetitionPhase : IAuctionPhase
 
     public bool CanRun(AuctionSession session) => session.Phase == AuctionPhase.Competition;
 
-    private static int RivalTop(CompetitionState competition)
-    {
-        return competition.Competitors.Where(c => !c.IsPlayer).Select(competition.TotalOf).DefaultIfEmpty(0).Max();
-    }
-
-    private static System.Collections.Generic.Dictionary<EmotionType, int> Remaining(AuctionSession session)
-    {
-        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, session.Player.Wallet.Get);
-    }
-
-    private static float NextNpcInterval()
-    {
-        return Random.Range(GameConstants.NPC_RAISE_INTERVAL_MIN, GameConstants.NPC_RAISE_INTERVAL_MAX);
-    }
-
     public async UniTask RunAsync(AuctionContext context, CancellationToken ct)
     {
         var view = context.View;
@@ -71,5 +56,20 @@ public class CompetitionPhase : IAuctionPhase
         view.Competition.Hide();
         var winner = session.ResolveCompetition();
         await view.Auction.ShowResultAsync(winner != null && winner.IsPlayer, false, false, RevealPhase.RivalColor(context));
+    }
+
+    private static int RivalTop(CompetitionState competition)
+    {
+        return competition.Competitors.Where(c => !c.IsPlayer).Select(competition.TotalOf).DefaultIfEmpty(0).Max();
+    }
+
+    private static System.Collections.Generic.Dictionary<EmotionType, int> Remaining(AuctionSession session)
+    {
+        return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, session.Player.Wallet.Get);
+    }
+
+    private static float NextNpcInterval()
+    {
+        return Random.Range(GameConstants.NPC_RAISE_INTERVAL_MIN, GameConstants.NPC_RAISE_INTERVAL_MAX);
     }
 }

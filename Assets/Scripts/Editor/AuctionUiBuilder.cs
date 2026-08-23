@@ -22,11 +22,15 @@ public static class AuctionUiBuilder
     private const string ALL_FLOOR_DATA = "Assets/ScriptableObjects/Auction/AllFloorData.asset";
     private const string ROOT_SCOPE_PREFAB = "Assets/Prefabs/Root/RootLifetimeScope.prefab";
     private const string DIALOGUE_PHASE_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialoguePhaseView.prefab";
+    private const string DIALOGUE_PORTRAIT_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialoguePortraitView.prefab";
+    private const string DIALOGUE_CHOICES_PREFAB = "Assets/Prefabs/NewBattleSceneView/DialoguePhase/DialogueChoicesView.prefab";
 
     // 旧ルール専用で、新オークションでは使わないプレハブインスタンス
     private static readonly string[] OBSOLETE_OBJECTS =
     {
         "CardBattleView", "DeckSelectionView", "RewardPhaseView", "MemoryGrowthView", "SkillButtonView", "TutorialView", "TutorialGizmoHelper",
+        // 立ち絵は対話 View に一本化したので、旧バトルの敵立ち絵は使わない
+        "EnemyView",
     };
 
     // 対話コマンドのボタン (DialogueCommand の順) に振るラベルとアイコン
@@ -43,11 +47,6 @@ public static class AuctionUiBuilder
 
     private static TMP_FontAsset _font;
 
-    private static Sprite LoadSprite(string path)
-    {
-        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
-    }
-
     [MenuItem("VoidRed/Auction/Build All")]
     public static void BuildAll()
     {
@@ -61,6 +60,7 @@ public static class AuctionUiBuilder
     {
         EnsureDir(PREFAB_DIR);
         LoadFont();
+        BuildDialoguePhasePrefab();
         BuildParticipantIcon();
         var wonEntry = BuildWonLotEntry();
         BuildBaptism(wonEntry);
@@ -86,11 +86,12 @@ public static class AuctionUiBuilder
 
         var canvas = scene.GetRootGameObjects().First(g => g.name == "Canvas");
 
-        // 対話 View は旧構成で AuctionView の中にも入っている。Canvas 直下の 1 つだけ残す
-        var dialogueViews = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialoguePhaseView>(true)).ToList();
-        var dialogueView = dialogueViews.FirstOrDefault(v => v.transform.parent == canvas.transform) ?? dialogueViews.FirstOrDefault();
-        foreach (var extra in dialogueViews.Where(v => v != dialogueView)) UnityEngine.Object.DestroyImmediate(extra.gameObject);
-        var dialogue = dialogueView ? dialogueView.gameObject : InstantiatePrefab(DIALOGUE_PHASE_PREFAB, canvas.transform);
+        // 旧シーンのインスタンスは構造の上書きを持ち、プレハブ側の組み替えが反映されない。作り直す
+        foreach (var stale in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialoguePhaseView>(true)).ToList())
+        {
+            UnityEngine.Object.DestroyImmediate(stale.gameObject);
+        }
+        var dialogue = InstantiatePrefab(DIALOGUE_PHASE_PREFAB, canvas.transform);
         var participantBar = BuildParticipantBar(canvas);
         var baptism = InstantiatePrefab($"{PREFAB_DIR}/BaptismView.prefab", canvas.transform).GetComponent<BaptismView>();
         var gameOver = InstantiatePrefab($"{PREFAB_DIR}/GameOverView.prefab", canvas.transform).GetComponent<GameOverView>();
@@ -105,11 +106,12 @@ public static class AuctionUiBuilder
             ("competition", Find<CompetitionView>(scene)),
             ("baptism", baptism),
             ("gameOver", gameOver),
-            ("rival", Find<EnemyView>(scene)),
             ("participantBar", participantBar.transform),
             ("participantIconPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR}/ParticipantIcon.prefab").GetComponent<ParticipantIconView>()));
 
-        ApplyDialogueCommands(dialogue.GetComponentInChildren<DialogueChoicesView>(true));
+        var auctionView = Find<AuctionView>(scene);
+        RenameConfirmButton(auctionView);
+        ApplyAuctionLayout(auctionView, participantBar);
 
         // 旧ルールの固定文言を新ルールに差し替える
         foreach (var text in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<TextMeshProUGUI>(true)).Where(t => t.name == "InstructionText"))
@@ -179,8 +181,151 @@ public static class AuctionUiBuilder
     }
 
     /// <summary>
+    /// 対話フェーズのプレハブを新ルール用に組み替える
+    /// 旧構成では選択肢が立ち絵の子で、立ち絵を動かすと一緒に動いてしまうため親を付け替える
+    /// (インスタンス側では親の付け替えが保存できないのでプレハブ本体を編集する)
+    /// </summary>
+    private static void BuildDialoguePhasePrefab()
+    {
+        // 選択肢は旧構成で立ち絵プレハブの内部に入っている。立ち絵を動かすと一緒に動くので中から出す
+        var portraitRoot = PrefabUtility.LoadPrefabContents(DIALOGUE_PORTRAIT_PREFAB);
+        try
+        {
+            foreach (var nested in portraitRoot.GetComponentsInChildren<DialogueChoicesView>(true).ToList()) UnityEngine.Object.DestroyImmediate(nested.gameObject);
+            PrefabUtility.SaveAsPrefabAsset(portraitRoot, DIALOGUE_PORTRAIT_PREFAB);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(portraitRoot);
+        }
+
+        var root = PrefabUtility.LoadPrefabContents(DIALOGUE_PHASE_PREFAB);
+        try
+        {
+            var portrait = root.GetComponentInChildren<DialoguePortraitView>(true);
+            var cutIn = root.GetComponentInChildren<DialogueCutInView>(true);
+
+            // 立ち絵は右端に小さく置き、参加者バーに被らせない (Canvas の参照解像度は 800x600)
+            var pso = new SerializedObject(portrait);
+            pso.FindProperty("hiddenX").floatValue = 520f;
+            pso.FindProperty("shownX").floatValue = 250f;
+            pso.ApplyModifiedPropertiesWithoutUndo();
+            SetRect(portrait.transform, new Vector2(250, -70), 0.2f);
+
+            // 立ち絵の背後にある旧演出の黒板は使わない
+            var portraitBack = portrait.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name == "PlayerBack");
+            if (portraitBack) portraitBack.gameObject.SetActive(false);
+
+            // カットインは再生時だけ出す
+            cutIn.gameObject.SetActive(false);
+
+            // 対話中の暗幕。全画面に伸ばして薄くし、背景を潰さない
+            var back = root.GetComponentsInChildren<Image>(true).FirstOrDefault(i => i.name == "Back");
+            if (back)
+            {
+                var bso = new SerializedObject(back);
+                bso.FindProperty("m_Color.a").floatValue = 0.35f;
+                bso.ApplyModifiedPropertiesWithoutUndo();
+                var rso = new SerializedObject(back.rectTransform);
+                rso.FindProperty("m_AnchorMin.x").floatValue = 0f;
+                rso.FindProperty("m_AnchorMin.y").floatValue = 0f;
+                rso.FindProperty("m_AnchorMax.x").floatValue = 1f;
+                rso.FindProperty("m_AnchorMax.y").floatValue = 1f;
+                rso.FindProperty("m_SizeDelta.x").floatValue = 0f;
+                rso.FindProperty("m_SizeDelta.y").floatValue = 0f;
+                rso.FindProperty("m_AnchoredPosition.x").floatValue = 0f;
+                rso.FindProperty("m_AnchoredPosition.y").floatValue = 0f;
+                rso.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var choices = root.GetComponentsInChildren<DialogueChoicesView>(true).FirstOrDefault();
+            if (!choices)
+            {
+                var instance = InstantiatePrefab(DIALOGUE_CHOICES_PREFAB, root.transform);
+                choices = instance.GetComponent<DialogueChoicesView>();
+            }
+            SetRect(choices.transform, new Vector2(-295, 35), 0.55f);
+            SetRect(choices.GetComponentsInChildren<RectTransform>(true).First(t => t.name == "Buttons"), Vector2.zero, 1f);
+            ApplyDialogueCommands(choices);
+            OrderChoiceButtons(choices);
+
+            var so = new SerializedObject(root.GetComponent<DialoguePhaseView>());
+            so.FindProperty("choicesView").objectReferenceValue = choices;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            PrefabUtility.SaveAsPrefabAsset(root, DIALOGUE_PHASE_PREFAB);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
+    /// <summary>
+    /// 画面配置のラフに寄せる: 中央にロット、左下に感情ホイール、右下に確定、下端に参加者
+    /// 位置はここで一括管理する (プレハブを直接いじらない)
+    /// </summary>
+    private static void ApplyAuctionLayout(AuctionView auction, GameObject participantBar)
+    {
+        var so = new SerializedObject(auction);
+        SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(0, 60), 1f);
+        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-300, -160), 0.42f);
+        SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(310, -175), 0.85f);
+        SetRect(participantBar.transform, new Vector2(0, 78), 1f);
+    }
+
+    private static void SetRect(Transform target, Vector2 position, float scale)
+    {
+        if (!target) return;
+        var so = new SerializedObject((RectTransform)target);
+        so.FindProperty("m_AnchoredPosition.x").floatValue = position.x;
+        so.FindProperty("m_AnchoredPosition.y").floatValue = position.y;
+        so.FindProperty("m_LocalScale.x").floatValue = scale;
+        so.FindProperty("m_LocalScale.y").floatValue = scale;
+        so.FindProperty("m_LocalScale.z").floatValue = 1f;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// 入札確定ボタンを検証や配線から引きやすい名前にする
+    /// </summary>
+    private static void RenameConfirmButton(AuctionView auction)
+    {
+        var so = new SerializedObject(auction);
+        var button = so.FindProperty("confirmBiddingButton").objectReferenceValue as Button;
+        if (!button) throw new InvalidOperationException("AuctionView の confirmBiddingButton が未設定");
+        button.gameObject.name = "ConfirmButton";
+    }
+
+    private static Sprite LoadSprite(string path)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
+
+    /// <summary>
     /// 対話コマンドのボタンを DialogueCommand の並び順に揃え、ラベルとアイコンを設定する
     /// </summary>
+    /// <summary>
+    /// 画面上の縦並びも DialogueCommand の順にする
+    /// </summary>
+    private static void OrderChoiceButtons(DialogueChoicesView choices)
+    {
+        var so = new SerializedObject(choices);
+        var list = so.FindProperty("choiceButtons");
+        var buttons = Enumerable.Range(0, list.arraySize).Select(i => (Button)list.GetArrayElementAtIndex(i).objectReferenceValue).ToList();
+
+        // 既存の縦位置を上から順に取り直し、DialogueCommand の並びに割り当てる
+        var slots = buttons.Select(b => b.GetComponent<RectTransform>().anchoredPosition).OrderByDescending(p => p.y).ToList();
+        for (var i = 0; i < buttons.Count; i++)
+        {
+            buttons[i].transform.SetSiblingIndex(i);
+            var rso = new SerializedObject(buttons[i].GetComponent<RectTransform>());
+            rso.FindProperty("m_AnchoredPosition.x").floatValue = slots[i].x;
+            rso.FindProperty("m_AnchoredPosition.y").floatValue = slots[i].y;
+            rso.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
+
     private static void ApplyDialogueCommands(DialogueChoicesView choices)
     {
         var buttons = choices.GetComponentsInChildren<Button>(true).OrderBy(b => b.name).ToList();
@@ -223,28 +368,28 @@ public static class AuctionUiBuilder
 
     private static GameObject BuildParticipantIcon()
     {
-        var root = Rect("ParticipantIcon", null, new Vector2(150, 170));
+        var root = Rect("ParticipantIcon", null, new Vector2(128, 128));
         var bg = Image(root, "Background", new Color(0.06f, 0.03f, 0.05f, 0.55f));
         Stretch(bg);
         // 枠は所属色の下線として使う (塗りつぶすと立ち絵が読めなくなる)
         var frame = Image(root, "Frame", Color.white);
-        Place(frame.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 4), new Vector2(150, 5));
+        Place(frame.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 3), new Vector2(128, 4));
         var icon = Image(root, "Icon", Color.white);
-        Place(icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -55), new Vector2(96, 96));
+        Place(icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -42), new Vector2(70, 70));
         var nameText = Text(root, "NameText", "名前", 19, TextAlignmentOptions.Center);
-        Place(nameText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -118), new Vector2(150, 26));
+        Place(nameText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -90), new Vector2(128, 22));
         var resourceText = Text(root, "ResourceText", "40", 20, TextAlignmentOptions.Center);
-        Place(resourceText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 22), new Vector2(150, 26));
+        Place(resourceText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 18), new Vector2(128, 24));
         var bidText = Text(root, "BidText", "", 30, TextAlignmentOptions.Center);
         bidText.color = new Color(1f, 0.88f, 0.5f);
-        Place(bidText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -55), new Vector2(150, 40));
+        Place(bidText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -42), new Vector2(128, 40));
         var winner = Text(root, "WinnerMark", "WINNER", 20, TextAlignmentOptions.Center);
         winner.color = new Color(1f, 0.45f, 0.35f);
-        Place(winner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 16), new Vector2(150, 28));
+        Place(winner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 14), new Vector2(128, 26));
         winner.gameObject.SetActive(false);
         var outMark = Text(root, "OutMark", "OUT", 24, TextAlignmentOptions.Center);
         outMark.color = new Color(0.65f, 0.65f, 0.65f);
-        Place(outMark.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(150, 30));
+        Place(outMark.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(128, 28));
         outMark.gameObject.SetActive(false);
         var button = root.AddComponent<Button>();
         button.targetGraphic = bg;
@@ -258,7 +403,7 @@ public static class AuctionUiBuilder
     private static GameObject BuildParticipantBar(GameObject canvas)
     {
         var bar = Rect("ParticipantBar", canvas, new Vector2(820, 175));
-        Place(bar.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0, 96), new Vector2(820, 175));
+        Place(bar.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0, 78), new Vector2(700, 130));
         var layout = bar.AddComponent<HorizontalLayoutGroup>();
         layout.spacing = 8;
         layout.childAlignment = TextAnchor.MiddleCenter;

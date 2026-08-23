@@ -21,7 +21,6 @@ public class AuctionSceneView : MonoBehaviour
     [SerializeField] private GameOverView gameOver;
 
     [Header("参加者")]
-    [SerializeField] private EnemyView rival;
     [SerializeField] private Transform participantBar;
     [SerializeField] private ParticipantIconView participantIconPrefab;
 
@@ -32,7 +31,6 @@ public class AuctionSceneView : MonoBehaviour
     public CompetitionView Competition => competition;
     public BaptismView Baptism => baptism;
     public GameOverView GameOver => gameOver;
-    public EnemyView Rival => rival;
     public AuctionParticipant SelectedTarget { get; private set; }
 
     private readonly List<ParticipantIconView> _icons = new();
@@ -45,6 +43,7 @@ public class AuctionSceneView : MonoBehaviour
     public async UniTask<DialogueInput> WaitDialogueInputAsync(AuctionSession session, CancellationToken ct)
     {
         SetTargetSelectable(true);
+        auction.SetConfirmLabel("入札へ");
         dialogue.SetCommandAvailability(i => SelectedTarget != null && session.CanUseDialogue(SelectedTarget, (DialogueCommand)i));
         auction.SetConfirmInteractable(true);
 
@@ -83,6 +82,8 @@ public class AuctionSceneView : MonoBehaviour
             _icons.Add(icon);
         }
         SetTargetSelectable(false);
+        auction.UpdateEmotionResources(EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, session.Player.Wallet.Get));
+        competition.UpdateResources(EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, session.Player.Wallet.Get));
         auction.Hide();
         dialogue.Hide();
         competition.Hide();

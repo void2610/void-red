@@ -42,11 +42,9 @@ public class DialogueCutInView : MonoBehaviour
     /// </summary>
     public UniTask PlayPlayerCutInAsync(string text) => PlayCutInAsync(playerStandingSprite, playerCutInSprite, text);
 
-    /// <summary>
-    /// カットイン演出を再生する
-    /// </summary>
     public async UniTask PlayCutInAsync(Sprite standing, Sprite cutIn, string text)
     {
+        SetVisible(true);
         _slideHandle.TryCancel();
         _fadeHandle.TryCancel();
         _bgFadeHandle.TryCancel();
@@ -77,9 +75,21 @@ public class DialogueCutInView : MonoBehaviour
         await _fadeHandle.ToUniTask();
 
         rectTransform.anchoredPosition = new Vector2(_initialX, rectTransform.anchoredPosition.y);
+        SetVisible(false);
 
         // 次のカットインとの間隔
         await UniTask.Delay((int)(intervalDuration * 1000));
+    }
+
+    /// <summary>
+    /// カットイン演出を再生する
+    /// </summary>
+    private void SetVisible(bool visible)
+    {
+        gameObject.SetActive(visible);
+        if (!visible) return;
+        standingImage.enabled = standingImage.sprite;
+        cutInImage.enabled = cutInImage.sprite;
     }
 
     private void Awake()

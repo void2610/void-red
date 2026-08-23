@@ -46,7 +46,6 @@ public class DialoguePhase : IAuctionPhase
         context.DialogueTarget = target;
         context.View.SetSelectedTarget(target);
         await context.View.Dialogue.SetTargetAsync(target.Data);
-        await context.View.Rival.ChangePortraitAsync(target.Data.Portrait);
     }
 
     private static async UniTask PlayOutcomeAsync(AuctionContext context, DialogueOutcome outcome, CancellationToken ct)
