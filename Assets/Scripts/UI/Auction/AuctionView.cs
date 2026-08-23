@@ -35,6 +35,7 @@ public class AuctionView : BasePhaseView
     public Observable<Unit> OnBiddingConfirmed => confirmBiddingButton.OnClickAsObservable();
 
     public AuctionCardView CurrentCard => _cards.Count > 0 ? _cards[^1] : null;
+    public EmotionType SelectedEmotion => emotionResourceDisplayView.SelectedEmotion;
 
     private readonly List<AuctionCardView> _cards = new();
 

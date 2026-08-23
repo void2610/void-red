@@ -17,6 +17,9 @@ public class AuctionSession
     public AuctionParticipant Player => _participants[0];
     public IReadOnlyList<AuctionParticipant> Rivals => _participants.Skip(1).ToList();
     public RevealResult LastReveal { get; private set; }
+
+    /// <summary>一斉開示の演出を見せ終えたか (競合に入る前に必ず 1 度通す)</summary>
+    public bool RevealShown { get; set; }
     public CompetitionState Competition { get; private set; }
     public AuctionParticipant LastWinner { get; private set; }
 
@@ -51,6 +54,9 @@ public class AuctionSession
             _participants.Add(new AuctionParticipant(rival, wallet, false, rival.DisplayName));
         }
     }
+
+    /// <summary>対話の初期対象 (入札に参加できる最初のライバル)</summary>
+    public AuctionParticipant FirstAvailableRival() => Rivals.FirstOrDefault(r => r.CanBid) ?? Rivals[0];
 
     public bool CanUseDialogue(AuctionParticipant target, DialogueCommand command) => Phase == AuctionPhase.Dialogue && !target.IsPlayer && target.CanBid && !target.UsedCommandsThisLot.Contains(command);
 
@@ -129,6 +135,7 @@ public class AuctionSession
         // 0 枚は入札したことにならない。全員 0 枚なら流札
         var bidders = _participants.Where(p => p.SubmittedBid != null && p.SubmittedBid.Total > 0).ToList();
         LastReveal = new RevealResult(bidders);
+        RevealShown = false;
         Phase = LastReveal.IsTie ? AuctionPhase.Competition : AuctionPhase.Reveal;
         if (Phase == AuctionPhase.Competition) Competition = new CompetitionState(CurrentLot, LastReveal.TiedParticipants, 0f, _competitionTimeout);
         return LastReveal;

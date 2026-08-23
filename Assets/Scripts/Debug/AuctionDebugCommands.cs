@@ -161,8 +161,8 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/UseDialogue", Description = "対話コマンドのボタンを押す (Observe / Provoke / Empathize / Persuade)")]
     public string UseDialogue(string command)
     {
-        var index = (int)Enum.Parse<DialogueCommand>(command);
-        var button = ChoiceButtons()[index];
+        var parsed = Enum.Parse<DialogueCommand>(command);
+        var button = ChoiceButtons().FirstOrDefault(b => b.name == $"DialogueChoice_{parsed}") ?? throw new InvalidOperationException($"対話ボタンが無い: {command}");
         if (!button.interactable) throw new InvalidOperationException($"押せない: {command}");
         button.onClick.Invoke();
         return command;
@@ -369,7 +369,7 @@ public sealed class AuctionDebugCommands
 
     private static Button[] ChoiceButtons()
     {
-        return View().Dialogue.GetComponentsInChildren<Button>(true).Where(b => b.name.StartsWith("Choice")).ToArray();
+        return View().Dialogue.GetComponentsInChildren<Button>(true).Where(b => b.name.StartsWith("DialogueChoice_")).ToArray();
     }
 
     private static ParticipantIconView[] Icons()

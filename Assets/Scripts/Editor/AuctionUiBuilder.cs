@@ -29,10 +29,24 @@ public static class AuctionUiBuilder
         "CardBattleView", "DeckSelectionView", "RewardPhaseView", "MemoryGrowthView", "SkillButtonView", "TutorialView", "TutorialGizmoHelper",
     };
 
+    // 対話コマンドのボタン (DialogueCommand の順) に振るラベルとアイコン
+    private static readonly (string label, string sprite)[] DIALOGUE_COMMANDS =
+    {
+        ("観察する", "Assets/Sprites/Auction/Dialogue/silence.png"),
+        ("挑発する", "Assets/Sprites/Auction/Dialogue/provoke.png"),
+        ("共感する", "Assets/Sprites/Auction/Dialogue/empathize.png"),
+        ("説得する", "Assets/Sprites/Auction/Dialogue/persuade.png"),
+    };
+
     private static readonly Color PANEL_BG = new(0.08f, 0.05f, 0.08f, 0.9f);
     private static readonly Color OVERLAY_BG = new(0.05f, 0.02f, 0.04f, 0.95f);
 
     private static TMP_FontAsset _font;
+
+    private static Sprite LoadSprite(string path)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
 
     [MenuItem("VoidRed/Auction/Build All")]
     public static void BuildAll()
@@ -48,7 +62,9 @@ public static class AuctionUiBuilder
         EnsureDir(PREFAB_DIR);
         LoadFont();
         BuildParticipantIcon();
-        BuildWonLotEntry();
+        var wonEntry = BuildWonLotEntry();
+        BuildBaptism(wonEntry);
+        BuildGameOver();
         AssetDatabase.SaveAssets();
         Debug.Log("[AuctionUiBuilder] プレハブ生成完了");
     }
@@ -69,12 +85,15 @@ public static class AuctionUiBuilder
         foreach (var scope in scene.GetRootGameObjects().Where(g => g.name == "BattleLifetimeScope").ToList()) UnityEngine.Object.DestroyImmediate(scope);
 
         var canvas = scene.GetRootGameObjects().First(g => g.name == "Canvas");
-        // 対話 View はシーンに元からあるものを使う (無ければプレハブから置く)
-        var dialogueView = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialoguePhaseView>(true)).FirstOrDefault();
+
+        // 対話 View は旧構成で AuctionView の中にも入っている。Canvas 直下の 1 つだけ残す
+        var dialogueViews = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialoguePhaseView>(true)).ToList();
+        var dialogueView = dialogueViews.FirstOrDefault(v => v.transform.parent == canvas.transform) ?? dialogueViews.FirstOrDefault();
+        foreach (var extra in dialogueViews.Where(v => v != dialogueView)) UnityEngine.Object.DestroyImmediate(extra.gameObject);
         var dialogue = dialogueView ? dialogueView.gameObject : InstantiatePrefab(DIALOGUE_PHASE_PREFAB, canvas.transform);
         var participantBar = BuildParticipantBar(canvas);
-        var baptism = BuildBaptism(canvas);
-        var gameOver = BuildGameOver(canvas);
+        var baptism = InstantiatePrefab($"{PREFAB_DIR}/BaptismView.prefab", canvas.transform).GetComponent<BaptismView>();
+        var gameOver = InstantiatePrefab($"{PREFAB_DIR}/GameOverView.prefab", canvas.transform).GetComponent<GameOverView>();
 
         var sceneViewGo = new GameObject("AuctionSceneView");
         var sceneView = sceneViewGo.AddComponent<AuctionSceneView>();
@@ -89,6 +108,8 @@ public static class AuctionUiBuilder
             ("rival", Find<EnemyView>(scene)),
             ("participantBar", participantBar.transform),
             ("participantIconPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR}/ParticipantIcon.prefab").GetComponent<ParticipantIconView>()));
+
+        ApplyDialogueCommands(dialogue.GetComponentInChildren<DialogueChoicesView>(true));
 
         // 旧ルールの固定文言を新ルールに差し替える
         foreach (var text in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<TextMeshProUGUI>(true)).Where(t => t.name == "InstructionText"))
@@ -157,6 +178,41 @@ public static class AuctionUiBuilder
         Debug.Log("[AuctionUiBuilder] ロビー UI 生成完了");
     }
 
+    /// <summary>
+    /// 対話コマンドのボタンを DialogueCommand の並び順に揃え、ラベルとアイコンを設定する
+    /// </summary>
+    private static void ApplyDialogueCommands(DialogueChoicesView choices)
+    {
+        var buttons = choices.GetComponentsInChildren<Button>(true).OrderBy(b => b.name).ToList();
+        if (buttons.Count != DIALOGUE_COMMANDS.Length) throw new InvalidOperationException($"対話ボタンの数が合わない: {buttons.Count}");
+
+        // 旧レイアウトは 挑発 / 共感 / 説得 / 沈黙 の順。沈黙のボタンを観察に読み替えて先頭へ回す
+        var ordered = new List<Button> { buttons[3], buttons[0], buttons[1], buttons[2] };
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            var (label, spritePath) = DIALOGUE_COMMANDS[i];
+            ordered[i].name = $"DialogueChoice_{(DialogueCommand)i}";
+            var text = ordered[i].GetComponentInChildren<TextMeshProUGUI>(true);
+            var tso = new SerializedObject(text);
+            tso.FindProperty("m_text").stringValue = label;
+            tso.ApplyModifiedPropertiesWithoutUndo();
+            var background = ordered[i].GetComponentsInChildren<Image>(true).FirstOrDefault(img => img.name == "Background");
+            var sprite = LoadSprite(spritePath);
+            if (background && sprite)
+            {
+                var iso = new SerializedObject(background);
+                iso.FindProperty("m_Sprite").objectReferenceValue = sprite;
+                iso.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        var so = new SerializedObject(choices);
+        var list = so.FindProperty("choiceButtons");
+        list.arraySize = ordered.Count;
+        for (var i = 0; i < ordered.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = ordered[i];
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
     private static void RegisterSceneInBuild()
     {
         var scenes = EditorBuildSettings.scenes.Where(s => s.path != AUCTION_SCENE).ToList();
@@ -213,9 +269,9 @@ public static class AuctionUiBuilder
         return bar;
     }
 
-    private static BaptismView BuildBaptism(GameObject canvas)
+    private static GameObject BuildBaptism(GameObject wonEntryPrefab)
     {
-        var root = Window(canvas, "BaptismView", "洗礼", out var close, showClose: false);
+        var root = Window(null, "BaptismView", "洗礼", out _, showClose: false);
         var header = root.GetComponentsInChildren<TextMeshProUGUI>(true).First(t => t.name == "TitleText");
         var container = Rect("EntryContainer", root, new Vector2(720, 360));
         Place(container.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0, -10), new Vector2(720, 360));
@@ -236,14 +292,14 @@ public static class AuctionUiBuilder
         Place(finish.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(210, 84), new Vector2(200, 44));
 
         var view = root.AddComponent<BaptismView>();
-        Wire(view, ("headerText", header), ("entryContainer", container.transform), ("entryPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR}/WonLotEntry.prefab")),
+        Wire(view, ("headerText", header), ("entryContainer", container.transform), ("entryPrefab", wonEntryPrefab),
             ("remainingText", remaining), ("collapsedText", collapsed), ("selectedText", selected), ("finishButton", finish));
-        return view;
+        return SavePrefab(root, "BaptismView");
     }
 
-    private static GameOverView BuildGameOver(GameObject canvas)
+    private static GameObject BuildGameOver()
     {
-        var root = Window(canvas, "GameOverView", "", out _, showClose: false);
+        var root = Window(null, "GameOverView", "", out _, showClose: false);
         var message = Text(root, "MessageText", "", 26, TextAlignmentOptions.Center);
         Place(message.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0, 60), new Vector2(700, 120));
         var retry = ButtonPrefab(root, "RetryButton", "やり直す", new Vector2(200, 44));
@@ -252,7 +308,7 @@ public static class AuctionUiBuilder
         Place(lobby.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(120, -50), new Vector2(200, 44));
         var view = root.AddComponent<GameOverView>();
         Wire(view, ("messageText", message), ("retryButton", retry), ("lobbyButton", lobby));
-        return view;
+        return SavePrefab(root, "GameOverView");
     }
 
     private static GameObject BuildWonLotEntry()

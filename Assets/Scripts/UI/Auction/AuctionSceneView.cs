@@ -39,8 +39,35 @@ public class AuctionSceneView : MonoBehaviour
     private readonly Subject<AuctionParticipant> _onTargetChanged = new();
     private readonly CompositeDisposable _disposables = new();
 
-    /// <summary>参加者アイコンで対話相手が選び直されるまで待つ</summary>
-    public async UniTask<AuctionParticipant> WaitTargetChangedAsync(CancellationToken ct) => await _onTargetChanged.FirstAsync(ct);
+    /// <summary>
+    /// 対話フェーズの入力を 1 つ待つ (相手の選び直し / コマンド / 入札へ進む)
+    /// </summary>
+    public async UniTask<DialogueInput> WaitDialogueInputAsync(AuctionSession session, CancellationToken ct)
+    {
+        SetTargetSelectable(true);
+        dialogue.SetCommandAvailability(i => SelectedTarget != null && session.CanUseDialogue(SelectedTarget, (DialogueCommand)i));
+        auction.SetConfirmInteractable(true);
+
+        var picked = await UniTask.WhenAny(
+            dialogue.WaitForCommandAsync(),
+            _onTargetChanged.FirstAsync(ct).AsUniTask(),
+            auction.OnBiddingConfirmed.FirstAsync(ct).AsUniTask());
+
+        return picked.winArgumentIndex switch
+        {
+            0 => DialogueInput.OfCommand((DialogueCommand)picked.result1),
+            1 => DialogueInput.OfTarget(picked.result2),
+            _ => DialogueInput.ProceedToBidding(),
+        };
+    }
+
+    /// <summary>対話中の入力を一時的に止める (演出中)</summary>
+    public void SetInputEnabled(bool enabled)
+    {
+        SetTargetSelectable(enabled);
+        dialogue.SetChoicesInteractable(enabled);
+        auction.SetConfirmInteractable(enabled);
+    }
 
     public void Initialize(AuctionSession session)
     {
