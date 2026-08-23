@@ -37,6 +37,20 @@ permissions:
   pull-requests: write
 
 jobs:
+  test-editmode:
+    # ルールの判定は EditMode で検証する。Play Mode を使わないぶん速く、進行が止まる不具合をここで捕まえる
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    uses: void2610/unity-coding-standards/.github/workflows/unity-test-self-hosted.yml@main
+    with:
+      job-name: EditMode テスト
+      test-mode: EditMode
+      unity-version: "6000.3.10f1"
+      runner-labels: '["self-hosted", "macOS"]'
+      artifact-name: test-results-editmode
+      pr-number: ${{ github.event.pull_request.number || 0 }}
+      nuget-restore-method: Void2610.UnityTemplate.Editor.CI.NuGetRestore.Restore
+      fail-on-test-failures: true
+
   test-playmode:
     # PlayMode テストは LiminalScenario ベースの E2E。Edit Mode batch ではメインループが回らないため PlayMode で回す
     # フォーク経由の pull_request では self-hosted runner で任意コードが走らないようスキップ
