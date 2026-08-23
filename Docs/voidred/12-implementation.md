@@ -26,6 +26,8 @@
 | 競合はパス無し・最後の上乗せから一定秒で確定 | `CompetitionState.IsTimedOut(now)`。時刻は Presenter が `Time.time` を渡す |
 | 同数のまま時間切れ | **抽選で落札者を決める** (`PickTiedLeader`)。流札は全員 0 枚のときだけ |
 | 競合が終わらない問題 | NPC の上乗せは提出額 + `GameConstants.NPC_MAX_RAISE_MARGIN` 枚まで。加えて `CompetitionState` が確定時間の `COMPETITION_HARD_LIMIT_RATIO` 倍で打ち切る |
+| 終盤ほど競りが激化する | 無落札のまま残り `DESPERATE_REMAINING_LOTS` ロットになった NPC は上乗せ確率と上限が上がる (`TryNpcRaise`)。競合を避ける性格 (確率 0) は据え置き |
+| 各ロットに目玉が 1 つ / 出現順と相関させない | 共鳴値が高いほど NPC の入札が厚くなる (`BidAI.Plan` の `RESONANCE_BID_BONUS_MAX`)。目玉は階層ごとに位置をずらして `AuctionDataBuilder` が配置する |
 | 進行が止まる問題 | `PhaseLoopGuard` が同じフェーズの繰り返しを検知。例外時は `AuctionPresenter` がロビーへ戻す |
 | 0 枚の参加者は卓から外れる | `AuctionParticipant.CanBid` (所持 0 / 挑発で取りやめ)。**0 枚の入札は不参加扱い** |
 | 対話は各コマンド各ライバル 1 ロット 1 回、失敗でもセリフ | `UseDialogue` / `DialogueOutcome`。成功率は `OBSERVE_SUCCESS_RATE` 85 / その他 25 |
@@ -33,7 +35,7 @@
 | 対話への反応はキャラごと | `BiddingProfile` の `BidReaction` (None / 増減 / 大幅増減 / Random / Withdraw / ShiftToNext / PullFromNext) と `ReactionScale` |
 | 人格崩壊 = 無落札、主人公はゲームオーバーで同階層やり直し | `FinishLots` で判定。`GameOverView` の「やり直す」は進行度を変えずに `AuctionScene` を再ロード |
 | 洗礼: 内訳と歪みを見せ 1 つだけ統合、残りはコレクション | `BaptismView` が旧リザルトの `CardAcquisitionView` (札 + 内訳のスタガー表示) を内包し、札をクリックして選ぶ。`PersonaState.Integrate` で統合。感情状態は入札の主属性 (同数なら記憶の属性) |
-| リソース持ち越し + 階層ごとに 8 × 5 補充 | `GameProgressService.PrepareWalletForFloor` (`Refill` は加算) |
+| リソース持ち越し + 階層ごとに 8 × 5 補充 | `GameProgressService.PrepareWalletForFloor` (`Refill` は加算)。ゲームオーバーのやり直しで補充が重ならないよう、階層に入ったときの手持ちを控えて復元する |
 | 記憶テーマの鮮明化 | 出品の過半 (3/5) を落札したとき洗礼の見出しに鮮明化後テーマを出す (`IsThemeClarified`) |
 | ロビー | HomeScene の旧デッキ / 図鑑ボタンを「人格」「記憶コレクション」に転用。進行案内は `HomeView.SetProgressText` |
 | 4 階層の獲得必須の記憶 (楽園への鍵) | `MemoryLotData.IsKey`。鍵のある階層で取り逃すと `MissedKey` でゲームオーバー (同階層やり直し)。初期データでは `4-5『楽園への鍵』` |
