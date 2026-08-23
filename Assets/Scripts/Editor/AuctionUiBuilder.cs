@@ -156,7 +156,7 @@ public static class AuctionUiBuilder
         foreach (var stale in Children(canvas.transform).Where(c => c.name is "MemoryCollectionView" or "PersonaView" or "ProgressText").ToList()) UnityEngine.Object.DestroyImmediate(stale.gameObject);
 
         var progress = Text(canvas, "ProgressText", "", 18, TextAlignmentOptions.MidlineLeft);
-        Place(progress.rectTransform, new Vector2(0f, 1f), new Vector2(230, -24), new Vector2(440, 28));
+        Place(progress.rectTransform, new Vector2(0f, 1f), new Vector2(275, -44), new Vector2(440, 28));
         var collection = (GameObject)PrefabUtility.InstantiatePrefab(collectionPrefab, canvas.transform);
         var persona = (GameObject)PrefabUtility.InstantiatePrefab(personaPrefab, canvas.transform);
         var settings = Children(canvas.transform).FirstOrDefault(c => c.name == "SettingsPanel");
@@ -684,8 +684,9 @@ public static class AuctionUiBuilder
         scrollRect.content = crt;
         scrollRect.horizontal = false;
         scrollRect.viewport = scroll.GetComponent<RectTransform>();
-        var summary = Text(root, "SummaryText", "", 18, TextAlignmentOptions.MidlineLeft);
-        Place(summary.rectTransform, new Vector2(0f, 1f), new Vector2(200, -60), new Vector2(300, 26));
+        // 窓の左上はホームの進行案内と重なるので、見出しの真下に置く
+        var summary = Text(root, "SummaryText", "", 18, TextAlignmentOptions.Center);
+        Place(summary.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -72), new Vector2(300, 26));
         var view = root.AddComponent<MemoryCollectionView>();
         Wire(view, ("closeButton", close), ("entryContainer", content.transform), ("entryPrefab", entryPrefab), ("summaryText", summary));
         return SavePrefab(root, "MemoryCollectionView", LOBBY_PREFAB_DIR);
