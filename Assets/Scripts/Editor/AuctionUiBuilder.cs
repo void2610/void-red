@@ -562,7 +562,7 @@ public static class AuctionUiBuilder
         Place(winner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, 12), new Vector2(128, 26));
         winner.gameObject.SetActive(false);
         var outMark = Text(root, "OutMark", "OUT", 24, TextAlignmentOptions.Center);
-        outMark.color = new Color(0.65f, 0.65f, 0.65f);
+        outMark.color = new Color(1f, 0.35f, 0.35f);
         Place(outMark.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(128, 28));
         outMark.gameObject.SetActive(false);
         var button = root.AddComponent<Button>();

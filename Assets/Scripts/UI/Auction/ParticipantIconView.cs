@@ -24,6 +24,7 @@ public class ParticipantIconView : MonoBehaviour
     /// <summary>頭上に出ている数字 (観察の推定なら ? 付き)</summary>
     public string BidLabel => bidText.text;
     private const float SELECTED_SCALE = 1.08f;
+    private static readonly Color OUT_TINT = new(0.3f, 0.3f, 0.32f);
 
     public void HideBid() => bidText.text = "";
 
@@ -68,6 +69,10 @@ public class ParticipantIconView : MonoBehaviour
     public void Refresh()
     {
         resourceText.text = Participant.Wallet.Total.ToString();
-        outMark.SetActive(!Participant.CanBid && !Participant.IsPlayer);
+
+        // 卓から外れた相手は絵柄ごと沈めて、OUT の文字が絵に埋もれないようにする
+        var isOut = !Participant.CanBid && !Participant.IsPlayer;
+        outMark.SetActive(isOut);
+        icon.color = isOut ? OUT_TINT : Color.white;
     }
 }
