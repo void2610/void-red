@@ -49,11 +49,13 @@ public static class LobbyScenarios
     {
         foreach (var step in ResetProgress()) yield return step;
         yield return WaitFadeDone();
-        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = 0, ["seed"] = 7, ["timeout"] = 1.5f });
+        yield return ScenarioStep.Run("Auction/Start", new Dictionary<string, object> { ["floor"] = 0, ["seed"] = 7, ["timeout"] = 1.5f, ["speed"] = 6f });
         foreach (var step in WaitScene("AuctionScene")) yield return step;
         yield return ScenarioStep.Run("Auction/AutoPlayFloor", Args("winLots", 2));
         yield return ScenarioStep.AssertCommandEventually("Auction/ActivePanel", null, "Baptism", 60f, "洗礼待ち");
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismReady", null, "True", 20f, "洗礼の札が並ぶまで待つ");
         yield return ScenarioStep.Run("Auction/ClickIntegrate", Args("lotIndex", 0));
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismSelected", null, "True", 10f, "統合する記憶の選択が反映されるまで待つ");
         yield return ScenarioStep.Run("UI/ClickButton", Args("name", "FinishButton"));
         foreach (var step in WaitScene("HomeScene")) yield return step;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -13,6 +14,9 @@ using Void2610.LiminalPalette;
 /// </summary>
 public sealed class AuctionDebugCommands
 {
+    /// <summary>上乗せが進まないまま回り続けないための打ち切り回数</summary>
+    private const int MAX_RAISE_ATTEMPTS = 200;
+
     private readonly AuctionStartRequest _request;
     private readonly SceneTransitionManager _sceneTransition;
     private readonly GameProgressService _progress;
@@ -143,6 +147,9 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/DialogueReady", Description = "対話フェーズの入力を受け付けているか")]
     public bool DialogueReady() => View().IsWaitingDialogueInput;
 
+    [LiminalCommand("Auction/CounterChoiceReady", Description = "逆対話の二択の入力を受け付けているか")]
+    public bool CounterChoiceReady() => View().IsWaitingCounterChoice;
+
     [LiminalCommand("Auction/LotSettled", Description = "今のロットの決着 (落札 / 流札) がついたか")]
     public bool LotSettled() => Session().Phase is AuctionPhase.LotResult or AuctionPhase.Baptism or AuctionPhase.GameOver or AuctionPhase.Dialogue && Session().LastReveal != null;
 
@@ -169,12 +176,15 @@ public sealed class AuctionDebugCommands
     [LiminalCommand("Auction/Speed", Description = "演出の早送り倍率を変える (検証用)")]
     public float Speed(float value = 1f) => Time.timeScale = Mathf.Clamp(value, 0.1f, 20f);
 
+    [LiminalCommand("Auction/BaptismHeader", Description = "洗礼の見出しに出ている文言を返す")]
+    public string BaptismHeader() => View().Baptism.HeaderLabel;
+
     [LiminalCommand("Auction/BaptismHeaderClarified", Description = "洗礼の見出しに鮮明化後のテーマが出ているか")]
     public bool BaptismHeaderClarified()
     {
         var clarified = Session().Floor.ClarifiedTheme;
         if (string.IsNullOrEmpty(clarified)) return false;
-        return View().Baptism.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text.Contains(clarified));
+        return View().Baptism.HeaderLabel.Contains(clarified);
     }
 
     [LiminalCommand("Auction/SelectTarget", Description = "参加者アイコンを押して対話相手を選ぶ")]
@@ -367,18 +377,56 @@ public sealed class AuctionDebugCommands
         return $"{lotEmotion}x{matching} + other x{mismatched - remaining}";
     }
 
-    [LiminalCommand("Auction/RaiseUntilLeading", Description = "競合中、他の競合者の最大額を margin 枚上回るまで上乗せする")]
-    public int RaiseUntilLeading(int margin = 5)
+    [LiminalCommand("Auction/AutoPlayFloor", Description = "階層の全ロットを対話なしで進める。先頭の winLots ロットだけ落札を狙い、残りは 0 枚で流す")]
+    public async UniTask<string> AutoPlayFloor(int winLots = 0)
+    {
+        for (var lot = 0; lot < GameConstants.LOTS_PER_FLOOR; lot++)
+        {
+            await WaitFor(DialogueReady, $"ロット {lot} の対話フェーズ");
+            Confirm();
+            await WaitFor(() => ActivePanel() == "Bid", $"ロット {lot} の入札フェーズ");
+            if (lot < winLots) await BidAboveTopRival();
+            Confirm();
+            await WaitFor(LotSettled, $"ロット {lot} の決着");
+        }
+        return $"winLots={winLots}";
+    }
+
+    [LiminalCommand("Auction/RaiseUntilLeading", Description = "競合中、他の競合者の最大額を margin 枚上回るまで上乗せする (選んだ属性が枯れたらホイールで切り替える)")]
+    public async UniTask<int> RaiseUntilLeading(int margin = 5)
     {
         var s = Session();
         var c = s.Competition;
+        var target = c.Competitors.Where(x => !x.IsPlayer).Max(c.TotalOf) + margin;
         var raised = 0;
-        while (c.TotalOf(s.Player) < c.Competitors.Where(x => !x.IsPlayer).Max(c.TotalOf) + margin)
+        for (var attempt = 0; c.TotalOf(s.Player) < target; attempt++)
         {
-            if (Raise() == 0) throw new InvalidOperationException("上乗せできない");
-            raised++;
+            if (attempt > MAX_RAISE_ATTEMPTS) throw new InvalidOperationException($"上乗せが進まない (現在 {c.TotalOf(s.Player)} / 目標 {target} / 手持ち {s.Player.Wallet.Total})");
+
+            var before = c.TotalOf(s.Player);
+            if (Raise() > 0 && c.TotalOf(s.Player) > before) raised++;
+            else await TurnCompetitionWheel();
         }
         return raised;
+    }
+
+    /// <summary>条件が満たされるまで待つ。待ちきれなければ例外にして、シナリオを黙って止めない</summary>
+    private static async UniTask WaitFor(Func<bool> condition, string what, float seconds = 60f)
+    {
+        var deadline = Time.realtimeSinceStartup + seconds;
+        while (!condition())
+        {
+            if (Time.realtimeSinceStartup > deadline) throw new InvalidOperationException($"待ちきれない: {what}");
+            await UniTask.Yield(View().destroyCancellationToken);
+        }
+    }
+
+    /// <summary>競合フェーズの感情ホイールを 1 つ回す (枯れた属性から抜けるため)</summary>
+    private static async UniTask TurnCompetitionWheel()
+    {
+        var wheel = View().Competition.GetComponentInChildren<EmotionResourceDisplayView>(true);
+        wheel.GetComponentInChildren<Button>(true).onClick.Invoke();
+        await UniTask.Yield(View().destroyCancellationToken);
     }
 
     private static Button BidButton(string name)
@@ -391,9 +439,9 @@ public sealed class AuctionDebugCommands
         return View().Dialogue.GetComponentsInChildren<Button>(true).Where(b => b.name.StartsWith("DialogueChoice_")).ToArray();
     }
 
-    private static ParticipantIconView[] Icons()
+    private static IReadOnlyList<ParticipantIconView> Icons()
     {
-        return View().GetComponentsInChildren<ParticipantIconView>(true);
+        return View().Icons;
     }
 
     private static AuctionSession Session()

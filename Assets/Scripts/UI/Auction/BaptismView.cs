@@ -19,6 +19,9 @@ public class BaptismView : BasePhaseView
     [SerializeField] private CardAcquisitionView acquisitionView;
     [SerializeField] private Button finishButton;
 
+    /// <summary>見出しに出している文言 (検証用の読み取り)</summary>
+    public string HeaderLabel => headerText.text;
+
     /// <summary>選ばれている記憶 (未選択なら null)</summary>
     public WonLot SelectedLot { get; private set; }
 

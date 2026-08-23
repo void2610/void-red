@@ -111,9 +111,12 @@ public static class AuctionScenarios
         yield return ScenarioStep.Run("Auction/RememberPlanned", Args("name", "アルヴ"));
         yield return ScenarioStep.Run("Auction/UseDialogue", Args("command", "Observe"));
         yield return ScenarioStep.AssertCommandEventually("Auction/CanUseDialogue", Args("name", "アルヴ", "command", "Observe"), "False", 20f, "観察は 1 度きり");
-        yield return ScenarioStep.AssertCommandEventually("Auction/DialogueReady", null, "True", 40f, "演出後は対話フェーズに戻る");
-        yield return ScenarioStep.AssertCommandReturns("Auction/PlannedDelta", Args("name", "アルヴ"), "0", "観察そのものは入札予定を動かさない");
+        yield return ScenarioStep.AssertCommandEventually("Auction/CounterChoiceReady", null, "True", 30f, "観察を仕掛けたので逆対話が来る");
+        // 逆対話への返答で予定が動くため、比較は返答前に行う
         yield return ScenarioStep.AssertCommandReturns("Auction/ObservedBidMatchesPlanned", Args("name", "アルヴ"), "True", "頭上の数字が相手の入札予定と一致する");
+        yield return ScenarioStep.AssertCommandReturns("Auction/PlannedDelta", Args("name", "アルヴ"), "0", "観察そのものは入札予定を動かさない");
+        yield return ScenarioStep.Run("Auction/UseDialogue", Args("command", "Observe"));
+        yield return ScenarioStep.AssertCommandEventually("Auction/DialogueReady", null, "True", 40f, "返答後は対話フェーズに戻る");
     }
 
     [LiminalScenario(
@@ -157,6 +160,8 @@ public static class AuctionScenarios
         foreach (var step in PlayFloor(winLots: 3)) yield return step;
         yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "3");
         yield return ScenarioStep.AssertCommandReturns("Auction/ThemeClarified", null, "True");
+        // ActivePanel はフェーズが移った時点で Baptism を返すため、見出しの確認は札が並ぶまで待つ
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismReady", null, "True", 20f, "洗礼の札が並ぶまで待つ");
         yield return ScenarioStep.AssertCommandReturns("Auction/BaptismHeaderClarified", null, "True", "見出しに鮮明化後のテーマが出る");
     }
 
@@ -170,6 +175,7 @@ public static class AuctionScenarios
         foreach (var step in PlayFloor(winLots: 2)) yield return step;
         yield return ScenarioStep.AssertCommandReturns("Auction/WonCount", Args("name", "ノア"), "2");
         yield return ScenarioStep.AssertCommandReturns("Auction/ThemeClarified", null, "False");
+        yield return ScenarioStep.AssertCommandEventually("Auction/BaptismReady", null, "True", 20f, "洗礼の札が並ぶまで待つ");
         yield return ScenarioStep.AssertCommandReturns("Auction/BaptismHeaderClarified", null, "False");
     }
 
