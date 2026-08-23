@@ -12,6 +12,9 @@ public static class AuctionDataBuilder
 {
     private const string ROOT = "Assets/ScriptableObjects/Auction";
 
+    /// <summary>目玉に置く共鳴値。他のロットより明確に高くする</summary>
+    private const int HEADLINE_RESONANCE = 95;
+
     // 立ち絵 / カットイン / アイコン / 所属色。素材が無いキャラは空のまま (UI 側で隠す)
     private static readonly Dictionary<string, (string portrait, string cutIn, string icon, Color color)> VISUALS = new()
     {
@@ -24,9 +27,6 @@ public static class AuctionDataBuilder
         BidReaction Provoke, BidReaction Empathize, BidReaction Persuade, bool PersuadeFav, int Scale, CompetitionPolicy Policy, int CounterChance,
         string Prompt, string A, string B, BidReaction ReactA, BidReaction ReactB,
         string ObserveLine, string ProvokeLine, string EmpathizeLine, string PersuadeLine, string FailLine);
-
-    /// <summary>目玉に置く共鳴値。他のロットより明確に高くする</summary>
-    private const int HEADLINE_RESONANCE = 95;
 
     private record Lot(string Id, string Title, EmotionType Emotion, string Flavor, int Resonance, bool IsKey = false);
 
