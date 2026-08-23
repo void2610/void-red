@@ -39,15 +39,10 @@ public class CompetitionPhase : IAuctionPhase
             view.RefreshParticipants();
         }).AddTo(d);
 
-        var npcNext = competition.Competitors.Where(c => !c.IsPlayer).ToDictionary(c => c, _ => Time.time + NextNpcInterval());
-        while (!competition.IsTimedOut(Time.time) && !competition.IsDeadlocked())
+        // 進行判定は CompetitionRunner が持ち、ここは描画と入力の反映だけを担う
+        var runner = new CompetitionRunner(session, session.Rng, Time.time);
+        while (runner.Step(Time.time))
         {
-            foreach (var npc in npcNext.Keys.ToList())
-            {
-                if (Time.time < npcNext[npc]) continue;
-                if (session.TryNpcRaise(npc, Time.time)) SeManager.Instance.PlaySe(npc.Data.Emotion.ToResourceSeName(), pitch: 1f);
-                npcNext[npc] = Time.time + NextNpcInterval();
-            }
             view.Competition.UpdateBids(competition.TotalOf(session.Player), RivalTop(competition));
             view.Competition.UpdateTimer(competition.RemainingSeconds(Time.time), competition.TimeoutSeconds);
             view.ShowCompetitionTotals(competition);
@@ -70,8 +65,4 @@ public class CompetitionPhase : IAuctionPhase
         return EmotionWallet.ALL_EMOTIONS.ToDictionary(e => e, session.Player.Wallet.Get);
     }
 
-    private static float NextNpcInterval()
-    {
-        return Random.Range(GameConstants.NPC_RAISE_INTERVAL_MIN, GameConstants.NPC_RAISE_INTERVAL_MAX);
-    }
 }

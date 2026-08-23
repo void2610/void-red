@@ -19,6 +19,7 @@ public class AuctionPresenter : IStartable, IDisposable
     private readonly AuctionContext _context;
     private readonly IReadOnlyList<IAuctionPhase> _phases;
     private readonly CancellationTokenSource _cts = new();
+    private readonly PhaseLoopGuard _guard = new();
 
     public AuctionPresenter(AuctionSceneView view, AuctionSession session, GameProgressService progress, SceneTransitionManager sceneTransition)
     {
@@ -34,7 +35,10 @@ public class AuctionPresenter : IStartable, IDisposable
             {
                 var phase = _phases.FirstOrDefault(p => p.CanRun(_context.Session));
                 if (phase == null) throw new InvalidOperationException($"進行できるフェーズが無い: {_context.Session.Phase}");
+
                 CurrentPhaseName = phase.GetType().Name;
+                if (_guard.IsStuck(CurrentPhaseName, _context.Session.Phase, _context.Session.CurrentLotIndex)) throw new InvalidOperationException($"進行が同じ状態で止まっている: {_guard.Describe()}");
+
                 await phase.RunAsync(_context, ct);
             }
         }

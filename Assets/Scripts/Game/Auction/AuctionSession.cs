@@ -32,6 +32,9 @@ public class AuctionSession
     public bool IsThemeClarified => Player.WonLots.Count * 2 > _lots.Count && !string.IsNullOrEmpty(Floor.ClarifiedTheme);
     public bool IsPlayerGameOver => Phase == AuctionPhase.GameOver;
 
+    /// <summary>このセッションの乱数。進行の再現性を保つため外でも同じ種を使う</summary>
+    public System.Random Rng => _rng;
+
     private const int OBSERVE_SUCCESS_RATE = 85;
     private const int OTHER_SUCCESS_RATE = 25;
 

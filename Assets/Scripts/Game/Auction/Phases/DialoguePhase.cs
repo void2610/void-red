@@ -18,6 +18,8 @@ public class DialoguePhase : IAuctionPhase
 
         while (true)
         {
+            // 入力が即座に返る状況でも 1 フレームは進める (取りこぼしと暴走の両方を避ける)
+            await UniTask.Yield(ct);
             var input = await view.WaitDialogueInputAsync(session, ct);
             if (input.IsProceedToBidding) break;
 
