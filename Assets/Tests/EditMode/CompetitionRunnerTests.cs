@@ -46,6 +46,29 @@ public class CompetitionRunnerTests
         Assert.Less(elapsed, GIVE_UP_SECONDS);
     }
 
+    [Test]
+    public void 無落札のまま終盤に入っても競合は決着する(
+        [Values(1, 2, 3, 4)] int rivalCount,
+        [Values(CompetitionPolicy.AllIn, CompetitionPolicy.FavoriteAggressive, CompetitionPolicy.Normal, CompetitionPolicy.ByBidSize)] CompetitionPolicy policy)
+    {
+        // 残りロットが尽きかけた無落札の NPC は上乗せ上限が広がるため、決着保証を別途確かめる
+        var session = CreateTiedSession(rivalCount, policy, competitionTimeout: 10f, lotCount: GameConstants.DESPERATE_REMAINING_LOTS);
+        var elapsed = RunToEnd(session);
+
+        Assert.Less(elapsed, GIVE_UP_SECONDS, $"{rivalCount} 人 / {policy} で競合が終わらない");
+        Assert.IsNotNull(session.ResolveCompetition(), "決着したら落札者が決まる");
+    }
+
+    [Test]
+    public void 無落札のまま終盤に入った相手は通常の上限を超えて食い下がる()
+    {
+        var session = CreateTiedSession(rivalCount: 2, CompetitionPolicy.AllIn, competitionTimeout: 10f, lotCount: GameConstants.DESPERATE_REMAINING_LOTS);
+        RunToEnd(session);
+
+        var deepest = session.Rivals.Max(r => session.Competition.RaisesOf(r).Total);
+        Assert.Greater(deepest, GameConstants.NPC_MAX_RAISE_MARGIN, "終盤の無落札キャラは上限を広げて競り上げる");
+    }
+
     /// <summary>決着するまで時間を進める。戻り値は経過秒</summary>
     private static float RunToEnd(AuctionSession session)
     {
@@ -56,9 +79,9 @@ public class CompetitionRunnerTests
     }
 
     /// <summary>全員同額で競合に入った状態のセッションを作る</summary>
-    private static AuctionSession CreateTiedSession(int rivalCount, CompetitionPolicy policy, float competitionTimeout)
+    private static AuctionSession CreateTiedSession(int rivalCount, CompetitionPolicy policy, float competitionTimeout, int lotCount = GameConstants.LOTS_PER_FLOOR)
     {
-        var session = AuctionTestFactory.CreateSession(rivalBid: 2, competitionTimeout: competitionTimeout, rivalCount: rivalCount, policy: policy);
+        var session = AuctionTestFactory.CreateSession(rivalBid: 2, competitionTimeout: competitionTimeout, rivalCount: rivalCount, policy: policy, lotCount: lotCount);
         session.BeginNextLot();
         session.EnterBidding();
         var bid = new EmotionBid();

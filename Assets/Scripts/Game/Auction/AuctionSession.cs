@@ -165,8 +165,12 @@ public class AuctionSession
         var leader = Competition.Leader();
         if (leader == npc) return false;
 
+        // 無落札のまま終盤に入ったキャラは人格崩壊が確定するため、上限を広げてでも食い下がる
+        var isDesperate = npc.WonLots.Count == 0 && _lots.Count - CurrentLotIndex <= GameConstants.DESPERATE_REMAINING_LOTS;
+        var margin = GameConstants.NPC_MAX_RAISE_MARGIN + (isDesperate ? GameConstants.NPC_DESPERATE_EXTRA_MARGIN : 0);
+
         // 際限なく競り上げると決着しないため、提出額に応じた上限で降りる
-        if (Competition.RaisesOf(npc).Total >= npc.SubmittedBid.Total + GameConstants.NPC_MAX_RAISE_MARGIN) return false;
+        if (Competition.RaisesOf(npc).Total >= npc.SubmittedBid.Total + margin) return false;
 
         var isFavorite = CurrentLot.Emotion == npc.Data.Emotion;
         var chance = npc.Data.Profile.CompetitionPolicy switch
@@ -181,6 +185,8 @@ public class AuctionSession
             CompetitionPolicy.AllIn => 100,
             _ => 50,
         };
+        // 競合を避ける性格 (chance 0) は必死になっても降りたままにする
+        if (isDesperate && chance > 0) chance = Math.Max(chance, GameConstants.NPC_DESPERATE_MIN_CHANCE);
         if (_rng.Next(100) >= chance) return false;
 
         var emotion = EmotionWallet.ALL_EMOTIONS

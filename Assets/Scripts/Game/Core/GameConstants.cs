@@ -35,6 +35,17 @@ public static class GameConstants
     public const int NPC_MAX_RAISE_MARGIN = 2;
 
     /// <summary>
+    /// 無落札のまま残りロットがこの数以下になった NPC は、人格崩壊を避けようと必死に食い下がる
+    /// </summary>
+    public const int DESPERATE_REMAINING_LOTS = 2;
+
+    /// <summary>
+    /// 必死になった NPC の上乗せ確率の下限と、上限枚数への上乗せ分
+    /// </summary>
+    public const int NPC_DESPERATE_MIN_CHANCE = 85;
+    public const int NPC_DESPERATE_EXTRA_MARGIN = 3;
+
+    /// <summary>
     /// 最終階層の番号 (0〜4 の 5 階層)
     /// </summary>
     public const int LAST_FLOOR_INDEX = 4;

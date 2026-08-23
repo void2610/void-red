@@ -16,10 +16,11 @@ public static class AuctionTestFactory
         int reactionScale = 100,
         bool distinctRivalBids = false,
         int rivalCount = 4,
-        CompetitionPolicy policy = CompetitionPolicy.Never)
+        CompetitionPolicy policy = CompetitionPolicy.Never,
+        int lotCount = GameConstants.LOTS_PER_FLOOR)
     {
         var floor = ScriptableObject.CreateInstance<FloorData>();
-        var lots = Enumerable.Range(0, GameConstants.LOTS_PER_FLOOR).Select(i => CreateLot(i, i == keyLotIndex)).ToList();
+        var lots = Enumerable.Range(0, lotCount).Select(i => CreateLot(i, i == keyLotIndex)).ToList();
         var rivals = Enumerable.Range(0, rivalCount)
             .Select(i => CreateRival(i, distinctRivalBids ? rivalBid + i : rivalBid, reactionScale, policy))
             .ToList();
