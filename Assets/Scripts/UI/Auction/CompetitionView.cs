@@ -31,6 +31,10 @@ public class CompetitionView : BasePhaseView
     [Header("上乗せボタン")]
     [SerializeField] private Button raiseButton;
 
+    [Header("競合者の立ち絵")]
+    [SerializeField] private Image playerPortrait;
+    [SerializeField] private Image rivalPortrait;
+
     // プレイヤーが上乗せボタンを押した時に発火
     public Observable<Unit> OnRaise => raiseButton.OnClickAsObservable();
 
@@ -56,6 +60,15 @@ public class CompetitionView : BasePhaseView
     /// 入札額を更新
     /// </summary>
     public void SetInstruction(string text) => instructionText.text = text;
+
+    /// <summary>競合している 2 人の立ち絵を差し替える (素材が無ければ隠す)</summary>
+    public void SetPortraits(Sprite player, Sprite rival)
+    {
+        playerPortrait.sprite = player;
+        rivalPortrait.sprite = rival;
+        playerPortrait.enabled = player;
+        rivalPortrait.enabled = rival;
+    }
 
     /// <summary>
     /// 競合UIを初期化して表示。enemyBid は自分以外の競合者の最高額

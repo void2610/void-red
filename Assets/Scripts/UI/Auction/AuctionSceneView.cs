@@ -21,6 +21,7 @@ public class AuctionSceneView : MonoBehaviour
     [SerializeField] private GameOverView gameOver;
 
     [Header("参加者")]
+    [SerializeField] private Sprite playerPortrait;
     [SerializeField] private Transform participantBar;
     [SerializeField] private ParticipantIconView participantIconPrefab;
 
@@ -32,6 +33,7 @@ public class AuctionSceneView : MonoBehaviour
     public BaptismView Baptism => baptism;
     public GameOverView GameOver => gameOver;
     public AuctionParticipant SelectedTarget { get; private set; }
+    public Sprite PlayerPortrait => playerPortrait;
 
     private readonly List<ParticipantIconView> _icons = new();
     private readonly Subject<AuctionParticipant> _onTargetChanged = new();

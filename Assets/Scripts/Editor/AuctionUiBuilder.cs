@@ -106,12 +106,16 @@ public static class AuctionUiBuilder
             ("competition", Find<CompetitionView>(scene)),
             ("baptism", baptism),
             ("gameOver", gameOver),
+            ("playerPortrait", LoadSprite("Assets/Sprites/Character/Protagonist/Protagonist_default.png")),
             ("participantBar", participantBar.transform),
             ("participantIconPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{PREFAB_DIR}/ParticipantIcon.prefab").GetComponent<ParticipantIconView>()));
 
         var auctionView = Find<AuctionView>(scene);
         RenameConfirmButton(auctionView);
         ApplyAuctionLayout(auctionView, participantBar);
+
+        ApplyCompetitionLayout(Find<CompetitionView>(scene));
+        ApplyDrawOrder(canvas, auctionView, dialogue, participantBar, baptism, gameOver);
 
         // 旧ルールの固定文言を新ルールに差し替える
         foreach (var text in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<TextMeshProUGUI>(true)).Where(t => t.name == "InstructionText"))
@@ -269,9 +273,49 @@ public static class AuctionUiBuilder
     {
         var so = new SerializedObject(auction);
         SetRect(so.FindProperty("cardContainer").objectReferenceValue as Transform, new Vector2(0, 60), 1f);
-        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-300, -160), 0.42f);
+        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(-330, -190), 0.38f);
         SetRect((so.FindProperty("confirmBiddingButton").objectReferenceValue as Component)?.transform, new Vector2(310, -175), 0.85f);
         SetRect(participantBar.transform, new Vector2(0, 78), 1f);
+    }
+
+    /// <summary>
+    /// 重なり順を明示する。奥から 背景 → 場 → 対話 → 参加者 → 競合 → 告知 → 全画面窓
+    /// </summary>
+    private static void ApplyDrawOrder(GameObject canvas, AuctionView auction, GameObject dialogue, GameObject participantBar, BaptismView baptism, GameOverView gameOver)
+    {
+        var order = new List<Transform>
+        {
+            auction.transform,
+            dialogue.transform,
+            participantBar.transform,
+            canvas.GetComponentInChildren<CompetitionView>(true)?.transform,
+            canvas.GetComponentInChildren<AnnouncementView>(true)?.transform,
+            baptism.transform,
+            gameOver.transform,
+        };
+        foreach (var t in order.Where(t => t)) t.SetAsLastSibling();
+
+        // 入札ウィンドウは場の中で最前面に出す
+        var bidWindow = new SerializedObject(auction).FindProperty("bidWindowView").objectReferenceValue as Component;
+        bidWindow?.transform.SetAsLastSibling();
+    }
+
+    /// <summary>
+    /// 競合画面: ホイールを画面内に収め、左右の立ち絵を競合者として配線する
+    /// </summary>
+    private static void ApplyCompetitionLayout(CompetitionView competition)
+    {
+        var so = new SerializedObject(competition);
+        SetRect((so.FindProperty("emotionResourceDisplayView").objectReferenceValue as Component)?.transform, new Vector2(0, -170), 0.42f);
+
+        // 検証や配線から引けるよう、上乗せボタンに名前を付ける
+        var raise = so.FindProperty("raiseButton").objectReferenceValue as Button;
+        if (raise) raise.gameObject.name = "RaiseButton";
+
+        var portraits = competition.GetComponentsInChildren<Image>(true).Where(i => i.name is "Player" or "Enemy").ToList();
+        so.FindProperty("playerPortrait").objectReferenceValue = portraits.FirstOrDefault(i => i.name == "Player");
+        so.FindProperty("rivalPortrait").objectReferenceValue = portraits.FirstOrDefault(i => i.name == "Enemy");
+        so.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static void SetRect(Transform target, Vector2 position, float scale)
